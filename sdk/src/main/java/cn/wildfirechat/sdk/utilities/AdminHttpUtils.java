@@ -38,11 +38,24 @@ public class AdminHttpUtils extends JsonUtils {
     private static CloseableHttpClient httpClient;
 
     public static void init(String url, String secret) {
+        init(url, secret, 15000);
+    }
+
+    public static void init(String url, String secret, int timeout) {
         adminUrl = url.trim();
         adminSecret = secret.trim();
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setValidateAfterInactivity(1000);
+        int connectTimeout = 5000; // 连接超时时间
+        int connectionRequestTimeout = 3000; // 从连接池获取连接的超时时间
+        RequestConfig requestConfig = RequestConfig.custom()
+            .setConnectTimeout(connectTimeout)
+            .setSocketTimeout(timeout)
+            .setConnectionRequestTimeout(connectionRequestTimeout)
+            .build();
+
         httpClient = HttpClients.custom()
+            .setDefaultRequestConfig(requestConfig)
             .setConnectionManager(cm)
             .evictExpiredConnections()
             .evictIdleConnections(60L, TimeUnit.SECONDS)

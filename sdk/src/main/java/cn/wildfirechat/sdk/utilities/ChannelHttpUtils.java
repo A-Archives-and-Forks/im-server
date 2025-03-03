@@ -8,6 +8,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -40,7 +41,16 @@ public class ChannelHttpUtils extends JsonUtils {
         this.channelSecret = secret.trim();
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setValidateAfterInactivity(1000);
+        int connectTimeout = 5000; // 连接超时时间
+        int socketTimeout = 15000; // 请求超时时间
+        int connectionRequestTimeout = 3000; // 从连接池获取连接的超时时间
+        RequestConfig requestConfig = RequestConfig.custom()
+            .setConnectTimeout(connectTimeout)
+            .setSocketTimeout(socketTimeout)
+            .setConnectionRequestTimeout(connectionRequestTimeout)
+            .build();
         httpClient = HttpClients.custom()
+            .setDefaultRequestConfig(requestConfig)
             .setConnectionManager(cm)
             .evictExpiredConnections()
             .evictIdleConnections(60L, TimeUnit.SECONDS)
