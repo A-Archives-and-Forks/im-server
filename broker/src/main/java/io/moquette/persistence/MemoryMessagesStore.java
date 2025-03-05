@@ -900,11 +900,13 @@ public class MemoryMessagesStore implements IMessagesStore {
                 session.setPullHistoryMsg(true);
             }
 
+            long previousCurrent;
             while (true) {
                 Map.Entry<Long, Long> entry = maps.higherEntry(current);
                 if (entry == null) {
                     break;
                 }
+                previousCurrent = current;
                 current = entry.getKey();
                 long targetMessageId = entry.getValue();
 
@@ -933,6 +935,8 @@ public class MemoryMessagesStore implements IMessagesStore {
                         if (size >= 512 * 1024) { //3M
                             if(builder.getMessageCount() == 0){
                                 builder.addMessage(bundle.getMessage());
+                            } else {
+                                current = previousCurrent;
                             }
                             break;
                         }
