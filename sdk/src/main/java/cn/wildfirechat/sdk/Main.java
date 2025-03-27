@@ -629,6 +629,22 @@ public class Main {
         }
 
         if(commercialServer) {
+            PojoGroupMember m4 = new PojoGroupMember();
+            m4.setMember_id("user4");
+            m4.setAlias("hello user4");
+
+            PojoGroupMember m5 = new PojoGroupMember();
+            m5.setMember_id("user5");
+            m5.setAlias("hello user5");
+
+            voidIMResult = GroupAdmin.addGroupMembers("user1", groupInfo.getTarget_id(), Arrays.asList(m4, m5), null, null, null);
+            if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("add group member success");
+            } else {
+                System.out.println("add group member failure");
+                System.exit(-1);
+            }
+
             voidIMResult = GroupAdmin.setGroupManager("user1", groupInfo.getTarget_id(), Arrays.asList("user4", "user5"), true, null, null);
             if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
                 System.out.println("set group manager success");
@@ -1588,6 +1604,22 @@ public class Main {
         }
 
         if(commercialServer) {
+            PojoGroupMember m4 = new PojoGroupMember();
+            m4.setMember_id("user4");
+            m4.setAlias("hello user4");
+
+            PojoGroupMember m5 = new PojoGroupMember();
+            m5.setMember_id("user5");
+            m5.setAlias("hello user5");
+
+            voidIMResult = robotService.addGroupMembers(groupInfo.getTarget_id(), Arrays.asList(m4, m5), null, null, null);
+            if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("add group member success");
+            } else {
+                System.out.println("add group member failure");
+                System.exit(-1);
+            }
+
             voidIMResult = robotService.setGroupManager(groupInfo.getTarget_id(), Arrays.asList("user4", "user5"), true, null, null);
             if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
                 System.out.println("set group manager success");

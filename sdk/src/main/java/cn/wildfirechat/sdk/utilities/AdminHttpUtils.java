@@ -46,7 +46,7 @@ public class AdminHttpUtils extends JsonUtils {
         adminSecret = secret.trim();
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setValidateAfterInactivity(1000);
-        int connectTimeout = 5000; // 连接超时时间
+        int connectTimeout = 15000; // 连接超时时间
         int connectionRequestTimeout = 3000; // 从连接池获取连接的超时时间
         RequestConfig requestConfig = RequestConfig.custom()
             .setConnectTimeout(connectTimeout)

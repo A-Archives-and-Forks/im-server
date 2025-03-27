@@ -205,8 +205,16 @@ public class MemoryMessagesStore implements IMessagesStore {
     private boolean mBroadcastTargetFromUserTable = false;
 
     private boolean mForwardMessageWithClientInfo = false;
+    private boolean mForwardMessageWithSenderInfo = false;
+    private boolean mForwardMessageWithTargetInfo = false;
+
     private boolean mRobotCallbackWithClientInfo = false;
+    private boolean mRobotCallbackWithSenderInfo = false;
+    private boolean mRobotCallbackWithTargetInfo = false;
+
     private boolean mChannelCallbackWithClientInfo = false;
+    private boolean mChannelCallbackWithSenderInfo = false;
+    private boolean mChannelCallbackWithTargetInfo = false;
     private boolean mChannelNewCallbackFeature = true;
 
     private Set<Integer> mUserHideProperties = new HashSet<>();
@@ -608,9 +616,13 @@ public class MemoryMessagesStore implements IMessagesStore {
 
         try {
             mForwardMessageWithClientInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.MESSAGE_Forward_With_Client_Info, "false"));
-        } catch (Exception e) {
-
-        }
+        } catch (Exception e) {}
+        try {
+            mForwardMessageWithSenderInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.MESSAGE_Forward_With_Sender_Info, "false"));
+        } catch (Exception e) {}
+        try {
+            mForwardMessageWithTargetInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.MESSAGE_Forward_With_Target_Info, "false"));
+        } catch (Exception e) {}
 
         try {
             mBroadcastTargetFromUserTable = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.BROADCAST_Target_From_User_Table, "false"));
@@ -620,17 +632,27 @@ public class MemoryMessagesStore implements IMessagesStore {
 
         try {
             mRobotCallbackWithClientInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.ROBOT_Callback_With_Client_Info, "false"));
-        } catch (Exception e) {
+        } catch (Exception e) {}
+        try {
+            mRobotCallbackWithSenderInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.ROBOT_Callback_With_Sender_Info, "false"));
+        } catch (Exception e) {}
+        try {
+            mRobotCallbackWithTargetInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.ROBOT_Callback_With_Target_Info, "false"));
+        } catch (Exception e) {}
 
-        }
         try {
             mChannelCallbackWithClientInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.CHANNEL_Callback_With_Client_Info, "false"));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
+        try {
+            mChannelCallbackWithSenderInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.CHANNEL_Callback_With_Sender_Info, "false"));
+        } catch (Exception e) {}
+        try {
+            mChannelCallbackWithTargetInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.CHANNEL_Callback_With_Target_Info, "false"));
+        } catch (Exception e) {}
+
         try {
             mChannelNewCallbackFeature = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.CHANNEL_New_Callback_Feature, "true"));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             mRecallForwardUrl = server.getConfig().getProperty(BrokerConstants.MESSAGE_RecallMsg_Forward_Url);
@@ -4729,13 +4751,43 @@ public class MemoryMessagesStore implements IMessagesStore {
     }
 
     @Override
+    public boolean isForwardMessageWithSenderInfo() {
+        return mForwardMessageWithSenderInfo;
+    }
+
+    @Override
+    public boolean isForwardMessageWithTargetInfo() {
+        return mForwardMessageWithTargetInfo;
+    }
+
+    @Override
     public boolean isRobotCallbackWithClientInfo() {
         return mRobotCallbackWithClientInfo;
     }
 
     @Override
+    public boolean isRobotCallbackWithSenderInfo() {
+        return mRobotCallbackWithSenderInfo;
+    }
+
+    @Override
+    public boolean isRobotCallbackWithTargetInfo() {
+        return mRobotCallbackWithTargetInfo;
+    }
+
+    @Override
     public boolean isChannelCallbackWithClientInfo() {
         return mChannelCallbackWithClientInfo;
+    }
+
+    @Override
+    public boolean isChannelCallbackWithSenderInfo() {
+        return mChannelCallbackWithSenderInfo;
+    }
+
+    @Override
+    public boolean isChannelCallbackWithTargetInfo() {
+        return mChannelCallbackWithTargetInfo;
     }
 
     @Override

@@ -22,6 +22,11 @@ public class OutputMessageData {
     private long timestamp;
     private OutputClient client;
 
+    private InputOutputUserInfo senderUserInfo;
+    private InputOutputUserInfo targetUserInfo;
+    private PojoGroupInfo targetGroupInfo;
+    private OutputGetChannelInfo targetChannelInfo;
+
     public String getSender() {
         return sender;
     }
@@ -76,6 +81,38 @@ public class OutputMessageData {
 
     public void setClient(OutputClient client) {
         this.client = client;
+    }
+
+    public InputOutputUserInfo getSenderUserInfo() {
+        return senderUserInfo;
+    }
+
+    public void setSenderUserInfo(InputOutputUserInfo senderUserInfo) {
+        this.senderUserInfo = senderUserInfo;
+    }
+
+    public InputOutputUserInfo getTargetUserInfo() {
+        return targetUserInfo;
+    }
+
+    public void setTargetUserInfo(InputOutputUserInfo targetUserInfo) {
+        this.targetUserInfo = targetUserInfo;
+    }
+
+    public PojoGroupInfo getTargetGroupInfo() {
+        return targetGroupInfo;
+    }
+
+    public void setTargetGroupInfo(PojoGroupInfo targetGroupInfo) {
+        this.targetGroupInfo = targetGroupInfo;
+    }
+
+    public OutputGetChannelInfo getTargetChannelInfo() {
+        return targetChannelInfo;
+    }
+
+    public void setTargetChannelInfo(OutputGetChannelInfo targetChannelInfo) {
+        this.targetChannelInfo = targetChannelInfo;
     }
 
     public static OutputMessageData fromProtoMessage(WFCMessage.Message protoMessage) {

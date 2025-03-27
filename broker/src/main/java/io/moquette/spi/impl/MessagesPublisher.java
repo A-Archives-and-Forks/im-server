@@ -16,14 +16,12 @@
 
 package io.moquette.spi.impl;
 
-import cn.wildfirechat.pojos.OutputClient;
-import cn.wildfirechat.pojos.OutputMessageData;
+import cn.wildfirechat.pojos.*;
 import cn.wildfirechat.proto.ProtoConstants;
 import cn.wildfirechat.proto.WFCMessage;
 import cn.wildfirechat.push.PushServer;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.util.StringUtil;
-import cn.wildfirechat.pojos.OutputNotifyChannelSubscribeStatus;
 import com.xiaoleilu.loServer.model.FriendData;
 import io.moquette.persistence.*;
 import io.moquette.persistence.MemorySessionStore.Session;
@@ -47,6 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
 
 import static cn.wildfirechat.common.IMExceptionEvent.EventType.EVENT_CALLBACK_Exception;
+import static cn.wildfirechat.proto.ProtoConstants.ConversationType.*;
 import static cn.wildfirechat.proto.ProtoConstants.PersistFlag.Transparent;
 
 public class MessagesPublisher {
@@ -283,7 +282,7 @@ public class MessagesPublisher {
 
                     if (!user.equals(sender)) {
                         WFCMessage.Conversation conversation;
-                        if (conversationType == ProtoConstants.ConversationType.ConversationType_Private) {
+                        if (conversationType == ConversationType_Private) {
                             conversation = WFCMessage.Conversation.newBuilder().setType(conversationType).setLine(line).setTarget(sender).build();
                         } else {
                             conversation = WFCMessage.Conversation.newBuilder().setType(conversationType).setLine(line).setTarget(target).build();
@@ -398,7 +397,7 @@ public class MessagesPublisher {
 
                     if(!sendNameLoaded) {
                         List<String> list = new ArrayList<>();
-                        senderName = getUserDisplayName(sender, conversationType == ProtoConstants.ConversationType.ConversationType_Group ? target : null, list);
+                        senderName = getUserDisplayName(sender, conversationType == ConversationType_Group ? target : null, list);
                         if(!list.isEmpty()) {
                             senderPortrait = list.get(0);
                         }
@@ -486,19 +485,10 @@ public class MessagesPublisher {
                     if (userInfo != null && userInfo.getType() == ProtoConstants.UserType.UserType_Robot) {
                         WFCMessage.Robot robot = m_messagesStore.getRobot(user);
                         if (robot != null && !StringUtil.isNullOrEmpty(robot.getCallback())) {
-                            OutputClient outputClient = null;
-                            if(m_messagesStore.isRobotCallbackWithClientInfo() && !StringUtil.isNullOrEmpty(exceptClientId)) {
-                                Session session = m_sessionsStore.getSession(exceptClientId);
-                                if(session != null && session.getUsername().equals(message.getFromUser())) {
-                                    outputClient = new OutputClient(session.getPlatform(), exceptClientId);
-                                }
-                            }
-
-                            final WFCMessage.Message finalMsg = message;
-                            OutputClient finalOutputClient = outputClient;
+                            OutputMessageData outputMessageData = getOutputMessageWithExtraInfo(message, exceptClientId, m_messagesStore.isRobotCallbackWithClientInfo() , m_messagesStore.isRobotCallbackWithSenderInfo(), m_messagesStore.isRobotCallbackWithTargetInfo());
                             Server.getServer().getCallbackScheduler().execute(() -> {
                                 try {
-                                    HttpUtils.httpJsonPost(robot.getCallback(), GsonUtil.gson.toJson(OutputMessageData.fromProtoMessage(finalMsg, finalOutputClient), OutputMessageData.class), HttpUtils.HttpPostType.POST_TYPE_Robot_Message_Callback);
+                                    HttpUtils.httpJsonPost(robot.getCallback(), GsonUtil.gson.toJson(outputMessageData, OutputMessageData.class), HttpUtils.HttpPostType.POST_TYPE_Robot_Message_Callback);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     Utility.printExecption(LOG, e, EVENT_CALLBACK_Exception);
@@ -530,9 +520,9 @@ public class MessagesPublisher {
     }
 
     String getTargetName(String targetId, int cnvType, String fromUser, List<String> portraitList) {
-        if (cnvType == ProtoConstants.ConversationType.ConversationType_Private) {
+        if (cnvType == ConversationType_Private) {
             return getUserDisplayName(targetId, null, portraitList);
-        } else if(cnvType == ProtoConstants.ConversationType.ConversationType_Group) {
+        } else if(cnvType == ConversationType_Group) {
             WFCMessage.GroupInfo group = m_messagesStore.getGroupInfo(targetId);
             if(group != null) {
                 if(!StringUtil.isNullOrEmpty(group.getPortrait())) {
@@ -545,7 +535,7 @@ public class MessagesPublisher {
                 }
                 return group.getName();
             }
-        } else if(cnvType == ProtoConstants.ConversationType.ConversationType_Channel) {
+        } else if(cnvType == ConversationType_Channel) {
             WFCMessage.ChannelInfo channelInfo = m_messagesStore.getChannelInfo(targetId);
             if (channelInfo != null) {
                 if(!StringUtil.isNullOrEmpty(channelInfo.getPortrait())) {
@@ -667,7 +657,7 @@ public class MessagesPublisher {
     }
 
     public void publish2Receivers(WFCMessage.Message message, Set<String> receivers, String exceptClientId, int pullType) {
-        if (message.getConversation().getType() == ProtoConstants.ConversationType.ConversationType_Channel) {
+        if (message.getConversation().getType() == ConversationType_Channel) {
             WFCMessage.ChannelInfo channelInfo = m_messagesStore.getChannelInfo(message.getConversation().getTarget());
 
             boolean forwardMsg;
@@ -678,18 +668,10 @@ public class MessagesPublisher {
             }
 
             if (forwardMsg) {
-                OutputClient outputClient = null;
-                if(m_messagesStore.isChannelCallbackWithClientInfo() && !StringUtil.isNullOrEmpty(exceptClientId)) {
-                    Session session = m_sessionsStore.getSession(exceptClientId);
-                    if(session != null && session.getUsername().equals(message.getFromUser())) {
-                        outputClient = new OutputClient(session.getPlatform(), exceptClientId);
-                    }
-                }
-
-                OutputClient finalOutputClient = outputClient;
+                OutputMessageData outputMessageData = getOutputMessageWithExtraInfo(message, exceptClientId, m_messagesStore.isChannelCallbackWithClientInfo() , m_messagesStore.isChannelCallbackWithSenderInfo(), m_messagesStore.isChannelCallbackWithTargetInfo());
                 Server.getServer().getCallbackScheduler().execute(() -> {
                     try {
-                        HttpUtils.httpJsonPost(channelInfo.getCallback() + "/message", GsonUtil.gson.toJson(OutputMessageData.fromProtoMessage(message, finalOutputClient), OutputMessageData.class), HttpUtils.HttpPostType.POST_TYPE_Channel_Message_Callback);
+                        HttpUtils.httpJsonPost(channelInfo.getCallback() + "/message", GsonUtil.gson.toJson(outputMessageData, OutputMessageData.class), HttpUtils.HttpPostType.POST_TYPE_Channel_Message_Callback);
                     } catch (Exception e) {
                         e.printStackTrace();
                         Utility.printExecption(LOG, e, EVENT_CALLBACK_Exception);
@@ -741,10 +723,72 @@ public class MessagesPublisher {
 
     }
 
-    public void forwardMessage(final WFCMessage.Message message, String forwardUrl, OutputClient outputClient) {
+    private OutputMessageData getOutputMessageWithExtraInfo(WFCMessage.Message message, String clientId, boolean withClient, boolean withSender, boolean withTarget) {
+        if (message == null) {
+            return null;
+        }
+
+        OutputClient outputClient = null;
+        if (withClient && !StringUtil.isNullOrEmpty(clientId)) {
+            Session session = m_sessionsStore.getSession(clientId);
+            if(session != null && session.getUsername().equals(message.getFromUser())) {
+                outputClient = new OutputClient(session.getPlatform(), clientId);
+            }
+        }
+
+        OutputMessageData outputMessageData = OutputMessageData.fromProtoMessage(message, outputClient);
+        if (withSender) {
+            WFCMessage.User senderInfo = m_messagesStore.getUserInfo(message.getFromUser());
+            outputMessageData.setSenderUserInfo(InputOutputUserInfo.fromPbUser(senderInfo));
+        }
+
+        if (withTarget) {
+            if (message.getConversation().getType() == ConversationType_Private) {
+                WFCMessage.User targetInfo = m_messagesStore.getUserInfo(message.getConversation().getTarget());
+                if (targetInfo != null) {
+                    outputMessageData.setTargetUserInfo(InputOutputUserInfo.fromPbUser(targetInfo));
+                }
+            } else if(message.getConversation().getType() == ConversationType_Group) {
+                WFCMessage.GroupInfo groupInfo = m_messagesStore.getGroupInfo(message.getConversation().getTarget());
+                if (groupInfo != null) {
+                    PojoGroupInfo pojoGroupInfo = new PojoGroupInfo();
+                    pojoGroupInfo.setExtra(groupInfo.getExtra());
+                    pojoGroupInfo.setName(groupInfo.getName());
+                    pojoGroupInfo.setOwner(groupInfo.getOwner());
+                    pojoGroupInfo.setPortrait(groupInfo.getPortrait());
+                    pojoGroupInfo.setTarget_id(groupInfo.getTargetId());
+                    pojoGroupInfo.setType(groupInfo.getType());
+                    pojoGroupInfo.setMember_count(groupInfo.getMemberCount());
+                    pojoGroupInfo.setMute(groupInfo.getMute());
+                    pojoGroupInfo.setJoin_type(groupInfo.getJoinType());
+                    pojoGroupInfo.setPrivate_chat(groupInfo.getPrivateChat());
+                    pojoGroupInfo.setSearchable(groupInfo.getSearchable());
+                    pojoGroupInfo.setMax_member_count(groupInfo.getMemberCount());
+                    pojoGroupInfo.setHistory_message(groupInfo.getHistoryMessage());
+                    pojoGroupInfo.setSuper_group(groupInfo.getSuperGroup()>0);
+                    pojoGroupInfo.setDeleted(groupInfo.getDeleted()>0);
+                    pojoGroupInfo.setUpdate_dt(groupInfo.getUpdateDt());
+                    pojoGroupInfo.setMember_update_dt(groupInfo.getMemberUpdateDt());
+                    outputMessageData.setTargetGroupInfo(pojoGroupInfo);
+                }
+            } else if(message.getConversation().getType() == ConversationType_Channel) {
+                WFCMessage.ChannelInfo targetInfo = m_messagesStore.getChannelInfo(message.getConversation().getTarget());
+                if (targetInfo != null) {
+                    outputMessageData.setTargetChannelInfo(OutputGetChannelInfo.fromPbInfo(targetInfo));
+                }
+            }
+        }
+
+        return outputMessageData;
+    }
+
+
+
+    public void forwardMessage(final WFCMessage.Message message, String forwardUrl, String fromClientId) {
+        OutputMessageData outputMessageData = getOutputMessageWithExtraInfo(message, fromClientId, m_messagesStore.isForwardMessageWithClientInfo() , m_messagesStore.isForwardMessageWithSenderInfo(), m_messagesStore.isForwardMessageWithTargetInfo());
         Server.getServer().getCallbackScheduler().execute(() -> {
             try {
-                HttpUtils.httpJsonPost(forwardUrl, GsonUtil.gson.toJson(OutputMessageData.fromProtoMessage(message, outputClient), OutputMessageData.class), HttpUtils.HttpPostType.POST_TYPE_Forward_Message_Callback);
+                HttpUtils.httpJsonPost(forwardUrl, GsonUtil.gson.toJson(outputMessageData), HttpUtils.HttpPostType.POST_TYPE_Forward_Message_Callback);
             } catch (Exception e) {
                 e.printStackTrace();
                 Utility.printExecption(LOG, e, EVENT_CALLBACK_Exception);
@@ -752,9 +796,10 @@ public class MessagesPublisher {
         });
     }
 
-    public void forwardMessageWithCallback(final WFCMessage.Message message, String forwardUrl, HttpUtils.HttpCallback callback) {
+    public void forwardMessageWithCallback(final WFCMessage.Message message, String fromClientId, String forwardUrl, HttpUtils.HttpCallback callback) {
+        OutputMessageData outputMessageData = getOutputMessageWithExtraInfo(message, fromClientId, m_messagesStore.isForwardMessageWithClientInfo() , m_messagesStore.isForwardMessageWithSenderInfo(), m_messagesStore.isForwardMessageWithTargetInfo());
         try {
-            HttpUtils.httpJsonPost(forwardUrl, GsonUtil.gson.toJson(OutputMessageData.fromProtoMessage(message), OutputMessageData.class), new HttpUtils.HttpCallback() {
+            HttpUtils.httpJsonPost(forwardUrl, GsonUtil.gson.toJson(outputMessageData), new HttpUtils.HttpCallback() {
                 @Override
                 public void onSuccess(String content) {
                     Server.getServer().getImBusinessScheduler().execute(()->{

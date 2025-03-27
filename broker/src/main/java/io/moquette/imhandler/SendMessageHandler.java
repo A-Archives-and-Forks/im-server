@@ -217,20 +217,13 @@ public class SendMessageHandler extends IMHandler<WFCMessage.Message> {
             }
             message = message.toBuilder().setFromUser(fromUser).setMessageId(messageId).setServerTimestamp(timestamp).build();
 
-            OutputClient outputClient = null;
-            if(m_messagesStore.isForwardMessageWithClientInfo() && requestSourceType == ProtoConstants.RequestSourceType.Request_From_User && !StringUtil.isNullOrEmpty(clientID)) {
-                MemorySessionStore.Session session = m_sessionsStore.getSession(clientID);
-                if(session != null && session.getUsername().equals(fromUser)) {
-                    outputClient = new OutputClient(session.getPlatform(), clientID);
-                }
-            }
 
             if (!StringUtil.isNullOrEmpty(mForwardUrl) && (mForwardMessageTypes.isEmpty() || mForwardMessageTypes.contains(message.getContent().getType())) && !(isAdmin && mNoForwardAdminMessage) && !mForwardExcludeMessageTypes.contains(message.getContent().getType())) {
-                publisher.forwardMessage(message, mForwardUrl, outputClient);
+                publisher.forwardMessage(message, mForwardUrl, clientID);
             }
 
             if(!StringUtil.isNullOrEmpty(mMentionForwardUrl) && message.hasContent() && message.getContent().getMentionedType() != 0 && !(isAdmin && mNoForwardAdminMessage)) {
-                publisher.forwardMessage(message, mMentionForwardUrl, outputClient);
+                publisher.forwardMessage(message, mMentionForwardUrl, clientID);
             }
 
             if (!isAdmin) {
@@ -239,7 +232,7 @@ public class SendMessageHandler extends IMHandler<WFCMessage.Message> {
                     if (matched != null && !matched.isEmpty()) {
                         m_messagesStore.storeSensitiveMessage(message);
                         if (!StringUtil.isNullOrEmpty(mSensitiveMessageForwardUrl)) {
-                            publisher.forwardMessage(message, mSensitiveMessageForwardUrl, outputClient);
+                            publisher.forwardMessage(message, mSensitiveMessageForwardUrl, clientID);
                         }
                         if (mSensitiveType == 0) {
                             errorCode = ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
@@ -256,7 +249,7 @@ public class SendMessageHandler extends IMHandler<WFCMessage.Message> {
                 } else {
                     if(mRemoteSensitiveMessageTypes.contains(message.getContent().getType())) {
                         final WFCMessage.Message finalMsg = message;
-                        publisher.forwardMessageWithCallback(message, mRemoteSensitiveServerUrl, new HttpUtils.HttpCallback() {
+                        publisher.forwardMessageWithCallback(message, mRemoteSensitiveServerUrl, clientID, new HttpUtils.HttpCallback() {
                             @Override
                             public void onSuccess(String content) {
                                 if(StringUtil.isNullOrEmpty(content)) {

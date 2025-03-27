@@ -242,8 +242,16 @@ public interface IMessagesStore {
     int getGroupForbiddenClientOperation();
 
     boolean isForwardMessageWithClientInfo();
+    boolean isForwardMessageWithSenderInfo();
+    boolean isForwardMessageWithTargetInfo();
+
     boolean isRobotCallbackWithClientInfo();
+    boolean isRobotCallbackWithSenderInfo();
+    boolean isRobotCallbackWithTargetInfo();
+
     boolean isChannelCallbackWithClientInfo();
+    boolean isChannelCallbackWithSenderInfo();
+    boolean isChannelCallbackWithTargetInfo();
     boolean isChannelNewCallbackFeature();
 
     boolean isRobotAutoAcceptFriendRequest();

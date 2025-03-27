@@ -163,11 +163,18 @@ public final class BrokerConstants {
     public static final String MESSAGE_Force_Push_Types = "message.force_push_types";
 
     public static final String MESSAGE_Forward_With_Client_Info = "message.forward_with_client_info";
+    public static final String MESSAGE_Forward_With_Sender_Info = "message.forward_with_sender_info";
+    public static final String MESSAGE_Forward_With_Target_Info = "message.forward_with_target_info";
 
     public static final String BROADCAST_Target_From_User_Table = "message.broadcast.target_from_user_table";
 
     public static final String ROBOT_Callback_With_Client_Info = "robot.callback_with_client_info";
+    public static final String ROBOT_Callback_With_Sender_Info = "robot.callback_with_sender_info";
+    public static final String ROBOT_Callback_With_Target_Info = "robot.callback_with_target_info";
+
     public static final String CHANNEL_Callback_With_Client_Info = "channel.callback_with_client_info";
+    public static final String CHANNEL_Callback_With_Sender_Info = "channel.callback_with_sender_info";
+    public static final String CHANNEL_Callback_With_Target_Info = "channel.callback_with_target_info";
     public static final String CHANNEL_New_Callback_Feature = "channel.new_callback_feature";
 
 
