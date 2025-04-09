@@ -1,8 +1,11 @@
 package com.xiaoleilu.loServer.action;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -13,6 +16,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.util.StringUtil;
 import com.xiaoleilu.loServer.ServerSetting;
 import com.xiaoleilu.loServer.handler.Request;
 import com.xiaoleilu.loServer.handler.Response;
@@ -90,9 +94,24 @@ public class FileAction extends Action {
         }
 
         response.setContent(file);
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+        if (isAudioOrVideoFile(file.getName())) {
+            response.setHeader("Accept-Ranges", "bytes");
+        } else {
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+        }
 
         return true;
+    }
+
+    private static boolean isAudioOrVideoFile(String name) {
+        try {
+            if (StringUtil.isNullOrEmpty(name)) return false;
+
+            String mimeType = Files.probeContentType(new File(name).toPath());
+            return mimeType != null && (mimeType.startsWith("audio/") || mimeType.startsWith("video/"));
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     private static final Pattern INSECURE_URI = Pattern.compile(".*[<>&\"].*");
