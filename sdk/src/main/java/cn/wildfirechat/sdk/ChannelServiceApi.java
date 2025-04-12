@@ -59,7 +59,7 @@ public class ChannelServiceApi {
     public IMResult<SendMessageResult> sendMessage(int line, List<String> targets, MessagePayload payload) throws Exception {
         String path = APIPath.Channel_Message_Send;
         SendChannelMessageData messageData = new SendChannelMessageData();
-        messageData.setLine(0);
+        messageData.setLine(line);
         messageData.setTargets(targets);
         messageData.setPayload(payload);
         return channelHttpUtils.httpJsonPost(path, messageData, SendMessageResult.class);

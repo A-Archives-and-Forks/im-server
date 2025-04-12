@@ -24,6 +24,7 @@ public class Main {
     private static boolean commercialServer = false;
     private static boolean advanceVoip = false;
     private static boolean robotMomentsEnabled = false;
+    private static boolean momentsEnabled = false;
     //管理端口是8080
     private static String AdminUrl = "http://localhost:18080";
     private static String AdminSecret = "123456";
@@ -81,6 +82,9 @@ public class Main {
         }
         if(advanceVoip) {
             testConference();
+        }
+        if (momentsEnabled) {
+            testMomentsApi();
         }
 
         System.out.println("Congratulation, all admin test case passed!!!!!!!");
@@ -2049,6 +2053,20 @@ public class Main {
             System.out.println("Sensitive word removed");
         } else {
             System.out.println("Sensitive word not removed");
+            System.exit(-1);
+        }
+    }
+
+    static void testMomentsApi() throws Exception {
+        FeedPojo feedPojo = new FeedPojo();
+        feedPojo.sender = "73055b4105de4b70993b7258afbfc387";
+        feedPojo.type = 0;
+        feedPojo.text = "hello from admin";
+        IMResult<SendMessageResult> sendResult = MomentsAdmin.postFeeds(feedPojo);
+        if (sendResult != null && sendResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("send moments feed success");
+        } else {
+            System.out.println("send moments feed failure");
             System.exit(-1);
         }
     }

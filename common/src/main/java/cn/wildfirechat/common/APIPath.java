@@ -61,6 +61,8 @@ public interface APIPath {
 
     String Handle_Friend_Send_Request = "/admin/friend/handle_send_request";
 
+    String Admin_Moments_Post_Feed = "/admin/moments/feed/post";
+
     String Msg_Send = "/admin/message/send";
     String Msg_Publish = "/admin/message/publish";
     String Msg_Recall = "/admin/message/recall";
