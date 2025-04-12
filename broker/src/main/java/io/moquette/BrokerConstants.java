@@ -168,6 +168,8 @@ public final class BrokerConstants {
 
     public static final String BROADCAST_Target_From_User_Table = "message.broadcast.target_from_user_table";
 
+    public static final String MESSAGES_ALLOW_SEND_TO_FORBIDDEN_USER = "message.allow_send_to_forbidden_user";
+
     public static final String ROBOT_Callback_With_Client_Info = "robot.callback_with_client_info";
     public static final String ROBOT_Callback_With_Sender_Info = "robot.callback_with_sender_info";
     public static final String ROBOT_Callback_With_Target_Info = "robot.callback_with_target_info";

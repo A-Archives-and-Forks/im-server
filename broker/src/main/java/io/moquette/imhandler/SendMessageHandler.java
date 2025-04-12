@@ -39,6 +39,7 @@ public class SendMessageHandler extends IMHandler<WFCMessage.Message> {
     private int mBlacklistStrategy = 0; //黑名单中时，0失败，1吞掉。
     private boolean mBlacklistAllowSend2Black = true;
     private boolean mNoForwardAdminMessage = false;
+    private boolean mAllowSend2ForbiddenUser = false;
 
     private String mRemoteSensitiveServerUrl = null;
     private Set<Integer> mRemoteSensitiveMessageTypes;
@@ -101,6 +102,9 @@ public class SendMessageHandler extends IMHandler<WFCMessage.Message> {
             Utility.printExecption(LOG, e);
         }
 
+        try {
+            mAllowSend2ForbiddenUser = Boolean.parseBoolean(mServer.getConfig().getProperty(BrokerConstants.MESSAGES_ALLOW_SEND_TO_FORBIDDEN_USER, "false"));
+        } catch (Exception e) {}
     }
 
     private void parseTypes(Collection<Integer> collection, String types) {
@@ -170,9 +174,11 @@ public class SendMessageHandler extends IMHandler<WFCMessage.Message> {
                         }
                     }
 
-                    userStatus = m_messagesStore.getUserStatus(message.getConversation().getTarget());
-                    if (userStatus == ProtoConstants.UserStatus.Forbidden) {
-                        return ErrorCode.ERROR_CODE_USER_FORBIDDEN;
+                    if (!mAllowSend2ForbiddenUser) {
+                        userStatus = m_messagesStore.getUserStatus(message.getConversation().getTarget());
+                        if (userStatus == ProtoConstants.UserStatus.Forbidden) {
+                            return ErrorCode.ERROR_CODE_USER_FORBIDDEN;
+                        }
                     }
                 }
 
