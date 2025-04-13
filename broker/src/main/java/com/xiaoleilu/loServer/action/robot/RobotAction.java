@@ -106,24 +106,6 @@ abstract public class RobotAction extends Action {
         response.send();
     }
 
-    protected <T> T getRequestBody(HttpRequest request, Class<T> cls) {
-        if (request instanceof FullHttpRequest) {
-            FullHttpRequest fullHttpRequest = (FullHttpRequest) request;
-            byte[] bytes = Utils.readBytesAndRewind(fullHttpRequest.content());
-            String content = null;
-            try {
-                content = new String(bytes, "UTF-8");
-                
-                T t = gson.fromJson(content, cls);
-                return t;
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                Utility.printExecption(LOG, e, IMExceptionEvent.EventType.ROBOT_API_Exception);
-            }
-        }
-        return null;
-    }
-
     protected void sendApiRequest(Response response, String topic, byte[] message, Callback callback) {
         ServerAPIHelper.sendRequest(robot.getUid(), null, topic, message, new ServerAPIHelper.Callback() {
             @Override

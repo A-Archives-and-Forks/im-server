@@ -105,18 +105,6 @@ abstract public class ChannelAction extends Action {
         response.send();
     }
 
-    protected <T> T getRequestBody(HttpRequest request, Class<T> cls) {
-        if (request instanceof FullHttpRequest) {
-            FullHttpRequest fullHttpRequest = (FullHttpRequest) request;
-            byte[] bytes = Utils.readBytesAndRewind(fullHttpRequest.content());
-            String content = new String(bytes, StandardCharsets.UTF_8);
-            
-            T t = gson.fromJson(content, cls);
-            return t;
-        }
-        return null;
-    }
-
     protected void sendApiMessage(Response response, String topic, byte[] message, Callback callback) {
         sendApiMessage(response, channelInfo.getOwner(), topic, message, callback);
     }

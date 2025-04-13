@@ -8,9 +8,13 @@
 
 package com.xiaoleilu.loServer.action;
 
+import cn.wildfirechat.common.IMExceptionEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.xiaoleilu.loServer.RestResult;
+import com.xiaoleilu.loServer.action.channel.ChannelAction;
+import com.xiaoleilu.loServer.action.robot.RobotAction;
 import com.xiaoleilu.loServer.annotation.RequireAuthentication;
 import com.xiaoleilu.loServer.handler.Request;
 import com.xiaoleilu.loServer.handler.Response;
@@ -23,7 +27,10 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import cn.wildfirechat.common.ErrorCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import win.liyufan.im.RateLimiter;
+import win.liyufan.im.Utility;
 
 import java.nio.charset.StandardCharsets;
 
@@ -38,6 +45,7 @@ import static io.moquette.BrokerConstants.*;
  */
 
 abstract public class Action {
+    private static final Logger LOG = LoggerFactory.getLogger(Action.class);
     public static IMessagesStore messagesStore = null;
     public static ISessionsStore sessionsStore = null;
     protected static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
@@ -153,9 +161,22 @@ abstract public class Action {
             FullHttpRequest fullHttpRequest = (FullHttpRequest) request;
             byte[] bytes = Utils.readBytesAndRewind(fullHttpRequest.content());
             String content = new String(bytes, StandardCharsets.UTF_8);//contribute by JiaRG from github
-            
-            T t = gson.fromJson(content, cls);
-            return t;
+
+            try {
+                T t = gson.fromJson(content, cls);
+                return t;
+            } catch (JsonSyntaxException e) {
+                e.printStackTrace();
+                LOG.error("Object {} from json {} failure", cls.getName(), content);
+                int exception = IMExceptionEvent.EventType.ADMIN_API_Exception;
+                if (this instanceof RobotAction) {
+                    exception = IMExceptionEvent.EventType.ROBOT_API_Exception;
+                } else if (this instanceof ChannelAction) {
+                    exception = IMExceptionEvent.EventType.CHANNEL_API_Exception;
+                }
+                Utility.printExecption(LOG, e, exception);
+                throw new RuntimeException(e);
+            }
         }
         return null;
     }
