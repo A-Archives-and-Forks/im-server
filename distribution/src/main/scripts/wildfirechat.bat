@@ -75,11 +75,9 @@ rem set JAVA_OPTS=%JAVA_OPTS% -XX:GCLogFileSize=10M"
 rem If the JDK version is 9 or above, please open this configuration.
 rem set JAVA_OPTS=%JAVA_OPTS% --add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED
 
-echo
 echo "Please set Xmx and Xms parameters!"
 echo "Please set Xmx and Xms parameters!"
 echo "Please set Xmx and Xms parameters!"
-echo
 
 rem set JAVA_OPTS=%JAVA_OPTS% -Xmx2G
 rem set JAVA_OPTS=%JAVA_OPTS% -Xms2G
