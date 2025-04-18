@@ -16,6 +16,7 @@
 
 package io.moquette.spi.impl;
 
+import org.json.simple.JSONObject;
 import cn.wildfirechat.pojos.*;
 import cn.wildfirechat.proto.ProtoConstants;
 import cn.wildfirechat.proto.WFCMessage;
@@ -32,12 +33,14 @@ import io.moquette.spi.ISessionsStore;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.mqtt.*;
+import org.json.simple.parser.JSONParser;
 import win.liyufan.im.*;
 
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -156,7 +159,7 @@ public class MessagesPublisher {
         }
     }
 
-    private void publish2Receivers(String sender, int conversationType, String target, int line, long messageId, Collection<String> receivers, String pushContent, String pushData, String exceptClientId, int pullType, int messageContentType, long serverTime, int mentionType, List<String> mentionTargets, int persistFlag, boolean directing) {
+    private void publish2Receivers(String sender, int conversationType, String target, int line, long messageId, Collection<String> receivers, String pushContent, String pushData, long callStartUid, String exceptClientId, int pullType, int messageContentType, long serverTime, int mentionType, List<String> mentionTargets, int persistFlag, boolean directing) {
         if (persistFlag == Transparent) {
             publishTransparentMessage2Receivers(messageId, receivers, pullType, exceptClientId);
             return;
@@ -420,7 +423,7 @@ public class MessagesPublisher {
                             name = fd.getAlias();
                         }
                     }
-                    this.messageSender.sendPush(sender, conversationType, target, line, messageId, targetSession.getClientID(), pushContent, pushData, messageContentType, serverTime, name, senderPortrait, targetName, targetPortrait, targetSession.getUnReceivedMsgs(), curMentionType, isHiddenDetail, targetSession.getLanguage());
+                    this.messageSender.sendPush(sender, conversationType, target, line, messageId, targetSession.getClientID(), pushContent, pushData, callStartUid, messageContentType, serverTime, name, senderPortrait, targetName, targetPortrait, targetSession.getUnReceivedMsgs(), curMentionType, isHiddenDetail, targetSession.getLanguage());
                 }
 
             }
@@ -715,11 +718,23 @@ public class MessagesPublisher {
             pushContent = null;
         }
 
+        long callStartUid = 0;
+        if (message.getContent().getType() == 402) {
+            try {
+                String str = new String(message.getContent().getData().toByteArray(), StandardCharsets.UTF_8);
+                JSONObject jsonObject = (JSONObject)(new JSONParser().parse(str));
+                if (jsonObject.containsKey("u")) {
+                    callStartUid = (Long)jsonObject.get("u");
+                }
+            } catch (Exception e) {}
+        }
+
+
         publish2Receivers(message.getFromUser(),
                     message.getConversation().getType(), message.getConversation().getTarget(), message.getConversation().getLine(),
                     messageId,
                     receivers,
-                    pushContent, message.getContent().getPushData(), exceptClientId, pullType, message.getContent().getType(), message.getServerTimestamp(), message.getContent().getMentionedType(), message.getContent().getMentionedTargetList(), message.getContent().getPersistFlag(), message.hasToUser() || !message.getToList().isEmpty());
+                    pushContent, message.getContent().getPushData(), callStartUid, exceptClientId, pullType, message.getContent().getType(), message.getServerTimestamp(), message.getContent().getMentionedType(), message.getContent().getMentionedTargetList(), message.getContent().getPersistFlag(), message.hasToUser() || !message.getToList().isEmpty());
 
     }
 
