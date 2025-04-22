@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
@@ -35,10 +37,29 @@ public class ChannelHttpUtils extends JsonUtils {
     private String channelSecret;
     private final CloseableHttpClient httpClient;
 
+    private final int port;
+
+    private void checkPort() {
+        if (port != 80 && port != 443) {
+            if (port == 18080) {
+                LOG.warn("您传入的频道API地址中的端口是18080，18080端口默认为管理API端口，频道API端口应该为IM服务的HTTP端口，默认为80，请确认是否使用错误！");
+            } else {
+                LOG.warn("您传入的频道API地址中的端口不是80/443，频道API的端口和客户端使用端口一样，都应该为IM服务的HTTP端口，默认为80，请确实是否正确？如果您定制化了IM服务端口或者使用其他端口反向代理IM服务的HTTP端口请忽略此提示。");
+            }
+        }
+    }
+
     public ChannelHttpUtils(String imurl, String channelId, String secret) {
         this.imurl = imurl.trim();
         this.channelId = channelId.trim();
         this.channelSecret = secret.trim();
+        try {
+            URL url = new URL(this.imurl);
+            this.port = url.getPort();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        checkPort();
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setValidateAfterInactivity(1000);
         int connectTimeout = 5000; // 连接超时时间
@@ -118,6 +139,7 @@ public class ChannelHttpUtils extends JsonUtils {
                 return fromJsonObject(content, clazz);
             }
         } catch (Exception e) {
+            checkPort();
             e.printStackTrace();
             throw e;
         }finally{
