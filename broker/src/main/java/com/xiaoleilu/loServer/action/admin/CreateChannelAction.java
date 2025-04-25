@@ -53,8 +53,11 @@ public class CreateChannelAction extends AdminAction {
                     if (errorCode == ErrorCode.ERROR_CODE_SUCCESS) {
                         byte[] data = new byte[byteBuf.readableBytes()];
                         byteBuf.readBytes(data);
-                        String channelId = new String(data);
-                        return new Result(ErrorCode.ERROR_CODE_SUCCESS, new OutputCreateChannel(channelId));
+                        String str = new String(data);
+                        String[] ss = str.split("\\|");
+                        String channelId = ss[0];
+                        String secret = ss[1];
+                        return new Result(ErrorCode.ERROR_CODE_SUCCESS, new OutputCreateChannel(channelId, secret));
                     } else {
                         return new Result(errorCode);
                     }

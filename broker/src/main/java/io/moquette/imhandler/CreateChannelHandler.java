@@ -16,6 +16,7 @@ import io.netty.buffer.ByteBuf;
 import cn.wildfirechat.common.ErrorCode;
 import win.liyufan.im.IMTopic;
 
+import static cn.wildfirechat.proto.ProtoConstants.RequestSourceType.Request_From_Admin;
 import static win.liyufan.im.IMTopic.PutUserSettingTopic;
 import static win.liyufan.im.UserSettingScope.kUserSettingMyChannels;
 
@@ -42,7 +43,13 @@ public class CreateChannelHandler extends GroupHandler<WFCMessage.ChannelInfo> {
         if (errorCode == ErrorCode.ERROR_CODE_SUCCESS) {
             WFCMessage.ModifyUserSettingReq modifyUserSettingReq = WFCMessage.ModifyUserSettingReq.newBuilder().setScope(kUserSettingMyChannels).setKey(request.getTargetId()).setValue("1").build();
             mServer.onApiMessage(fromUser, null, modifyUserSettingReq.toByteArray(), 0, fromUser, PutUserSettingTopic, requestSourceType);
-            byte[] data = request.getTargetId().getBytes();
+            byte[] data;
+            if (requestSourceType == Request_From_Admin) {
+                //When server api create channel, need return channelId and secret together.
+                data = (request.getTargetId() + "|" + request.getSecret()).getBytes();
+            } else {
+                data = request.getTargetId().getBytes();
+            }
             ackPayload.ensureWritable(data.length).writeBytes(data);
             return ErrorCode.ERROR_CODE_SUCCESS;
         } else {

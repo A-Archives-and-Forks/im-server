@@ -51,14 +51,7 @@ public class AliasPutAction extends AdminAction {
                     ByteBuf byteBuf = Unpooled.buffer();
                     byteBuf.writeBytes(result);
                     ErrorCode errorCode = ErrorCode.fromCode(byteBuf.readByte());
-                    if (errorCode == ErrorCode.ERROR_CODE_SUCCESS) {
-                        byte[] data = new byte[byteBuf.readableBytes()];
-                        byteBuf.readBytes(data);
-                        String channelId = new String(data);
-                        return new Result(ErrorCode.ERROR_CODE_SUCCESS, new OutputCreateChannel(channelId));
-                    } else {
-                        return new Result(errorCode);
-                    }
+                    return new Result(errorCode);
                 });
                 return false;
             } else {
