@@ -255,7 +255,7 @@ public class SendMessageHandler extends IMHandler<WFCMessage.Message> {
                 } else {
                     if(mRemoteSensitiveMessageTypes.contains(message.getContent().getType())) {
                         final WFCMessage.Message finalMsg = message;
-                        publisher.forwardMessageWithCallback(message, mRemoteSensitiveServerUrl, clientID, new HttpUtils.HttpCallback() {
+                        publisher.forwardMessageWithCallback(message, clientID, mRemoteSensitiveServerUrl, new HttpUtils.HttpCallback() {
                             @Override
                             public void onSuccess(String content) {
                                 if(StringUtil.isNullOrEmpty(content)) {
