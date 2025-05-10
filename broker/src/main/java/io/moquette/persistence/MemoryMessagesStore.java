@@ -2480,7 +2480,7 @@ public class MemoryMessagesStore implements IMessagesStore {
             }
             boolean isExpired = false;
             if (!canRecall && message.getFromUser().equals(operatorId)) {
-                if (mRecallTimeLimit > 0 && now - message.getServerTimestamp() > mRecallTimeLimit * 1000) {
+                if (mRecallTimeLimit >= 0 && now - message.getServerTimestamp() > mRecallTimeLimit * 1000) {
                     isExpired = true;
                 } else {
                     canRecall = true;
