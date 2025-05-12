@@ -1974,8 +1974,8 @@ public class Main {
             System.exit(-1);
         }
 
-        List<OutputGetChannelInfo.OutputMenu> menus = new ArrayList<>();
-        OutputGetChannelInfo.OutputMenu menu1 = new OutputGetChannelInfo.OutputMenu();
+        List<PojoChannelMenu> menus = new ArrayList<>();
+        PojoChannelMenu menu1 = new PojoChannelMenu();
         menu1.menuId = UUID.randomUUID().toString();
         menu1.type = "view";
         menu1.name = "一级菜单1";
@@ -1983,7 +1983,7 @@ public class Main {
         menu1.url = "http://www.baidu.com";
         menus.add(menu1);
 
-        OutputGetChannelInfo.OutputMenu menu2 = new OutputGetChannelInfo.OutputMenu();
+        PojoChannelMenu menu2 = new PojoChannelMenu();
         menu2.menuId = UUID.randomUUID().toString();
         menu2.type = "view";
         menu2.name = "一级菜单2";
@@ -1992,7 +1992,7 @@ public class Main {
         menu2.subMenus = new ArrayList<>();
         menus.add(menu2);
 
-        OutputGetChannelInfo.OutputMenu menu21 = new OutputGetChannelInfo.OutputMenu();
+        PojoChannelMenu menu21 = new PojoChannelMenu();
         menu21.menuId = UUID.randomUUID().toString();
         menu21.type = "click";
         menu21.name = "二级菜单21";

@@ -4484,7 +4484,7 @@ public class MemoryMessagesStore implements IMessagesStore {
         } else if(modifyType == Modify_Channel_Menu) {
             OutputGetChannelInfo.OutputMenuList outputMenuButtons = GsonUtil.gson.fromJson(value, OutputGetChannelInfo.OutputMenuList.class);
             if (!outputMenuButtons.isEmpty()) {
-                for (OutputGetChannelInfo.OutputMenu outputMenuButton : outputMenuButtons) {
+                for (PojoChannelMenu outputMenuButton : outputMenuButtons) {
                     newInfoBuilder.addMenu(outputMenuButton.toPbInfo());
                 }
             }

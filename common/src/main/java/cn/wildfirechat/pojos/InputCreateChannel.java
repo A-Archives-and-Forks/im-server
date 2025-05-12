@@ -12,6 +12,9 @@ package cn.wildfirechat.pojos;
 import cn.wildfirechat.proto.WFCMessage;
 import io.netty.util.internal.StringUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class InputCreateChannel {
     private String owner;
     private String name;
@@ -24,6 +27,7 @@ public class InputCreateChannel {
     private int state;
     private String extra;
     private long updateDt;
+    public List<PojoChannelMenu> menus;
 
     public WFCMessage.ChannelInfo toProtoChannelInfo() {
         WFCMessage.ChannelInfo.Builder builder = WFCMessage.ChannelInfo.newBuilder().setOwner(owner);
@@ -47,6 +51,12 @@ public class InputCreateChannel {
             builder = builder.setUpdateDt(updateDt);
         else
             builder = builder.setUpdateDt(System.currentTimeMillis());
+
+        if (menus != null && !menus.isEmpty()) {
+            for (PojoChannelMenu menu : menus) {
+                builder.addMenu(menu.toPbInfo());
+            }
+        }
 
         return builder.build();
     }

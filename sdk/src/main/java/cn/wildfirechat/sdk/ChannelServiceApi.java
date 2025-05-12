@@ -51,7 +51,7 @@ public class ChannelServiceApi {
         return channelHttpUtils.httpJsonPost(path, null, OutputGetChannelInfo.class);
     }
 
-    public IMResult<Void> modifyChannelMenu(List<OutputGetChannelInfo.OutputMenu> menus) throws Exception {
+    public IMResult<Void> modifyChannelMenu(List<PojoChannelMenu> menus) throws Exception {
         String menuStr = new Gson().toJson(menus);
         return modifyChannelInfo(ProtoConstants.ModifyChannelInfoType.Modify_Channel_Menu, menuStr);
     }
