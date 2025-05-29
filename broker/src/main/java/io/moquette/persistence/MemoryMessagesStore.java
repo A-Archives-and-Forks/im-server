@@ -1963,6 +1963,14 @@ public class MemoryMessagesStore implements IMessagesStore {
             newInfoBuilder.setPrivateChat(Integer.parseInt(value));
         else if(modifyType == Modify_Group_Searchable)
             newInfoBuilder.setSearchable(Integer.parseInt(value));
+        else if(modifyType == Modify_Group_Type) {
+            int newType = Integer.parseInt(value);
+            if(newType < 0 || newType > ProtoConstants.GroupType.GroupType_Organization) {
+                LOG.error("modify group type failure, invalid group type {}", newType);
+                return ErrorCode.INVALID_PARAMETER;
+            }
+            newInfoBuilder.setType(newType);
+        }
         else
             return ErrorCode.INVALID_PARAMETER;
 
