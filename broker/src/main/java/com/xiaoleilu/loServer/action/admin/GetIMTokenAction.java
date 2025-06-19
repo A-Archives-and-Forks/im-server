@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import cn.wildfirechat.common.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import win.liyufan.im.GitRepositoryState;
 import win.liyufan.im.IMTopic;
 
 import java.util.Base64;
@@ -53,7 +54,7 @@ public class GetIMTokenAction extends AdminAction {
 
                     LOG.info("get im token success {},{},{}", userId, input.getClientId(), token.substring(0, Math.min(10, token.length())));
                     
-                    return new Result(errorCode1, new OutputGetIMTokenData(userId, token));
+                    return new Result(errorCode1, new OutputGetIMTokenData(userId, token, GitRepositoryState.globalLabel));
                 } else {
                     return new Result(errorCode1);
                 }

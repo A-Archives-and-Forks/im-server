@@ -12,6 +12,7 @@ import io.moquette.server.Server;
 
 import java.io.*;
 import java.util.Properties;
+import java.util.UUID;
 
 public class GitRepositoryState {
     public final String tags;
@@ -28,6 +29,8 @@ public class GitRepositoryState {
     public final String commitMessageFull;
     public final String commitMessageShort;
     public final String commitTime;
+    public static final String globalLabel = UUID.randomUUID().toString();
+    public String label;
     public final String closestTagName;
     public final String closestTagCommitCount;
 
@@ -63,6 +66,7 @@ public class GitRepositoryState {
         this.buildHost = String.valueOf(properties.get("git.build.host"));
         this.buildVersion = String.valueOf(properties.get("git.build.version"));
         this.runTime = Server.getServer().getRunTime();
+        this.label = globalLabel;
     }
 
     public static GitRepositoryState getGitRepositoryState() throws IOException {
