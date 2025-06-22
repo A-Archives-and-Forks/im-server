@@ -3109,7 +3109,7 @@ public class MemoryMessagesStore implements IMessagesStore {
     }
 
     @Override
-    public List<WFCMessage.User> searchUser(String keyword, int searchType, int page) {
+    public List<WFCMessage.User> searchUser(String keyword, int searchType, int userType, int page) {
         if (mDisableSearch) {
             return new ArrayList<>();
         }
@@ -3130,7 +3130,7 @@ public class MemoryMessagesStore implements IMessagesStore {
             return new ArrayList<>();
         }
 
-        return databaseStore.searchUserFromDB(keyword, searchType, page);
+        return databaseStore.searchUserFromDB(keyword, searchType, userType, page);
     }
 
     @Override

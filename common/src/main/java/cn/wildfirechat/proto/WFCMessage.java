@@ -54041,6 +54041,31 @@ public final class WFCMessage {
      * <code>optional int32 page = 3;</code>
      */
     int getPage();
+
+    // optional string domain_id = 4;
+    /**
+     * <code>optional string domain_id = 4;</code>
+     */
+    boolean hasDomainId();
+    /**
+     * <code>optional string domain_id = 4;</code>
+     */
+    java.lang.String getDomainId();
+    /**
+     * <code>optional string domain_id = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getDomainIdBytes();
+
+    // optional int32 type = 5;
+    /**
+     * <code>optional int32 type = 5;</code>
+     */
+    boolean hasType();
+    /**
+     * <code>optional int32 type = 5;</code>
+     */
+    int getType();
   }
   /**
    * Protobuf type {@code SearchUserRequest}
@@ -54106,6 +54131,16 @@ public final class WFCMessage {
             case 24: {
               bitField0_ |= 0x00000004;
               page_ = input.readInt32();
+              break;
+            }
+            case 34: {
+              bitField0_ |= 0x00000008;
+              domainId_ = input.readBytes();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              type_ = input.readInt32();
               break;
             }
           }
@@ -54223,10 +54258,71 @@ public final class WFCMessage {
       return page_;
     }
 
+    // optional string domain_id = 4;
+    public static final int DOMAIN_ID_FIELD_NUMBER = 4;
+    private java.lang.Object domainId_;
+    /**
+     * <code>optional string domain_id = 4;</code>
+     */
+    public boolean hasDomainId() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional string domain_id = 4;</code>
+     */
+    public java.lang.String getDomainId() {
+      java.lang.Object ref = domainId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          domainId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string domain_id = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDomainIdBytes() {
+      java.lang.Object ref = domainId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        domainId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional int32 type = 5;
+    public static final int TYPE_FIELD_NUMBER = 5;
+    private int type_;
+    /**
+     * <code>optional int32 type = 5;</code>
+     */
+    public boolean hasType() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional int32 type = 5;</code>
+     */
+    public int getType() {
+      return type_;
+    }
+
     private void initFields() {
       keyword_ = "";
       fuzzy_ = 0;
       page_ = 0;
+      domainId_ = "";
+      type_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -54253,6 +54349,12 @@ public final class WFCMessage {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt32(3, page_);
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBytes(4, getDomainIdBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeInt32(5, type_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -54273,6 +54375,14 @@ public final class WFCMessage {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, page_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(4, getDomainIdBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(5, type_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -54396,6 +54506,10 @@ public final class WFCMessage {
         bitField0_ = (bitField0_ & ~0x00000002);
         page_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
+        domainId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000008);
+        type_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -54436,6 +54550,14 @@ public final class WFCMessage {
           to_bitField0_ |= 0x00000004;
         }
         result.page_ = page_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.domainId_ = domainId_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.type_ = type_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -54462,6 +54584,14 @@ public final class WFCMessage {
         }
         if (other.hasPage()) {
           setPage(other.getPage());
+        }
+        if (other.hasDomainId()) {
+          bitField0_ |= 0x00000008;
+          domainId_ = other.domainId_;
+          onChanged();
+        }
+        if (other.hasType()) {
+          setType(other.getType());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -54630,6 +54760,113 @@ public final class WFCMessage {
       public Builder clearPage() {
         bitField0_ = (bitField0_ & ~0x00000004);
         page_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional string domain_id = 4;
+      private java.lang.Object domainId_ = "";
+      /**
+       * <code>optional string domain_id = 4;</code>
+       */
+      public boolean hasDomainId() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional string domain_id = 4;</code>
+       */
+      public java.lang.String getDomainId() {
+        java.lang.Object ref = domainId_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          domainId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string domain_id = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDomainIdBytes() {
+        java.lang.Object ref = domainId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          domainId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string domain_id = 4;</code>
+       */
+      public Builder setDomainId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        domainId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string domain_id = 4;</code>
+       */
+      public Builder clearDomainId() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        domainId_ = getDefaultInstance().getDomainId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string domain_id = 4;</code>
+       */
+      public Builder setDomainIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        domainId_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 type = 5;
+      private int type_ ;
+      /**
+       * <code>optional int32 type = 5;</code>
+       */
+      public boolean hasType() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional int32 type = 5;</code>
+       */
+      public int getType() {
+        return type_;
+      }
+      /**
+       * <code>optional int32 type = 5;</code>
+       */
+      public Builder setType(int value) {
+        bitField0_ |= 0x00000010;
+        type_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 type = 5;</code>
+       */
+      public Builder clearType() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        type_ = 0;
         onChanged();
         return this;
       }
@@ -67604,44 +67841,45 @@ public final class WFCMessage {
       "ead\030\004 \001(\003\022\021\n\tnode_addr\030\005 \001(\t\022\021\n\tnode_por" +
       "t\030\006 \001(\005\022\023\n\013server_time\030\007 \001(\003\"P\n\rIMHttpWr",
       "apper\022\r\n\005token\030\001 \002(\t\022\021\n\tclient_id\030\002 \002(\t\022" +
-      "\017\n\007request\030\003 \002(\t\022\014\n\004data\030\004 \001(\014\"A\n\021Search" +
+      "\017\n\007request\030\003 \002(\t\022\014\n\004data\030\004 \001(\014\"b\n\021Search" +
       "UserRequest\022\017\n\007keyword\030\001 \002(\t\022\r\n\005fuzzy\030\002 " +
-      "\001(\005\022\014\n\004page\030\003 \001(\005\"(\n\020SearchUserResult\022\024\n" +
-      "\005entry\030\001 \003(\0132\005.User\"@\n\026GetChatroomInfoRe" +
-      "quest\022\023\n\013chatroom_id\030\001 \002(\t\022\021\n\tupdate_dt\030" +
-      "\002 \001(\003\"\227\001\n\014ChatroomInfo\022\r\n\005title\030\001 \002(\t\022\014\n" +
-      "\004desc\030\002 \001(\t\022\020\n\010portrait\030\003 \001(\t\022\024\n\014member_" +
-      "count\030\004 \001(\005\022\021\n\tcreate_dt\030\005 \001(\003\022\021\n\tupdate" +
-      "_dt\030\006 \001(\003\022\r\n\005extra\030\007 \001(\t\022\r\n\005state\030\010 \001(\005\"",
-      "F\n\034GetChatroomMemberInfoRequest\022\023\n\013chatr" +
-      "oom_id\030\001 \002(\t\022\021\n\tmax_count\030\002 \001(\005\";\n\022Chatr" +
-      "oomMemberInfo\022\024\n\014member_count\030\001 \001(\005\022\017\n\007m" +
-      "embers\030\002 \003(\t\"\026\n\010INT64Buf\022\n\n\002id\030\001 \002(\003\"4\n\023" +
-      "NotifyRecallMessage\022\n\n\002id\030\001 \002(\003\022\021\n\tfrom_" +
-      "user\030\002 \002(\t\"/\n\020BlackUserRequest\022\013\n\003uid\030\001 " +
-      "\002(\t\022\016\n\006status\030\002 \002(\005\"\323\001\n\014RouteRequest\022\013\n\003" +
-      "app\030\001 \001(\t\022\020\n\010platform\030\002 \001(\005\022\021\n\tpush_type" +
-      "\030\003 \001(\005\022\023\n\013device_name\030\004 \001(\t\022\026\n\016device_ve" +
-      "rsion\030\005 \001(\t\022\022\n\nphone_name\030\006 \001(\t\022\020\n\010langu",
-      "age\030\007 \001(\t\022\024\n\014carrier_name\030\010 \001(\t\022\023\n\013app_v" +
-      "ersion\030\t \001(\t\022\023\n\013sdk_version\030\n \001(\t\"D\n\rRou" +
-      "teResponse\022\014\n\004host\030\001 \002(\t\022\021\n\tlong_port\030\002 " +
-      "\002(\005\022\022\n\nshort_port\030\003 \002(\005\"G\n\017GetTokenReque" +
-      "st\022\017\n\007user_id\030\001 \002(\t\022\021\n\tclient_id\030\002 \002(\t\022\020" +
-      "\n\010platform\030\003 \001(\005\"r\n\022LoadRemoteMessages\022#" +
-      "\n\014conversation\030\001 \002(\0132\r.Conversation\022\022\n\nb" +
-      "efore_uid\030\002 \002(\003\022\r\n\005count\030\003 \002(\005\022\024\n\014conten" +
-      "t_type\030\004 \003(\005\"a\n\020MultiCastMessage\022\021\n\tfrom" +
-      "_user\030\001 \002(\t\022 \n\007content\030\002 \002(\0132\017.MessageCo",
-      "ntent\022\n\n\002to\030\003 \003(\t\022\014\n\004line\030\004 \002(\005\"E\n\035Recal" +
-      "lMultiCastMessageRequest\022\022\n\nmessage_id\030\001" +
-      " \002(\003\022\020\n\010receiver\030\002 \003(\t\"@\n\017AuthCodeReques" +
-      "t\022\021\n\ttarget_id\030\001 \002(\t\022\014\n\004type\030\002 \002(\005\022\014\n\004ho" +
-      "st\030\003 \002(\t\"o\n\030ApplicationConfigRequest\022\r\n\005" +
-      "appId\030\001 \002(\t\022\017\n\007appType\030\002 \002(\005\022\021\n\ttimestam" +
-      "p\030\003 \002(\003\022\r\n\005nonce\030\004 \002(\t\022\021\n\tsignature\030\005 \002(" +
-      "\tB/\n\025cn.wildfirechat.protoB\nWFCMessageZ\n" +
-      "./go;proto"
+      "\001(\005\022\014\n\004page\030\003 \001(\005\022\021\n\tdomain_id\030\004 \001(\t\022\014\n\004" +
+      "type\030\005 \001(\005\"(\n\020SearchUserResult\022\024\n\005entry\030" +
+      "\001 \003(\0132\005.User\"@\n\026GetChatroomInfoRequest\022\023" +
+      "\n\013chatroom_id\030\001 \002(\t\022\021\n\tupdate_dt\030\002 \001(\003\"\227" +
+      "\001\n\014ChatroomInfo\022\r\n\005title\030\001 \002(\t\022\014\n\004desc\030\002" +
+      " \001(\t\022\020\n\010portrait\030\003 \001(\t\022\024\n\014member_count\030\004" +
+      " \001(\005\022\021\n\tcreate_dt\030\005 \001(\003\022\021\n\tupdate_dt\030\006 \001",
+      "(\003\022\r\n\005extra\030\007 \001(\t\022\r\n\005state\030\010 \001(\005\"F\n\034GetC" +
+      "hatroomMemberInfoRequest\022\023\n\013chatroom_id\030" +
+      "\001 \002(\t\022\021\n\tmax_count\030\002 \001(\005\";\n\022ChatroomMemb" +
+      "erInfo\022\024\n\014member_count\030\001 \001(\005\022\017\n\007members\030" +
+      "\002 \003(\t\"\026\n\010INT64Buf\022\n\n\002id\030\001 \002(\003\"4\n\023NotifyR" +
+      "ecallMessage\022\n\n\002id\030\001 \002(\003\022\021\n\tfrom_user\030\002 " +
+      "\002(\t\"/\n\020BlackUserRequest\022\013\n\003uid\030\001 \002(\t\022\016\n\006" +
+      "status\030\002 \002(\005\"\323\001\n\014RouteRequest\022\013\n\003app\030\001 \001" +
+      "(\t\022\020\n\010platform\030\002 \001(\005\022\021\n\tpush_type\030\003 \001(\005\022" +
+      "\023\n\013device_name\030\004 \001(\t\022\026\n\016device_version\030\005",
+      " \001(\t\022\022\n\nphone_name\030\006 \001(\t\022\020\n\010language\030\007 \001" +
+      "(\t\022\024\n\014carrier_name\030\010 \001(\t\022\023\n\013app_version\030" +
+      "\t \001(\t\022\023\n\013sdk_version\030\n \001(\t\"D\n\rRouteRespo" +
+      "nse\022\014\n\004host\030\001 \002(\t\022\021\n\tlong_port\030\002 \002(\005\022\022\n\n" +
+      "short_port\030\003 \002(\005\"G\n\017GetTokenRequest\022\017\n\007u" +
+      "ser_id\030\001 \002(\t\022\021\n\tclient_id\030\002 \002(\t\022\020\n\010platf" +
+      "orm\030\003 \001(\005\"r\n\022LoadRemoteMessages\022#\n\014conve" +
+      "rsation\030\001 \002(\0132\r.Conversation\022\022\n\nbefore_u" +
+      "id\030\002 \002(\003\022\r\n\005count\030\003 \002(\005\022\024\n\014content_type\030" +
+      "\004 \003(\005\"a\n\020MultiCastMessage\022\021\n\tfrom_user\030\001",
+      " \002(\t\022 \n\007content\030\002 \002(\0132\017.MessageContent\022\n" +
+      "\n\002to\030\003 \003(\t\022\014\n\004line\030\004 \002(\005\"E\n\035RecallMultiC" +
+      "astMessageRequest\022\022\n\nmessage_id\030\001 \002(\003\022\020\n" +
+      "\010receiver\030\002 \003(\t\"@\n\017AuthCodeRequest\022\021\n\tta" +
+      "rget_id\030\001 \002(\t\022\014\n\004type\030\002 \002(\005\022\014\n\004host\030\003 \002(" +
+      "\t\"o\n\030ApplicationConfigRequest\022\r\n\005appId\030\001" +
+      " \002(\t\022\017\n\007appType\030\002 \002(\005\022\021\n\ttimestamp\030\003 \002(\003" +
+      "\022\r\n\005nonce\030\004 \002(\t\022\021\n\tsignature\030\005 \002(\tB/\n\025cn" +
+      ".wildfirechat.protoB\nWFCMessageZ\n./go;pr" +
+      "oto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -68007,7 +68245,7 @@ public final class WFCMessage {
           internal_static_SearchUserRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_SearchUserRequest_descriptor,
-              new java.lang.String[] { "Keyword", "Fuzzy", "Page", });
+              new java.lang.String[] { "Keyword", "Fuzzy", "Page", "DomainId", "Type", });
           internal_static_SearchUserResult_descriptor =
             getDescriptor().getMessageTypes().get(60);
           internal_static_SearchUserResult_fieldAccessorTable = new

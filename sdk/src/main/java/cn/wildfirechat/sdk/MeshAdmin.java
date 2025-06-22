@@ -39,12 +39,13 @@ public class MeshAdmin {
         return AdminHttpUtils.httpJsonPost(path, getUserInfo, OutputUserInfoList.class);
     }
 
-    public static IMResult<PojoSearchUserRes> searchUser(String keyword, int searchType, int page) throws Exception {
+    public static IMResult<PojoSearchUserRes> searchUser(String keyword, int searchType, int userType, int page) throws Exception {
         String path = APIPath.Search_User;
         PojoSearchUserReq req = new PojoSearchUserReq();
         req.keyword = keyword;
         req.searchType = searchType;
         req.page = page;
+        req.userType = userType;
         return AdminHttpUtils.httpJsonPost(path, req, PojoSearchUserRes.class);
     }
 

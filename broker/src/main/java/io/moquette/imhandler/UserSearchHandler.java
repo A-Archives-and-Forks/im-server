@@ -21,7 +21,7 @@ import java.util.List;
 public class UserSearchHandler extends IMHandler<WFCMessage.SearchUserRequest> {
     @Override
     public ErrorCode action(ByteBuf ackPayload, String clientID, String fromUser, ProtoConstants.RequestSourceType requestSourceType, WFCMessage.SearchUserRequest request, Qos1PublishHandler.IMCallback callback) {
-        List<WFCMessage.User> users = m_messagesStore.searchUser(request.getKeyword(), request.getFuzzy(), request.getPage());
+        List<WFCMessage.User> users = m_messagesStore.searchUser(request.getKeyword(), request.getFuzzy(), request.getType(), request.getPage());
         WFCMessage.SearchUserResult.Builder builder = WFCMessage.SearchUserResult.newBuilder();
         builder.addAllEntry(users);
         byte[] data = builder.build().toByteArray();

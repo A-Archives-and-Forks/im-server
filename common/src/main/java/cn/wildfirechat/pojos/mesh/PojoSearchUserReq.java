@@ -3,6 +3,7 @@ package cn.wildfirechat.pojos.mesh;
 public class PojoSearchUserReq {
     public String keyword;
     public int searchType;
+    public int userType;
     public int page;
     public String domainId;
 
@@ -20,6 +21,14 @@ public class PojoSearchUserReq {
 
     public void setSearchType(int searchType) {
         this.searchType = searchType;
+    }
+
+    public int getUserType() {
+        return userType;
+    }
+
+    public void setUserType(int userType) {
+        this.userType = userType;
     }
 
     public int getPage() {

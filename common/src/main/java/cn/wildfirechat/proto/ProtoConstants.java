@@ -238,6 +238,12 @@ public class ProtoConstants {
         int SearchUserType_Name_Mobile_DisplayName = 100;
     }
 
+    public interface UserSearchUserType {
+        int UserSearchUserType_ALL = 0;
+        int UserSearchUserType_ONLY_USER = 1;
+        int UserSearchUserType_ONLY_ROBOT = 2;
+    }
+
     public interface DisableSearchMask {
         int DisableSearchDisplayNameMask = 1;
         int DisableSearchNameMask = 2;

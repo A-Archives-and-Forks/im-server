@@ -36,6 +36,8 @@ import java.util.function.Function;
 
 import static cn.wildfirechat.common.IMExceptionEvent.EventType.RDBS_Exception;
 import static cn.wildfirechat.proto.ProtoConstants.PersistFlag.Transparent;
+import static cn.wildfirechat.proto.ProtoConstants.UserSearchUserType.UserSearchUserType_ONLY_ROBOT;
+import static cn.wildfirechat.proto.ProtoConstants.UserSearchUserType.UserSearchUserType_ONLY_USER;
 import static io.moquette.BrokerConstants.GROUP_INFO_MARK_DELETION;
 import static io.moquette.server.Constants.MAX_MESSAGE_QUEUE;
 import static cn.wildfirechat.proto.ProtoConstants.SearchUserType.*;
@@ -169,7 +171,7 @@ public class DatabaseStore {
         return null;
     }
 
-    List<WFCMessage.User> searchUserByNameMobileUserId(String keyword, int searchType) {
+    List<WFCMessage.User> searchUserByNameMobileUserId(String keyword, int searchType, int userType) {
         ArrayList<WFCMessage.User> out = new ArrayList<>();
         Connection connection = null;
         PreparedStatement statement = null;
@@ -203,7 +205,15 @@ public class DatabaseStore {
                 sql += " where (`_name` = ? or `_mobile` = ? or `_uid` = ?) ";
             }
 
-            sql += " and `_type` <> 2 and `_deleted` = 0"; //can search normal user(0) and robot(1) and admin(100), can not search things
+            if(userType == UserSearchUserType_ONLY_USER) {
+                sql += " and _type <> 2 "; //can not search device
+                sql += " and _type <> 1 ";
+            } else if(userType == UserSearchUserType_ONLY_ROBOT) {
+                sql += " and _type = 1 ";
+            } else {
+                sql += " and _type <> 2 "; //can not search device
+            }
+            sql += " and _deleted = 0 ";
 
             if(searchType == SearchUserType_Name || searchType == SearchUserType_Mobile || searchType == SearchUserType_UserId) {
                 sql += " limit 1";
@@ -408,7 +418,7 @@ public class DatabaseStore {
         return out;
     }
 
-    List<WFCMessage.User> searchUserByDisplayName(String keyword, int page, List<WFCMessage.User> nameOrIdMatched) {
+    List<WFCMessage.User> searchUserByDisplayName(String keyword, int userType, int page, List<WFCMessage.User> nameOrIdMatched) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet rs = null;
@@ -419,7 +429,18 @@ public class DatabaseStore {
             connection = DBUtil.getConnection();
             String sql = "select u._uid, u._name, u._display_name, u._portrait, u._mobile, u._gender, u._email, u._address, u._company, u._social, u._extra, u._dt, u._type " +
                 " from t_user u left join (select _uid, _value from t_user_setting where _scope = 27) s on u._uid = s._uid " +
-                " where u._display_name like ? ESCAPE '!' and u._type <> 2 and u._deleted = 0 ";
+                " where u._display_name like ? ESCAPE '!' ";
+
+            if(userType == UserSearchUserType_ONLY_USER) {
+                sql += " and u._type <> 2 ";
+                sql += " and u._type <> 1 ";
+            } else if(userType == UserSearchUserType_ONLY_ROBOT) {
+                sql += " and u._type = 1 ";
+            } else {
+                sql += " and u._type <> 2 ";
+            }
+            sql += " and u._deleted = 0 ";
+
             if(nameOrIdMatched.size() == 1) {
                 sql += " and u._uid <> ? and u._name <> ?";
             } else if(nameOrIdMatched.size() == 2) {
@@ -523,15 +544,15 @@ public class DatabaseStore {
         return out;
     }
 
-    List<WFCMessage.User> searchUserFromDB(String keyword, int searchType, int page) {
-        List<WFCMessage.User> nameOrIdMatched = searchUserByNameMobileUserId(keyword, searchType);
+    List<WFCMessage.User> searchUserFromDB(String keyword, int searchType, int userType, int page) {
+        List<WFCMessage.User> nameOrIdMatched = searchUserByNameMobileUserId(keyword, searchType, userType);
         List<WFCMessage.User> out = new ArrayList<>();
         if(page == 0) {
             out.addAll(nameOrIdMatched);
         }
 
         if(searchType == SearchUserType_General || searchType == SearchUserType_Name_Mobile_DisplayName) {
-            List<WFCMessage.User> general = searchUserByDisplayName(keyword, page, nameOrIdMatched);
+            List<WFCMessage.User> general = searchUserByDisplayName(keyword, userType, page, nameOrIdMatched);
             general.removeAll(nameOrIdMatched);
             out.addAll(general);
         }
