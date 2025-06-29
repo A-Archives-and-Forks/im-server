@@ -44,7 +44,8 @@
 | [organization-platform](https://github.com/wildfirechat/organization-platform)   | [organization-platform](https://gitee.com/wfchat/organization-platform)   | 野火组织通讯录服务。  |
 | [android-chat](https://github.com/wildfirechat/android-chat) | [android-chat](https://gitee.com/wfchat/android-chat) | 野火IM Android SDK源码和App源码。 |
 | [ios-chat](https://github.com/wildfirechat/ios-chat)         | [ios-chat](https://gitee.com/wfchat/ios-chat)         | 野火IM iOS SDK源码和App源码。|
-| [pc-chat](https://github.com/wildfirechat/vue-pc-chat)       | [pc-chat](https://gitee.com/wfchat/vue-pc-chat)       | 基于[Electron](https://electronjs.org/)的PC 端，支持Windows、Mac、Linux（包括国产化linux系统和CPU）。   |
+| [pc-chat(electron)](https://github.com/wildfirechat/vue-pc-chat)       | [pc-chat(electron)](https://gitee.com/wfchat/vue-pc-chat)       | 基于[Electron](https://electronjs.org/)开发的PC 端                   |                         |
+| [pc-chat(Qt)](https://github.com/wildfirechat/qt-pc-chat)       | [pc-chat(Qt)](https://gitee.com/wfchat/qt-pc-chat)       | 基于Qt开发的PC 端                   |                         |
 | [web-chat](https://github.com/wildfirechat/vue-chat)         | [web-chat](https://gitee.com/wfchat/vue-chat)         | 野火IM Web 端, [体验地址](https://web.wildfirechat.cn)。  |
 | [wx-chat](https://github.com/wildfirechat/wx-chat)           | [wx-chat](https://gitee.com/wfchat/wx-chat)           | 小程序平台的Demo(支持微信、百度、阿里、字节、QQ 等小程序平台)。  |
 | [uni-chat](https://github.com/wildfirechat/uni-chat)           | [uni-chat](https://gitee.com/wfchat/uni-chat)           | UniApp平台移动端应用(使用原生插件)。   |
