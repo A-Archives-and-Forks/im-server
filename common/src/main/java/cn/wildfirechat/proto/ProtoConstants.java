@@ -396,5 +396,7 @@ public class ProtoConstants {
     
     public static final int MESSAGE_CONTENT_TYPE_MODIFY_GROUP_EXTRA = 122;
     public static final int MESSAGE_CONTENT_TYPE_MODIFY_GROUP_MEMBER_EXTRA = 123;
+    public static final int MESSAGE_CONTENT_TYPE_MODIFY_GROUP_SETTINGS = 124;
+    public static final int MESSAGE_CONTENT_TYPE_REJECT_JOIN_GROUP = 125;
 }
 

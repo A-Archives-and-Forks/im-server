@@ -65,6 +65,8 @@ public enum ErrorCode {
     ERROR_CODE_CONFERENCE_ERROR(90, "Conference server response error"),
 
     ERROR_CODE_FUNCTION_DISABLED(220, "function disabled"),
+    ERROR_CODE_SERVER_BUSY(221, "Server busy"),
+    ERROR_CODE_PARTLY_SUCCESS(222, "Partly success"),
 
     ERROR_CODE_OTHER_CLIENT_ALREADY_IN_CHATROOM(225, "other client already in chatroom"),
 

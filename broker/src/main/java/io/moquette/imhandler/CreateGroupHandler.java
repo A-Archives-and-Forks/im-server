@@ -17,6 +17,9 @@ import io.netty.buffer.ByteBuf;
 import cn.wildfirechat.common.ErrorCode;
 import win.liyufan.im.IMTopic;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Handler(value = IMTopic.CreateGroupTopic)
 public class CreateGroupHandler extends GroupHandler<WFCMessage.CreateGroupRequest> {
     @Override
@@ -51,14 +54,21 @@ public class CreateGroupHandler extends GroupHandler<WFCMessage.CreateGroupReque
             }
         }
 
+        Map<String, Integer> failedMembers = new HashMap<>();
         if(requestSourceType == ProtoConstants.RequestSourceType.Request_From_User) {
-            ErrorCode errorCode = m_messagesStore.canAddGroupMembers(fromUser, request.getGroup().getMembersList());
+            ErrorCode errorCode = m_messagesStore.canAddGroupMembers(fromUser, request.getGroup().getMembersList(), failedMembers);
             if (errorCode != ErrorCode.ERROR_CODE_SUCCESS) {
                 return errorCode;
             }
         }
 
-        WFCMessage.GroupInfo groupInfo = m_messagesStore.createGroup(fromUser, request.getGroup().getGroupInfo(), request.getGroup().getMembersList(), request.getMemberExtra(), isAdmin);
+        if (request.getGroup().getGroupInfo().getTargetId().length() > 64
+            || request.getGroup().getGroupInfo().getName().length() > 64
+            || request.getGroup().getGroupInfo().getPortrait().length() > 1024) {
+            return ErrorCode.INVALID_PARAMETER;
+        }
+
+        WFCMessage.GroupInfo groupInfo = m_messagesStore.createGroup(fromUser, request.getGroup().getGroupInfo(), request.getGroup().getMembersList(), request.getMemberExtra(), isAdmin, failedMembers);
         if (groupInfo != null && groupInfo.getDeleted() == 0) {
             if(request.hasNotifyContent() && request.getNotifyContent().getType() > 0) {
                 sendGroupNotification(fromUser, groupInfo.getTargetId(), request.getToLineList(), request.getNotifyContent());
@@ -66,9 +76,19 @@ public class CreateGroupHandler extends GroupHandler<WFCMessage.CreateGroupReque
                 WFCMessage.MessageContent content = new GroupNotificationBinaryContent(groupInfo.getTargetId(), fromUser, groupInfo.getName(), "").setExtra(request.getMemberExtra()).getCreateGroupNotifyContent();
                 sendGroupNotification(fromUser, groupInfo.getTargetId(), request.getToLineList(), content);
             }
+
+            if(!failedMembers.isEmpty()) {
+                WFCMessage.MessageContent content = new GroupNotificationBinaryContent(groupInfo.getTargetId(), fromUser, null, "").setMi(failedMembers).getGroupNotifyContent(ProtoConstants.MESSAGE_CONTENT_TYPE_REJECT_JOIN_GROUP);
+                sendGroupNotification(fromUser, groupInfo.getTargetId(), request.getToLineList(), content);
+            }
         }
+
         byte[] data = groupInfo.getTargetId().getBytes();
         ackPayload.ensureWritable(data.length).writeBytes(data);
-        return ErrorCode.ERROR_CODE_SUCCESS;
+        if(failedMembers.isEmpty()) {
+            return ErrorCode.ERROR_CODE_SUCCESS;
+        } else {
+            return ErrorCode.ERROR_CODE_PARTLY_SUCCESS;
+        }
     }
 }

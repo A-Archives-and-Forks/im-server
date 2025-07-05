@@ -102,9 +102,9 @@ public interface IMessagesStore {
     WFCMessage.PullMessageResult fetchMessage(String user, String exceptClientId, long fromMessageId, int pullType);
     WFCMessage.PullMessageResult loadRemoteMessages(String user, WFCMessage.Conversation conversation, long beforeUid, int count, Collection<Integer> contentTypes);
     long insertUserMessages(String sender, int conversationType, String target, int line, int messageContentType, String userId, long messageId, boolean directing);
-    ErrorCode canAddGroupMembers(String operator, List<WFCMessage.GroupMember> memberList);
-    WFCMessage.GroupInfo createGroup(String operator, WFCMessage.GroupInfo groupInfo, List<WFCMessage.GroupMember> memberList, String memberExtra, boolean isAdmin);
-    ErrorCode addGroupMembers(String operator, boolean isAdmin, String groupId, List<WFCMessage.GroupMember> memberList, String extra);
+    ErrorCode canAddGroupMembers(String operator, List<WFCMessage.GroupMember> memberList, Map<String, Integer> failedMembers);
+    WFCMessage.GroupInfo createGroup(String operator, WFCMessage.GroupInfo groupInfo, List<WFCMessage.GroupMember> memberList, String memberExtra, boolean isAdmin, Map<String, Integer> failedMembers);
+    ErrorCode addGroupMembers(String operator, boolean isAdmin, String groupId, List<WFCMessage.GroupMember> memberList, String extra, Map<String, Integer> failedMembers);
     ErrorCode kickoffGroupMembers(String operator, boolean isAdmin, String groupId, List<String> memberList);
     ErrorCode quitGroup(String operator, String groupId, boolean admin);
     void clearUserGroups(String userId);
@@ -253,7 +253,7 @@ public interface IMessagesStore {
     boolean isChannelCallbackWithSenderInfo();
     boolean isChannelCallbackWithTargetInfo();
     boolean isChannelNewCallbackFeature();
-
+    boolean isGroupAllowPartSuccess();
     boolean isRobotAutoAcceptFriendRequest();
 
     long getPushExpiredTimes();

@@ -205,6 +205,7 @@ public final class BrokerConstants {
     public static final String GROUP_Forbidden_Client_Operation = "group.forbidden_client_operation";
 
     public static final String GROUP_Disable_Stranger_Invite = "group.disable_stranger_invite";
+    public static final String GROUP_ADD_MEMBER_ALLOW_PART_SUCCESS = "group.add_member_allow_part_success";
 
     public static final String GROUP_INFO_MARK_DELETION = "group.enable_mark_deletion";
 

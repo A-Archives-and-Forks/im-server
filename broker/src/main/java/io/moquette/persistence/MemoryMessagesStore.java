@@ -167,6 +167,7 @@ public class MemoryMessagesStore implements IMessagesStore {
     private Set<String> mAllowStrangerChatSet = new HashSet<>();
     private Set<Integer> mAllowStrangerLineSet = new HashSet<>();
     private boolean mDisableStrangerAddGroup = false;
+    private boolean mGroupAllowPartSuccess = false;
 
     private boolean mIDUseUUID = true;
 
@@ -628,6 +629,11 @@ public class MemoryMessagesStore implements IMessagesStore {
             mBroadcastTargetFromUserTable = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.BROADCAST_Target_From_User_Table, "false"));
         } catch (Exception e) {
 
+        }
+
+        try {
+            mGroupAllowPartSuccess = "true".equals(server.getConfig().getProperty(BrokerConstants.GROUP_ADD_MEMBER_ALLOW_PART_SUCCESS, "false"));
+        } catch (Exception e) {
         }
 
         try {
@@ -1282,7 +1288,7 @@ public class MemoryMessagesStore implements IMessagesStore {
     }
 
     @Override
-    public ErrorCode canAddGroupMembers(String fromUser, List<WFCMessage.GroupMember> memberList) {
+    public ErrorCode canAddGroupMembers(String fromUser, List<WFCMessage.GroupMember> memberList, Map<String, Integer> failedMembers) {
         HazelcastInstance hzInstance = m_Server.getHazelcastInstance();
         MultiMap<String, FriendData> friendsMap = hzInstance.getMultiMap(USER_FRIENDS);
         IMap<String, WFCMessage.User> mUserMap = hzInstance.getMap(USERS);
@@ -1308,7 +1314,12 @@ public class MemoryMessagesStore implements IMessagesStore {
                 for (FriendData friendData : friendDatas) {
                     if (friendData.getFriendUid().equals(fromUser)) {
                         if (friendData.getBlacked() == 1) {
-                            return ErrorCode.ERROR_CODE_IN_BLACK_LIST;
+                            LOG.error("Add group member failure, because inviter {} is blocked by invitee {}", fromUser, targetUser);
+                            if(isGroupAllowPartSuccess()) {
+                                failedMembers.put(targetUser, 1); //black
+                            } else {
+                                return ErrorCode.ERROR_CODE_IN_BLACK_LIST;
+                            }
                         } else {
                             if (friendData.getState() == 0) {
                                 allow = true;
@@ -1332,7 +1343,11 @@ public class MemoryMessagesStore implements IMessagesStore {
                     continue;
                 }
 
-                return ErrorCode.ERROR_CODE_NOT_RIGHT;
+                if(isGroupAllowPartSuccess()) {
+                    failedMembers.put(targetUser, 2);//stranger
+                } else {
+                    return ErrorCode.ERROR_CODE_NOT_RIGHT;
+                }
             }
         } else {
             for (WFCMessage.GroupMember groupMember : memberList) {
@@ -1349,7 +1364,12 @@ public class MemoryMessagesStore implements IMessagesStore {
                 for (FriendData friendData : friendDatas) {
                     if (friendData.getFriendUid().equals(fromUser)) {
                         if (friendData.getBlacked() == 1) {
-                            return ErrorCode.ERROR_CODE_IN_BLACK_LIST;
+                            LOG.error("Add group member failure, because inviter {} is blocked by invitee {}", fromUser, targetUser);
+                            if(isGroupAllowPartSuccess()) {
+                                failedMembers.put(targetUser, 1); //black
+                            } else {
+                                return ErrorCode.ERROR_CODE_IN_BLACK_LIST;
+                            }
                         } else {
                             break;
                         }
@@ -1361,7 +1381,7 @@ public class MemoryMessagesStore implements IMessagesStore {
     }
 
     @Override
-    public WFCMessage.GroupInfo createGroup(String fromUser, WFCMessage.GroupInfo groupInfo, List<WFCMessage.GroupMember> memberList, String memberExtra, boolean isAdmin) {
+    public WFCMessage.GroupInfo createGroup(String fromUser, WFCMessage.GroupInfo groupInfo, List<WFCMessage.GroupMember> memberList, String memberExtra, boolean isAdmin, Map<String, Integer> failedMembers) {
         HazelcastInstance hzInstance = m_Server.getHazelcastInstance();
         IMap<String, WFCMessage.GroupInfo> mIMap = hzInstance.getMap(GROUPS_MAP);
 
@@ -1383,6 +1403,9 @@ public class MemoryMessagesStore implements IMessagesStore {
         List<WFCMessage.GroupMember> updatedMemberList = new ArrayList<>();
         boolean hasOwnerMember = false;
         for (WFCMessage.GroupMember member : memberList) {
+            if(failedMembers.containsKey(member.getMemberId())) {
+                continue;
+            }
             WFCMessage.GroupMember.Builder builder = member.toBuilder();
             builder.setUpdateDt(dt).setCreateDt(dt);
             if (member.getMemberId().equals(owner)) {
@@ -1577,7 +1600,7 @@ public class MemoryMessagesStore implements IMessagesStore {
     }
 
     @Override
-    public ErrorCode addGroupMembers(String operator, boolean isAdmin, String groupId, List<WFCMessage.GroupMember> memberList, String extra) {
+    public ErrorCode addGroupMembers(String operator, boolean isAdmin, String groupId, List<WFCMessage.GroupMember> memberList, String extra, Map<String, Integer> failedMembers) {
         HazelcastInstance hzInstance = m_Server.getHazelcastInstance();
         IMap<String, WFCMessage.GroupInfo> mIMap = hzInstance.getMap(GROUPS_MAP);
 
@@ -1650,6 +1673,10 @@ public class MemoryMessagesStore implements IMessagesStore {
         List<WFCMessage.GroupMember> tmp = new ArrayList<>();
         int newMemberCount = 0;
         for (WFCMessage.GroupMember member : memberList) {
+            if(failedMembers.containsKey(member.getMemberId())) {
+                continue;
+            }
+
             if (existMemberIds.contains(member.getMemberId()) && member.getType() != GroupMemberType_Removed) {
                 if(!isAdmin)
                     continue;
@@ -1682,7 +1709,11 @@ public class MemoryMessagesStore implements IMessagesStore {
 
         if (memberList.size() == 0) {
             if (!isAdmin) {
-                return ErrorCode.ERROR_CODE_ALREADY_IN_GROUP;
+                if(failedMembers.isEmpty()) {
+                    return ErrorCode.ERROR_CODE_ALREADY_IN_GROUP;
+                } else {
+                    return ErrorCode.ERROR_CODE_SUCCESS;
+                }
             } else {
                 return ErrorCode.ERROR_CODE_SUCCESS;
             }
@@ -1701,6 +1732,10 @@ public class MemoryMessagesStore implements IMessagesStore {
 
         List<String> memberIds = new ArrayList<>();
         for (WFCMessage.GroupMember member : memberList) {
+            if(failedMembers.containsKey(member.getMemberId())) {
+                continue;
+            }
+
             if (member.getType() != GroupMemberType_Removed) {
                 memberIds.add(member.getMemberId());
             }
@@ -4746,6 +4781,11 @@ public class MemoryMessagesStore implements IMessagesStore {
     @Override
     public int getVisibleQuitKickoffNotification() {
         return mGroupVisibleQuitKickoffNotification;
+    }
+
+    @Override
+    public boolean isGroupAllowPartSuccess() {
+        return mGroupAllowPartSuccess;
     }
 
     @Override

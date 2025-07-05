@@ -16,6 +16,7 @@ import com.google.protobuf.ByteString;
 import io.netty.util.internal.StringUtil;
 
 import java.util.List;
+import java.util.Map;
 
 public class GroupNotificationBinaryContent {
     //groupId
@@ -32,6 +33,8 @@ public class GroupNotificationBinaryContent {
 
     //value2(member or something)
     private String m;
+
+    private Map<String, Integer> mi;
 
     private String extra;
 
@@ -90,6 +93,11 @@ public class GroupNotificationBinaryContent {
 
     public void setMs(List<String> ms) {
         this.ms = ms;
+    }
+
+    public GroupNotificationBinaryContent setMi(Map<String, Integer> mi) {
+        this.mi = mi;
+        return this;
     }
 
     public GroupNotificationBinaryContent setExtra(String extra) {
