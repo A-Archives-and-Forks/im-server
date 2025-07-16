@@ -1004,6 +1004,12 @@ public class Main {
     }
 
     static void testReadMessageContentFromDB() throws Exception {
+        //需要注意几点：
+        // 1 WFCMessage类不能混淆，如果混淆 WFCMessage.MessageContent.parseFrom(data) 就会失败。
+        // 2 MessageContentFactory方法会自动查找所有的消息类，包括文本/图片/语音等。也有可能在某些环境下找不到这些类。可以检查MessageContentFactory
+        // 类的源码，修改registerAllMessageContent方法，确保能找到所有的内容类。也可以显式调用注册的方法把所有已知消息都注册一遍，比如：
+        // MessageContentFactory.registerCustomMessageContent(TextMessageContent.class); //这里示例只写了文本的，其他所有已知消息都需要注册一遍。
+
         //从数据库t_messages_x表中读取到消息内容字段_data的二进制数据为
         byte[] data = {8,1,18,5,72,101,108,108,111,64,3};
         //1. 先把二进制数据转化为协议栈消息内容。
