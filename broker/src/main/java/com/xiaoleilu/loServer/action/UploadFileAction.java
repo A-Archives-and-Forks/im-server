@@ -284,9 +284,10 @@ public class UploadFileAction extends Action {
 
                         savedThunkSize += readableBytesSize;
                         offset += readableBytesSize;
+                        byteBuf.release();
+                        byteBuf = null;
 
                         if (savedThunkSize >= remoteFileSize) {
-                            byteBuf.release();
                             fileUpload.release();
 
                             response.setStatus(HttpResponseStatus.OK);
