@@ -81,10 +81,6 @@ public class PushServer {
         }
 
         MemorySessionStore.Session session = sessionsStore.getSession(deviceId);
-        int badge = session.getUnReceivedMsgs();
-        if (badge <= 0) {
-            badge = 1;
-        }
         if (StringUtil.isNullOrEmpty(session.getDeviceToken())) {
             LOG.warn("Device token is empty for device {}", deviceId);
             return;
@@ -94,7 +90,6 @@ public class PushServer {
         pushMessage.pushType = session.getPushType();
         pushMessage.pushContent = pushContent;
         pushMessage.deviceToken = session.getDeviceToken();
-        pushMessage.unReceivedMsg = badge;
         pushMessage.userId = session.getUsername();
         if (session.getPlatform() == ProtoConstants.Platform.Platform_iOS ||
             session.getPlatform() == ProtoConstants.Platform.Platform_iPad ||

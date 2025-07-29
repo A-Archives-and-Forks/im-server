@@ -56,6 +56,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static cn.wildfirechat.common.IMExceptionEvent.EventType.EVENT_CALLBACK_Exception;
@@ -844,6 +845,18 @@ public class MemoryMessagesStore implements IMessagesStore {
         return pullType;
     }
 
+    private final Map<String, Integer> unreceivedMsgCount = new ConcurrentHashMap<>();
+
+    @Override
+    public void increaseUnreceivedMsgCount(String user) {
+        unreceivedMsgCount.compute(user, (s, integer) -> integer == null ? 1 : integer+1);
+    }
+
+    @Override
+    public int getUnreceivedMsgCount(String user) {
+        return unreceivedMsgCount.getOrDefault(user, 0);
+    }
+
     @Override
     public Set<String> getAllEnds() {
         return databaseStore.getAllEnds(mBroadcastTargetFromUserTable);
@@ -858,7 +871,7 @@ public class MemoryMessagesStore implements IMessagesStore {
         MemorySessionStore.Session session = m_Server.getStore().sessionsStore().getSession(exceptClientId);
         session.refreshLastActiveTime();
         if (pullType != ProtoConstants.PullType.Pull_ChatRoom) {
-            session.setUnReceivedMsgs(0);
+            unreceivedMsgCount.put(user, 0);
         } else {
             session.refreshLastChatroomActiveTime();
         }

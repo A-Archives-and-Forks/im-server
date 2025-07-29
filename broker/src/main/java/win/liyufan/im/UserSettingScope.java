@@ -21,4 +21,5 @@ public interface UserSettingScope {
     int kUserSettingGroupRemark = 26;
     int kUserSettingPrivacySearchable = 27;
     int kUserSettingAddFriendStrategy = 28;
+    int kUserSettingScopeSyncBadge = 29;
 }

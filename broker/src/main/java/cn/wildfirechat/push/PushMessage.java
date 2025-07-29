@@ -37,6 +37,7 @@ public class PushMessage {
     public boolean republish;
     public long messageId;
     public long callStartUid;
+    public int existBadgeNumber;
 
     public PushMessage(String sender, int conversationType, String target, int line, int messageContentType, long serverTime, String senderName, String senderPortrait, String targetName, String targetPortrait, int unReceivedMsg, int mentionedType, boolean isHiddenDetail, String language) {
         this.sender = sender;

@@ -37,17 +37,18 @@ class PersistentQueueMessageSender {
         this.connectionDescriptorStore = connectionDescriptorStore;
     }
 
-    void sendPush(String sender, int conversationType, String target, int line, long messageId, String deviceId, String pushContent, String pushData, long callStartUid, int messageContentType, long serverTime, String senderName, String senderPortrait, String targetName, String targetPortrait, int unReceivedMsg, int mentionType, boolean isHiddenDetail, String language) {
+    void sendPush(String sender, int conversationType, String target, int line, long messageId, String deviceId, String pushContent, String pushData, long callStartUid, int messageContentType, long serverTime, String senderName, String senderPortrait, String targetName, String targetPortrait, int unReceivedMsg, int mentionType, boolean isHiddenDetail, String language, int existBadgeNumber) {
         LOG.info("Send push to {}, message from {}", deviceId, sender);
         PushMessage pushMessage = new PushMessage(sender, conversationType, target, line, messageContentType, serverTime, senderName, senderPortrait, targetName, targetPortrait, unReceivedMsg, mentionType, isHiddenDetail, language);
         pushMessage.pushContent = pushContent;
         pushMessage.pushData = pushData;
         pushMessage.messageId = messageId;
         pushMessage.callStartUid = callStartUid;
+        pushMessage.existBadgeNumber = existBadgeNumber;
         PushServer.getServer().pushMessage(pushMessage, deviceId, pushContent);
     }
 
-    void sendPush(String sender, String target, String deviceId, String pushContent, int pushContentType, long serverTime, String senderName, int unReceivedMsg, String language) {
+    void sendPush(String sender, String target, String deviceId, String pushContent, int pushContentType, long serverTime, String senderName, int unReceivedMsg, String language, int existBadgeNumber) {
         LOG.info("Send push to {}, message from {}", deviceId, sender);
         PushMessage pushMessage = new PushMessage(sender, target, serverTime, senderName, unReceivedMsg, language, pushContentType);
         pushMessage.pushContent = pushContent;

@@ -324,7 +324,7 @@ public class MessagesPublisher {
 
                     if (!StringUtil.isNullOrEmpty(pushContent) || messageContentType == 400) {
                         if (!isConvSilent && (persistFlag & 0x02) > 0) {
-                            targetSession.setUnReceivedMsgs(targetSession.getUnReceivedMsgs() + 1);
+                            m_messagesStore.increaseUnreceivedMsgCount(user);
                         }
                     }
                 }
@@ -423,13 +423,25 @@ public class MessagesPublisher {
                             name = fd.getAlias();
                         }
                     }
-                    this.messageSender.sendPush(sender, conversationType, target, line, messageId, targetSession.getClientID(), pushContent, pushData, callStartUid, messageContentType, serverTime, name, senderPortrait, targetName, targetPortrait, targetSession.getUnReceivedMsgs(), curMentionType, isHiddenDetail, targetSession.getLanguage());
+
+                    this.messageSender.sendPush(sender, conversationType, target, line, messageId, targetSession.getClientID(), pushContent, pushData, callStartUid, messageContentType, serverTime, name, senderPortrait, targetName, targetPortrait, m_messagesStore.getUnreceivedMsgCount(user), curMentionType, isHiddenDetail, targetSession.getLanguage(), getExistBadgeNumber(user));
                 }
 
             }
         }
     }
-    
+
+    private int getExistBadgeNumber(String user) {
+        int existBadgeNumber = 0;
+        WFCMessage.UserSettingEntry userSettingData = m_messagesStore.getUserSetting(user, UserSettingScope.kUserSettingScopeSyncBadge, "");
+        if(userSettingData != null && !StringUtil.isNullOrEmpty(userSettingData.getValue())) {
+            try {
+                existBadgeNumber = Integer.parseInt(userSettingData.getValue());
+            } catch (NumberFormatException e) {}
+        }
+        return existBadgeNumber;
+    }
+
     public boolean sendOfflineNotify(String clientId) {
         boolean targetIsActive = this.connectionDescriptors.isConnected(clientId);
         if (targetIsActive) {
@@ -595,7 +607,7 @@ public class MessagesPublisher {
                 }
 
                 if (IMTopic.NotifyFriendRequestTopic.equals(topic)) {
-                    messageSender.sendPush(fromUser, receiver, targetSession.getClientID(), pushContent, PushServer.PushMessageType.PUSH_MESSAGE_TYPE_FRIEND_REQUEST, System.currentTimeMillis(), fromUserName, targetSession.getUnReceivedMsgs() + 1, targetSession.getLanguage());
+                    messageSender.sendPush(fromUser, receiver, targetSession.getClientID(), pushContent, PushServer.PushMessageType.PUSH_MESSAGE_TYPE_FRIEND_REQUEST, System.currentTimeMillis(), fromUserName, m_messagesStore.getUnreceivedMsgCount(receiver) + 1, targetSession.getLanguage(), getExistBadgeNumber(receiver));
                 }
             }
         }

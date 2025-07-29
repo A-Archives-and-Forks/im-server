@@ -92,10 +92,6 @@ public class MemorySessionStore implements ISessionsStore {
             return unReceivedMsgs;
         }
 
-        public void setUnReceivedMsgs(int unReceivedMsgs) {
-            this.unReceivedMsgs = unReceivedMsgs;
-        }
-
         public int getPushType() {
             return pushType;
         }

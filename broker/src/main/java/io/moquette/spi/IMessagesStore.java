@@ -235,6 +235,9 @@ public interface IMessagesStore {
 
     WFCMessage.Message getMessage(long messageId);
 
+    void increaseUnreceivedMsgCount(String user);
+    int getUnreceivedMsgCount(String user);
+
     boolean isAllowClientCustomGroupNotification();
     boolean isAllowRobotCustomGroupNotification();
     int getVisibleQuitKickoffNotification();
