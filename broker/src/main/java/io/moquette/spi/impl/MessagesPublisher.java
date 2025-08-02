@@ -178,19 +178,10 @@ public class MessagesPublisher {
                         if (message == null) {
                             message = m_messagesStore.getMessage(messageId);
                         }
-                        OutputClient outputClient = null;
-                        if(m_messagesStore.isRobotCallbackWithClientInfo() && !StringUtil.isNullOrEmpty(exceptClientId)) {
-                            Session session = m_sessionsStore.getSession(exceptClientId);
-                            if(session != null && session.getUsername().equals(sender)) {
-                                outputClient = new OutputClient(session.getPlatform(), exceptClientId);
-                            }
-                        }
-
-                        final WFCMessage.Message finalMsg = message;
-                        OutputClient finalOutputClient = outputClient;
+                        OutputMessageData outputMessageData = getOutputMessageWithExtraInfo(message, exceptClientId, m_messagesStore.isRobotCallbackWithClientInfo() , m_messagesStore.isRobotCallbackWithSenderInfo(), m_messagesStore.isRobotCallbackWithTargetInfo());
                         Server.getServer().getCallbackScheduler().execute(() -> {
                             try {
-                                HttpUtils.httpJsonPost(robot.getCallback(), GsonUtil.gson.toJson(OutputMessageData.fromProtoMessage(finalMsg, finalOutputClient), OutputMessageData.class), HttpUtils.HttpPostType.POST_TYPE_Robot_Message_Callback);
+                                HttpUtils.httpJsonPost(robot.getCallback(), GsonUtil.gson.toJson(outputMessageData, OutputMessageData.class), HttpUtils.HttpPostType.POST_TYPE_Robot_Message_Callback);
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 Utility.printExecption(LOG, e, EVENT_CALLBACK_Exception);
