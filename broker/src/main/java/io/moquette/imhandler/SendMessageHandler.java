@@ -136,6 +136,15 @@ public class SendMessageHandler extends IMHandler<WFCMessage.Message> {
         ErrorCode errorCode = ErrorCode.ERROR_CODE_SUCCESS;
         boolean isAdmin = requestSourceType == ProtoConstants.RequestSourceType.Request_From_Admin;
         if (message != null) {
+            if(message.getContent().getContent().length() +
+                message.getContent().getSearchableContent().length() +
+                message.getContent().getData().size() +
+                message.getContent().getExtra().length() +
+                message.getContent().getPushContent().length() +
+                message.getContent().getPushData().length() > 64 * 1024) {
+                return ErrorCode.ERROR_CODE_MESSAGE_TOO_LARGE;
+            }
+
             boolean ignoreMsg = false;
             if (!isAdmin) {  //admin do not check the right
                 // 不能在端上直接发送撤回和群通知
