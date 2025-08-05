@@ -11,10 +11,13 @@ package io.moquette.imhandler;
 import cn.wildfirechat.proto.ProtoConstants;
 import cn.wildfirechat.proto.WFCMessage;
 import cn.wildfirechat.pojos.GroupNotificationBinaryContent;
+import com.hazelcast.util.StringUtil;
 import io.moquette.spi.impl.Qos1PublishHandler;
 import io.netty.buffer.ByteBuf;
 import cn.wildfirechat.common.ErrorCode;
 import win.liyufan.im.IMTopic;
+
+import java.util.Set;
 
 import static cn.wildfirechat.common.ErrorCode.ERROR_CODE_SUCCESS;
 
@@ -26,8 +29,16 @@ public class ModifyGroupAliasHandler extends GroupHandler<WFCMessage.ModifyGroup
         if(request.hasNotifyContent() && request.getNotifyContent().getType() > 0 && requestSourceType == ProtoConstants.RequestSourceType.Request_From_User && !m_messagesStore.isAllowClientCustomGroupNotification()) {
             return ErrorCode.ERROR_CODE_NOT_RIGHT;
         }
+
         if(request.hasNotifyContent() && request.getNotifyContent().getType() > 0 && requestSourceType == ProtoConstants.RequestSourceType.Request_From_Robot && !m_messagesStore.isAllowRobotCustomGroupNotification()) {
             return ErrorCode.ERROR_CODE_NOT_RIGHT;
+        }
+
+        if (!m_messagesStore.isSensitiveOnlyMessage() && !isAdmin && !StringUtil.isNullOrEmpty(request.getAlias())) {
+            Set<String> matched = m_messagesStore.handleSensitiveWord(request.getAlias());
+            if (matched != null && !matched.isEmpty()) {
+                return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+            }
         }
 
         ErrorCode errorCode = m_messagesStore.modifyGroupMemberAlias(fromUser, request.getGroupId(), request.getAlias(), null, isAdmin);

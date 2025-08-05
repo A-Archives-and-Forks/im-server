@@ -12,9 +12,12 @@ import cn.wildfirechat.common.ErrorCode;
 import cn.wildfirechat.pojos.GroupNotificationBinaryContent;
 import cn.wildfirechat.proto.ProtoConstants;
 import cn.wildfirechat.proto.WFCMessage;
+import com.hazelcast.util.StringUtil;
 import io.moquette.spi.impl.Qos1PublishHandler;
 import io.netty.buffer.ByteBuf;
 import win.liyufan.im.IMTopic;
+
+import java.util.Set;
 
 import static cn.wildfirechat.common.ErrorCode.ERROR_CODE_SUCCESS;
 
@@ -28,6 +31,12 @@ public class ModifyGroupMemberAliasHandler extends GroupHandler<WFCMessage.Modif
         }
         if(request.hasNotifyContent() && request.getNotifyContent().getType() > 0 && requestSourceType == ProtoConstants.RequestSourceType.Request_From_Robot && !m_messagesStore.isAllowRobotCustomGroupNotification()) {
             return ErrorCode.ERROR_CODE_NOT_RIGHT;
+        }
+        if (!m_messagesStore.isSensitiveOnlyMessage() && !isAdmin && !StringUtil.isNullOrEmpty(request.getAlias())) {
+            Set<String> matched = m_messagesStore.handleSensitiveWord(request.getAlias());
+            if (matched != null && !matched.isEmpty()) {
+                return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+            }
         }
 
         ErrorCode errorCode = m_messagesStore.modifyGroupMemberAlias(fromUser, request.getGroupId(), request.getAlias(), request.getMemberId(), isAdmin);

@@ -171,7 +171,7 @@ public class MemoryMessagesStore implements IMessagesStore {
     private boolean mGroupAllowPartSuccess = false;
 
     private boolean mIDUseUUID = true;
-
+    private boolean mSensitiveOnlyMessage = true;
     private Set<String> mClientSignatureSet = new HashSet<>();
     private boolean mRejectEmptySignature = true;
 
@@ -669,6 +669,11 @@ public class MemoryMessagesStore implements IMessagesStore {
 
         try {
             mIDUseUUID = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.ID_USE_UUID, "false"));
+        } catch (Exception e) {
+        }
+
+        try {
+            mSensitiveOnlyMessage = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.SENSITIVE_Only_Message, "true"));
         } catch (Exception e) {
         }
     }
@@ -1974,6 +1979,13 @@ public class MemoryMessagesStore implements IMessagesStore {
                 if (!isAllow) {
                     return ErrorCode.ERROR_CODE_NOT_RIGHT;
                 }
+
+                if (!mSensitiveOnlyMessage && modifyType == Modify_Group_Name && !StringUtil.isNullOrEmpty(value)) {
+                    Set<String> matched = handleSensitiveWord(value);
+                    if (matched != null && !matched.isEmpty()) {
+                        return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+                    }
+                }
             }
 
             if (oldInfo.getType() == ProtoConstants.GroupType.GroupType_Normal) {
@@ -2810,6 +2822,12 @@ public class MemoryMessagesStore implements IMessagesStore {
             ) {
             switch (entry.getType()) {
                 case Modify_DisplayName:
+                    if(!mSensitiveOnlyMessage) {
+                        Set<String> matched = handleSensitiveWord(entry.getValue());
+                        if (matched != null && !matched.isEmpty()) {
+                            return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+                        }
+                    }
                     builder.setDisplayName(entry.getValue());
                     modified = true;
                     break;
@@ -4768,6 +4786,11 @@ public class MemoryMessagesStore implements IMessagesStore {
     @Override
     public List<String> getAllSensitiveWords() {
         return new ArrayList<>(databaseStore.getSensitiveWord());
+    }
+
+    @Override
+    public boolean isSensitiveOnlyMessage() {
+        return mSensitiveOnlyMessage;
     }
 
     @Override

@@ -19,6 +19,7 @@ import win.liyufan.im.IMTopic;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Handler(value = IMTopic.CreateGroupTopic)
 public class CreateGroupHandler extends GroupHandler<WFCMessage.CreateGroupRequest> {
@@ -66,6 +67,13 @@ public class CreateGroupHandler extends GroupHandler<WFCMessage.CreateGroupReque
             || request.getGroup().getGroupInfo().getName().length() > 64
             || request.getGroup().getGroupInfo().getPortrait().length() > 1024) {
             return ErrorCode.INVALID_PARAMETER;
+        }
+
+        if(!m_messagesStore.isSensitiveOnlyMessage() && !isAdmin && !StringUtil.isNullOrEmpty(request.getGroup().getGroupInfo().getName())) {
+            Set<String> matched = m_messagesStore.handleSensitiveWord(request.getGroup().getGroupInfo().getName());
+            if (matched != null && !matched.isEmpty()) {
+                return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+            }
         }
 
         WFCMessage.GroupInfo groupInfo = m_messagesStore.createGroup(fromUser, request.getGroup().getGroupInfo(), request.getGroup().getMembersList(), request.getMemberExtra(), isAdmin, failedMembers);

@@ -124,7 +124,7 @@ public final class BrokerConstants {
 
 
     public static final String SENSITIVE_Filter_Type = "sensitive.filter.type";
-
+    public static final String SENSITIVE_Only_Message = "sensitive.only_message";
     public static final String SENSITIVE_Remote_Server_URL = "sensitive.remote_server_url";
     public static final String SENSITIVE_Remote_Message_Type = "sensitive.remote_sensitive_message_type";
     public static final String SENSITIVE_Remote_Fail_When_Matched = "sensitive.remote_fail_when_matched";

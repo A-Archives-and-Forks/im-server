@@ -232,6 +232,7 @@ public interface IMessagesStore {
     boolean addSensitiveWords(List<String> words);
     boolean removeSensitiveWords(List<String> words);
     List<String> getAllSensitiveWords();
+    boolean isSensitiveOnlyMessage();
 
     WFCMessage.Message getMessage(long messageId);
 
