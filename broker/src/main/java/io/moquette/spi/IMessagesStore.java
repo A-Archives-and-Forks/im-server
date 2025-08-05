@@ -190,6 +190,8 @@ public interface IMessagesStore {
     ErrorCode setFriendAliasRequest(String fromUser, String targetUserId, String alias, long[] head);
     ErrorCode setFriendExtraRequest(String fromUser, String targetUserId, String extra, long[] head);
 
+    boolean isAllowName(String name);
+
     ErrorCode handleJoinChatroom(String userId, String clientId, String chatroomId);
     ErrorCode handleQuitChatroom(String userId, String clientId, String chatroomId);
 

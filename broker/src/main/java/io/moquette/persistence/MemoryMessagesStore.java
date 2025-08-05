@@ -1980,10 +1980,16 @@ public class MemoryMessagesStore implements IMessagesStore {
                     return ErrorCode.ERROR_CODE_NOT_RIGHT;
                 }
 
-                if (!mSensitiveOnlyMessage && modifyType == Modify_Group_Name && !StringUtil.isNullOrEmpty(value)) {
-                    Set<String> matched = handleSensitiveWord(value);
-                    if (matched != null && !matched.isEmpty()) {
-                        return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+                if (modifyType == Modify_Group_Name && !StringUtil.isNullOrEmpty(value)) {
+                    if(!mSensitiveOnlyMessage) {
+                        Set<String> matched = handleSensitiveWord(value);
+                        if (matched != null && !matched.isEmpty()) {
+                            return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+                        }
+                    }
+
+                    if(!isAllowName(value)) {
+                        return ErrorCode.ERROR_CODE_NOT_RIGHT;
                     }
                 }
             }
@@ -2822,12 +2828,19 @@ public class MemoryMessagesStore implements IMessagesStore {
             ) {
             switch (entry.getType()) {
                 case Modify_DisplayName:
-                    if(!mSensitiveOnlyMessage) {
-                        Set<String> matched = handleSensitiveWord(entry.getValue());
-                        if (matched != null && !matched.isEmpty()) {
-                            return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+                    if(!StringUtil.isNullOrEmpty(entry.getValue())) {
+                        if (!mSensitiveOnlyMessage) {
+                            Set<String> matched = handleSensitiveWord(entry.getValue());
+                            if (matched != null && !matched.isEmpty()) {
+                                return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+                            }
+                        }
+
+                        if(!isAllowName(entry.getValue())) {
+                            return ErrorCode.ERROR_CODE_NOT_RIGHT;
                         }
                     }
+
                     builder.setDisplayName(entry.getValue());
                     modified = true;
                     break;
@@ -3917,6 +3930,25 @@ public class MemoryMessagesStore implements IMessagesStore {
 
         callbackRelationEvent(fromUser, targetUserId, 3, extra);
         return ErrorCode.ERROR_CODE_SUCCESS;
+    }
+
+    @Override
+    public boolean isAllowName(String name) {
+        if(StringUtil.isNullOrEmpty(name)) {
+            return true;
+        }
+
+        name = name.trim();
+        SystemSettingPojo notAllowNameSetting = getSystemSetting(ProtoConstants.SystemSettingType.NOT_ALLOW_USER_NAMES);
+        if (notAllowNameSetting != null && !StringUtil.isNullOrEmpty(notAllowNameSetting.value)) {
+            String[] ss = notAllowNameSetting.value.split(",");
+            for (String s : ss) {
+                if(name.contains(s.trim())) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override

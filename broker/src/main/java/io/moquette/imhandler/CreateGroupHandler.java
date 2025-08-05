@@ -69,10 +69,16 @@ public class CreateGroupHandler extends GroupHandler<WFCMessage.CreateGroupReque
             return ErrorCode.INVALID_PARAMETER;
         }
 
-        if(!m_messagesStore.isSensitiveOnlyMessage() && !isAdmin && !StringUtil.isNullOrEmpty(request.getGroup().getGroupInfo().getName())) {
-            Set<String> matched = m_messagesStore.handleSensitiveWord(request.getGroup().getGroupInfo().getName());
-            if (matched != null && !matched.isEmpty()) {
-                return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+        if(!isAdmin && !StringUtil.isNullOrEmpty(request.getGroup().getGroupInfo().getName())) {
+            if(!m_messagesStore.isSensitiveOnlyMessage()) {
+                Set<String> matched = m_messagesStore.handleSensitiveWord(request.getGroup().getGroupInfo().getName());
+                if (matched != null && !matched.isEmpty()) {
+                    return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+                }
+            }
+
+            if(!m_messagesStore.isAllowName(request.getGroup().getGroupInfo().getName())) {
+                return ErrorCode.ERROR_CODE_NOT_RIGHT;
             }
         }
 

@@ -226,6 +226,7 @@ public class ProtoConstants {
 
     public interface SystemSettingType {
         int Group_Max_Member_Count = 1;
+        int NOT_ALLOW_USER_NAMES = 2;
     }
 
     public interface SearchUserType {

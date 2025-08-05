@@ -34,10 +34,16 @@ public class ModifyGroupAliasHandler extends GroupHandler<WFCMessage.ModifyGroup
             return ErrorCode.ERROR_CODE_NOT_RIGHT;
         }
 
-        if (!m_messagesStore.isSensitiveOnlyMessage() && !isAdmin && !StringUtil.isNullOrEmpty(request.getAlias())) {
-            Set<String> matched = m_messagesStore.handleSensitiveWord(request.getAlias());
-            if (matched != null && !matched.isEmpty()) {
-                return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+        if (!isAdmin && !StringUtil.isNullOrEmpty(request.getAlias())) {
+            if(!m_messagesStore.isSensitiveOnlyMessage()) {
+                Set<String> matched = m_messagesStore.handleSensitiveWord(request.getAlias());
+                if (matched != null && !matched.isEmpty()) {
+                    return ErrorCode.ERROR_CODE_SENSITIVE_MATCHED;
+                }
+            }
+
+            if(!m_messagesStore.isAllowName(request.getAlias())) {
+                return ErrorCode.ERROR_CODE_NOT_RIGHT;
             }
         }
 

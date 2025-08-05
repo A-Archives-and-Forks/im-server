@@ -58,6 +58,9 @@ public class Main {
         //测试解析数据库中消息内容
         testReadMessageContentFromDB();
 
+        //计算消息分表
+        testMessageSharding();
+
         //Robot和Channel都是使用的80端口，第三方可以创建或者为第三方创建，第三方可以使用robot或者channel与IM系统进行对接。
         testRobot();
         testChannel();
@@ -616,7 +619,7 @@ public class Main {
             System.exit(-1);
         }
 
-        voidIMResult = GroupAdmin.setGroupMemberAlias("user1", groupInfo.getTarget_id(), "user3", "test user3", null, null);
+        voidIMResult = GroupAdmin.setGroupMemberAlias("user1", groupInfo.getTarget_id(), "user2", "test user2", null, null);
         if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("set group member alias success");
         } else {
@@ -1003,13 +1006,24 @@ public class Main {
         testStreamingText(sender, conversation);
     }
 
-    static void testReadMessageContentFromDB() throws Exception {
-        //需要注意几点：
-        // 1 WFCMessage类不能混淆，如果混淆 WFCMessage.MessageContent.parseFrom(data) 就会失败。
-        // 2 MessageContentFactory方法会自动查找所有的消息类，包括文本/图片/语音等。也有可能在某些环境下找不到这些类。可以检查MessageContentFactory
-        // 类的源码，修改registerAllMessageContent方法，确保能找到所有的内容类。也可以显式调用注册的方法把所有已知消息都注册一遍，比如：
-        // MessageContentFactory.registerCustomMessageContent(TextMessageContent.class); //这里示例只写了文本的，其他所有已知消息都需要注册一遍。
+    //消息相关表分为2类，分表是:t_messages_x和t_user_messages_y，并且是分表存储的。表内存储数据和分表规则请参考 https://docs.wildfirechat.cn/faq/server.html 问题2
+    static void testMessageSharding() {
+        String userId = "user1";
+        int hashId = Math.abs(userId.hashCode())%128;
+        String userMessageTable = "t_user_messages_" + hashId;
+        System.out.println("user:" + userId + " user messages table is " + userMessageTable);
 
+        Calendar calendar = Calendar.getInstance();
+        Date date = new Date();
+        calendar.setTime(date);
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+        year %= 3;
+        String messageTable = "t_messages_" + (year * 12 + month);
+        System.out.println("This month save message to table " + messageTable);
+    }
+
+    static void testReadMessageContentFromDB() throws Exception {
         //从数据库t_messages_x表中读取到消息内容字段_data的二进制数据为
         byte[] data = {8,1,18,5,72,101,108,108,111,64,3};
         //1. 先把二进制数据转化为协议栈消息内容。
@@ -1605,7 +1619,7 @@ public class Main {
             System.exit(-1);
         }
 
-        voidIMResult = robotService.setGroupMemberAlias(groupInfo.getTarget_id(), "user3", "test user3", null, null);
+        voidIMResult = robotService.setGroupMemberAlias(groupInfo.getTarget_id(), "user2", "test user2", null, null);
         if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("set group member alias success");
         } else {
