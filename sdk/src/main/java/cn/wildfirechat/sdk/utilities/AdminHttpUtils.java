@@ -67,8 +67,8 @@ public class AdminHttpUtils extends JsonUtils {
 
     public static <T> IMResult<T> httpGet(String path, Class<T> clazz) throws Exception {
         if (isNullOrEmpty(adminUrl) || isNullOrEmpty(adminSecret)) {
-            LOG.error("野火IM Server SDK必须先初始化才能使用，是不是忘记初始化了！！！！");
-            throw new Exception("SDK没有初始化");
+            LOG.error("野火IM Server SDK必须先初始化才能使用，是不是忘记初始化了！请调用AdminConfig.initAdmin(AdminUrl, AdminSecret);进行初始化");
+            throw new Exception("SDK没有初始化，请调用AdminConfig.initAdmin(AdminUrl, AdminSecret);进行初始化");
         }
 
         if (isNullOrEmpty(path)) {
