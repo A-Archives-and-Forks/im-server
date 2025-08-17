@@ -4,6 +4,7 @@ import cn.wildfirechat.common.APIPath;
 import cn.wildfirechat.pojos.*;
 import cn.wildfirechat.proto.ProtoConstants;
 import cn.wildfirechat.sdk.model.IMResult;
+import cn.wildfirechat.sdk.utilities.AdminHttpUtils;
 import cn.wildfirechat.sdk.utilities.ChannelHttpUtils;
 import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -63,6 +64,23 @@ public class ChannelServiceApi {
         messageData.setTargets(targets);
         messageData.setPayload(payload);
         return channelHttpUtils.httpJsonPost(path, messageData, SendMessageResult.class);
+    }
+
+    //仅专业版支持
+    public IMResult<String> recallMessage(long messageUid) throws Exception {
+        String path = APIPath.Channel_Msg_Recall;
+        RecallMessageData messageData = new RecallMessageData();
+        messageData.setMessageUid(messageUid);
+        return channelHttpUtils.httpJsonPost(path, messageData, String.class);
+    }
+
+    //仅专业版支持
+    public IMResult<Void> republishMessage(long messageUid, List<String> targets) throws Exception {
+        String path = APIPath.Channel_Msg_Republish;
+        RepublishChannelMessageData messageData = new RepublishChannelMessageData();
+        messageData.setMessageId(messageUid);
+        messageData.setTargets(targets);
+        return channelHttpUtils.httpJsonPost(path, messageData, Void.class);
     }
 
     public IMResult<Void> subscribe(String userId) throws Exception {

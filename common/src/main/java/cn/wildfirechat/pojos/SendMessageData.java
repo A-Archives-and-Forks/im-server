@@ -20,6 +20,7 @@ public class SendMessageData {
     private MessagePayload payload;
     private List<String> toUsers;
     private boolean isMeshMessage;
+    private boolean isUserMessage;
 
     public String getSender() {
         return sender;
@@ -59,6 +60,14 @@ public class SendMessageData {
 
     public void setMeshMessage(boolean meshMessage) {
         isMeshMessage = meshMessage;
+    }
+
+    public boolean isUserMessage() {
+        return isUserMessage;
+    }
+
+    public void setUserMessage(boolean userMessage) {
+        isUserMessage = userMessage;
     }
 
     public static boolean isValide(SendMessageData sendMessageData) {

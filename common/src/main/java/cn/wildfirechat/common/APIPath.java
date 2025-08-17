@@ -128,6 +128,8 @@ public interface APIPath {
     String Channel_Update_Profile = "/channel/update_profile";
     String Channel_Get_Profile = "/channel/get_profile";
     String Channel_Message_Send = "/channel/message/send";
+    String Channel_Msg_Recall = "/channel/message/recall";
+    String Channel_Msg_Republish = "/channel/message/republish";
     String Channel_Subscribe = "/channel/subscribe";
     String Channel_Subscriber_List = "/channel/subscriber_list";
     String Channel_Is_Subscriber = "/channel/is_subscriber";
