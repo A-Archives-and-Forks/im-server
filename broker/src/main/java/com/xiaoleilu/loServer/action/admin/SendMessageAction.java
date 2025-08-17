@@ -51,7 +51,7 @@ public class SendMessageAction extends AdminAction {
                     } else {
                         return new Result(errorCode);
                     }
-                });
+                }, sendMessageData.isUserMessage());
                 return false;
             } else {
                 setResponseContent(RestResult.resultOf(ErrorCode.INVALID_PARAMETER), response);

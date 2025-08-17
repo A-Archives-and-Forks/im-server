@@ -11,14 +11,21 @@ public class MessageAdmin {
     public static IMResult<SendMessageResult> sendMessage(String sender, Conversation conversation, MessagePayload payload) throws Exception {
         return sendMessage(sender, conversation, payload, null);
     }
+
     //toUsers为发送给会话中部分用户用的，正常为null，仅当需要指定群/频道/聊天室中部分接收用户时使用
     public static IMResult<SendMessageResult> sendMessage(String sender, Conversation conversation, MessagePayload payload, List<String> toUsers) throws Exception {
+        return sendMessage(sender, conversation, payload, toUsers, false);
+    }
+    
+    //toUsers为发送给会话中部分用户用的，正常为null，仅当需要指定群/频道/聊天室中部分接收用户时使用
+    public static IMResult<SendMessageResult> sendMessage(String sender, Conversation conversation, MessagePayload payload, List<String> toUsers, boolean isUserMessage) throws Exception {
         String path = APIPath.Msg_Send;
         SendMessageData messageData = new SendMessageData();
         messageData.setSender(sender);
         messageData.setConv(conversation);
         messageData.setPayload(payload);
         messageData.setToUsers(toUsers);
+        messageData.setUserMessage(isUserMessage);
         if (payload.getType() == 1 && (payload.getSearchableContent() == null || payload.getSearchableContent().isEmpty())) {
             System.out.println("Payload错误，Payload格式应该跟客户端消息encode出来的Payload对齐，这样客户端才能正确识别。比如文本消息，文本需要放到searchableContent属性。请与客户端同事确认Payload的格式，或则去 https://gitee.com/wfchat/android-chat/tree/master/client/src/main/java/cn/wildfirechat/message 找到消息encode的实现方法！");
         }
