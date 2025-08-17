@@ -1,6 +1,7 @@
 package cn.wildfirechat.sdk;
 
 import cn.wildfirechat.common.APIPath;
+import cn.wildfirechat.common.ErrorCode;
 import cn.wildfirechat.pojos.*;
 import cn.wildfirechat.sdk.model.IMResult;
 import cn.wildfirechat.sdk.utilities.AdminHttpUtils;
@@ -176,6 +177,36 @@ public class GroupAdmin {
         input.setTo_lines(to_lines);
         input.setNotify_message(notify_message);
         return AdminHttpUtils.httpJsonPost(path, input, Void.class);
+    }
+
+    public static IMResult<Void> setGroupRemark(String userId, String groupId, String remark) throws Exception {
+        return GeneralAdmin.setUserSetting(userId, 26, groupId, remark);
+    }
+
+    public static IMResult<String> getGroupRemark(String userId, String groupId) throws Exception {
+        IMResult<UserSettingPojo> imResult = GeneralAdmin.getUserSetting(userId, 26, groupId);
+        IMResult<String> result = new IMResult<>();
+        result.code = imResult.code;;
+        result.msg = imResult.msg;;
+        if(imResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            result.result = imResult.result.getValue();
+        }
+        return result;
+    }
+
+    public static IMResult<Void> setFavGroup(String userId, String groupId, boolean fav) throws Exception {
+        return GeneralAdmin.setUserSetting(userId, 6, groupId, fav?"1":"0");
+    }
+
+    public static IMResult<Boolean> isFavGroup(String userId, String groupId) throws Exception {
+        IMResult<UserSettingPojo> imResult = GeneralAdmin.getUserSetting(userId, 6, groupId);
+        IMResult<Boolean> result = new IMResult<>();
+        result.code = imResult.code;;
+        result.msg = imResult.msg;;
+        if(imResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            result.result = "1".equals(imResult.getResult().getValue());
+        }
+        return result;
     }
 
     public static IMResult<OutputGroupIds> getUserGroups(String user) throws Exception {
