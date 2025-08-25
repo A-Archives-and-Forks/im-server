@@ -8,11 +8,13 @@ import cn.wildfirechat.sdk.model.IMResult;
 import cn.wildfirechat.sdk.utilities.RobotHttpUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 
 import static cn.wildfirechat.proto.ProtoConstants.ApplicationType.ApplicationType_Robot;
 
-public class RobotService {
+public class RobotService implements Closeable {
     private final RobotHttpUtils robotHttpUtils;
 
     public RobotService(String url, String robotId, String robotSecret) {
@@ -422,5 +424,10 @@ public class RobotService {
         requestPojo.al = addList;
         requestPojo.rl = removeList;
         return robotHttpUtils.httpJsonPost(path, requestPojo, Void.class);
+    }
+
+    @Override
+    public void close() throws IOException {
+        robotHttpUtils.close();
     }
 }

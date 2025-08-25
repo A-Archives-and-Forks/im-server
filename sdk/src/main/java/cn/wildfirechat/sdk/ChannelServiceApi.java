@@ -9,12 +9,14 @@ import cn.wildfirechat.sdk.utilities.ChannelHttpUtils;
 import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 
 import static cn.wildfirechat.proto.ProtoConstants.ApplicationType.ApplicationType_Channel;
 
 //仅专业版支持，社区版不支持
-public class ChannelServiceApi {
+public class ChannelServiceApi implements Closeable {
     private final ChannelHttpUtils channelHttpUtils;
 
     public ChannelServiceApi(String imurl, String channelId, String secret) {
@@ -66,7 +68,6 @@ public class ChannelServiceApi {
         return channelHttpUtils.httpJsonPost(path, messageData, SendMessageResult.class);
     }
 
-    //仅专业版支持
     public IMResult<String> recallMessage(long messageUid) throws Exception {
         String path = APIPath.Channel_Msg_Recall;
         RecallMessageData messageData = new RecallMessageData();
@@ -74,7 +75,6 @@ public class ChannelServiceApi {
         return channelHttpUtils.httpJsonPost(path, messageData, String.class);
     }
 
-    //仅专业版支持
     public IMResult<Void> republishMessage(long messageUid, List<String> targets) throws Exception {
         String path = APIPath.Channel_Msg_Republish;
         RepublishChannelMessageData messageData = new RepublishChannelMessageData();
@@ -131,4 +131,8 @@ public class ChannelServiceApi {
         return configData;
     }
 
+    @Override
+    public void close() throws IOException {
+        channelHttpUtils.close();
+    }
 }

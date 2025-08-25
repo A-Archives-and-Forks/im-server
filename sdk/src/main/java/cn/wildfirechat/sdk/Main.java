@@ -21,7 +21,7 @@ import static cn.wildfirechat.proto.ProtoConstants.ChannelState.*;
 import static cn.wildfirechat.proto.ProtoConstants.SystemSettingType.Group_Max_Member_Count;
 
 public class Main {
-    private static boolean commercialServer = false;
+    private static boolean commercialServer = true;
     private static boolean advanceVoip = false;
     private static boolean robotMomentsEnabled = false;
     private static boolean momentsEnabled = false;
@@ -1413,6 +1413,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //使用完需要释放
         RobotService robotService = new RobotService(IMUrl, robotId, robotSecret);
 
         //***********************************************
@@ -1812,6 +1813,9 @@ public class Main {
                 System.exit(-1);
             }
         }
+
+        //使用完需要释放
+        robotService.close();
     }
 
     //***测试频道API功能，仅专业版支持***
@@ -1882,7 +1886,7 @@ public class Main {
         }
 
 
-        //2. 初始化api，注意端口是80，不是18080
+        //2. 初始化api，注意端口是80，不是18080 //使用完需要释放
         ChannelServiceApi channelServiceApi = new ChannelServiceApi(IMUrl, channelId, secret);
 
 
@@ -2038,6 +2042,9 @@ public class Main {
         }
         OutputApplicationConfigData config = channelServiceApi.getApplicationSignature();
         System.out.println(config);
+
+        //使用完需要释放
+        channelServiceApi.close();
     }
     static void testSensitiveApi() throws Exception {
         List<String> words = Arrays.asList("a","b","c");

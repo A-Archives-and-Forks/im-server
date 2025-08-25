@@ -3,29 +3,35 @@ package cn.wildfirechat.sdk.utilities;
 import cn.wildfirechat.sdk.model.IMResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import ikidou.reflect.TypeBuilder;
 import io.netty.util.internal.StringUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 
-public class RobotHttpUtils extends JsonUtils {
+public class RobotHttpUtils extends JsonUtils implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(RobotHttpUtils.class);
     public static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
@@ -77,6 +83,7 @@ public class RobotHttpUtils extends JsonUtils {
             .setMaxConnPerRoute(50)
             .build();
     }
+
 
     public <T> IMResult<T> httpJsonPost(String path, Object object, Class<T> clazz) throws Exception{
         if (isNullOrEmpty(url) || isNullOrEmpty(path)) {
@@ -153,5 +160,10 @@ public class RobotHttpUtils extends JsonUtils {
 
     public String getRobotSecret() {
         return robotSecret;
+    }
+
+    @Override
+    public void close() throws IOException {
+        httpClient.close();
     }
 }

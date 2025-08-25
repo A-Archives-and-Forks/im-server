@@ -41,28 +41,30 @@ public class AdminHttpUtils extends JsonUtils {
         init(url, secret, 15000);
     }
 
-    public static void init(String url, String secret, int timeout) {
+    public static synchronized void init(String url, String secret, int timeout) {
         adminUrl = url.trim();
         adminSecret = secret.trim();
-        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-        cm.setValidateAfterInactivity(1000);
-        int connectTimeout = 15000; // 连接超时时间
-        int connectionRequestTimeout = 3000; // 从连接池获取连接的超时时间
-        RequestConfig requestConfig = RequestConfig.custom()
-            .setConnectTimeout(connectTimeout)
-            .setSocketTimeout(timeout)
-            .setConnectionRequestTimeout(connectionRequestTimeout)
-            .build();
+        if(httpClient == null) {
+            PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+            cm.setValidateAfterInactivity(1000);
+            int connectTimeout = 15000; // 连接超时时间
+            int connectionRequestTimeout = 3000; // 从连接池获取连接的超时时间
+            RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(connectTimeout)
+                .setSocketTimeout(timeout)
+                .setConnectionRequestTimeout(connectionRequestTimeout)
+                .build();
 
-        httpClient = HttpClients.custom()
-            .setDefaultRequestConfig(requestConfig)
-            .setConnectionManager(cm)
-            .evictExpiredConnections()
-            .evictIdleConnections(60L, TimeUnit.SECONDS)
-            .setRetryHandler(DefaultHttpRequestRetryHandler.INSTANCE)
-            .setMaxConnTotal(100)
-            .setMaxConnPerRoute(50)
-            .build();
+            httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .setConnectionManager(cm)
+                .evictExpiredConnections()
+                .evictIdleConnections(60L, TimeUnit.SECONDS)
+                .setRetryHandler(DefaultHttpRequestRetryHandler.INSTANCE)
+                .setMaxConnTotal(100)
+                .setMaxConnPerRoute(50)
+                .build();
+        }
     }
 
     public static <T> IMResult<T> httpGet(String path, Class<T> clazz) throws Exception {

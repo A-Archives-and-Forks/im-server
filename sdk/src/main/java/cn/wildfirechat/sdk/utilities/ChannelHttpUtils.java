@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -28,7 +30,7 @@ import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 
-public class ChannelHttpUtils extends JsonUtils {
+public class ChannelHttpUtils extends JsonUtils implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(ChannelHttpUtils.class);
     public static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
@@ -155,5 +157,10 @@ public class ChannelHttpUtils extends JsonUtils {
 
     public String getChannelSecret() {
         return channelSecret;
+    }
+
+    @Override
+    public void close() throws IOException {
+        httpClient.close();
     }
 }
