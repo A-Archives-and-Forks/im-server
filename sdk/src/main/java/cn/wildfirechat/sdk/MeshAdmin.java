@@ -227,4 +227,10 @@ public class MeshAdmin {
         return AdminHttpUtils.httpJsonPost(path, event, Void.class);
     }
 
+    public static IMResult<PojoDomainPingResponse> pingDomain(String domainId) throws Exception {
+        String path = APIPath.Ping_Domain;
+        PojoDomainPingRequest request = new PojoDomainPingRequest();
+        request.domainId = domainId;
+        return AdminHttpUtils.httpJsonPost(path, request, PojoDomainPingResponse.class);
+    }
 }

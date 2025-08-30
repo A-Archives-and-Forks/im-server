@@ -21,6 +21,7 @@ public interface APIPath {
     String Get_Domain = "/admin/domain/get";
     String Destroy_Domain = "/admin/domain/destroy";
     String List_Domain = "/admin/domain/list";
+    String Ping_Domain = "/admin/domain/ping";
 
     String Create_User = "/admin/user/create";
     String Update_User = "/admin/user/update";
