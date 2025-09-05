@@ -43,7 +43,7 @@ public class RobotHttpUtils extends JsonUtils implements Closeable {
     private final int port;
 
     private void checkPort() {
-        if (port != 80 && port != 443) {
+        if (port != 80 && port != 443 && port != -1) {
             if (port == 18080) {
                 LOG.warn("您传入的机器人API地址中的端口是18080，18080端口默认为管理API端口，机器人API端口应该为IM服务的HTTP端口，默认为80，请确认是否使用错误！");
             } else {
@@ -58,7 +58,11 @@ public class RobotHttpUtils extends JsonUtils implements Closeable {
         this.robotSecret = robotSecret.trim();
         try {
             URL u = new URL(this.url);
-            this.port = u.getPort();
+            int port = u.getPort();
+            if(port == -1) {
+                port = u.getDefaultPort();
+            }
+            this.port = port;
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
