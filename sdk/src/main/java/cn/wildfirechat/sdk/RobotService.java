@@ -39,6 +39,15 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, messageData, SendMessageResult.class);
     }
 
+    public IMResult<SendMessageResult> replyMessage(long messageUid, MessagePayload payload, boolean only2Sender) throws Exception {
+        String path = APIPath.Robot_Message_Reply;
+        ReplyMessageData messageData = new ReplyMessageData();
+        messageData.setMessageUid(messageUid);
+        messageData.setOnly2Sender(only2Sender);
+        messageData.setPayload(payload);
+        return robotHttpUtils.httpJsonPost(path, messageData, SendMessageResult.class);
+    }
+
     public IMResult<String> recallMessage(long messageUid) throws Exception {
         String path = APIPath.Robot_Message_Recall;
         RecallMessageData messageData = new RecallMessageData();
