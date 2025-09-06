@@ -254,6 +254,7 @@ public interface IMessagesStore {
     boolean isRobotCallbackWithClientInfo();
     boolean isRobotCallbackWithSenderInfo();
     boolean isRobotCallbackWithTargetInfo();
+    boolean isRobotMentionExternalRobot();
 
     boolean isChannelCallbackWithClientInfo();
     boolean isChannelCallbackWithSenderInfo();

@@ -55,6 +55,15 @@ public class ReplyMessageAction extends RobotAction {
                     errorCode = ErrorCode.ERROR_CODE_NOT_IMPLEMENT;
                 } else if(System.currentTimeMillis() - message.getServerTimestamp() > 15*60*1000) {
                     errorCode = ErrorCode.ERROR_CODE_RECALL_TIME_EXPIRED;
+                } else if(!messagesStore.isRobotMentionExternalRobot()) {
+                    if(message.getConversation().getType() != ProtoConstants.ConversationType.ConversationType_Group) {
+                        errorCode = ErrorCode.ERROR_CODE_NOT_IMPLEMENT;
+                    } else {
+                        WFCMessage.GroupMember member = messagesStore.getGroupMember(message.getConversation().getTarget(), robot.getUid());
+                        if(member == null || member.getType() == ProtoConstants.GroupMemberType.GroupMemberType_Removed) {
+                            errorCode = ErrorCode.ERROR_CODE_NOT_IMPLEMENT;
+                        }
+                    }
                 }
 
                 if(errorCode != null) {

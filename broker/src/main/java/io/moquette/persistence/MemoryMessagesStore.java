@@ -213,6 +213,7 @@ public class MemoryMessagesStore implements IMessagesStore {
     private boolean mRobotCallbackWithClientInfo = false;
     private boolean mRobotCallbackWithSenderInfo = false;
     private boolean mRobotCallbackWithTargetInfo = false;
+    private boolean mRobotMentionExternalRobot = false;
 
     private boolean mChannelCallbackWithClientInfo = false;
     private boolean mChannelCallbackWithSenderInfo = false;
@@ -646,6 +647,9 @@ public class MemoryMessagesStore implements IMessagesStore {
         try {
             mRobotCallbackWithTargetInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.ROBOT_Callback_With_Target_Info, "false"));
         } catch (Exception e) {}
+        try {
+            mRobotMentionExternalRobot = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.ROBOT_Mention_External_Robot, "false"));
+        } catch (Exception e) {}
 
         try {
             mChannelCallbackWithClientInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.CHANNEL_Callback_With_Client_Info, "false"));
@@ -741,7 +745,7 @@ public class MemoryMessagesStore implements IMessagesStore {
         int type = message.getConversation().getType();
         int pullType = ProtoConstants.PullType.Pull_Normal;
 
-        if (type == ProtoConstants.ConversationType.ConversationType_Private) {
+        if (mRobotMentionExternalRobot && type == ProtoConstants.ConversationType.ConversationType_Private) {
             if(message.getConversation().getTarget().contains("|")) {
                 String[] ss = message.getConversation().getTarget().split("\\|");
                 notifyReceivers.add(ss[0]);
@@ -761,7 +765,7 @@ public class MemoryMessagesStore implements IMessagesStore {
                     notifyReceivers.add(message.getConversation().getTarget());
                 }
             }
-            if (message.getContent().getMentionedTargetCount() > 0) {
+            if (mRobotMentionExternalRobot && message.getContent().getMentionedTargetCount() > 0) {
                 for (String mentioned : message.getContent().getMentionedTargetList()) {
                     if (!notifyReceivers.contains(mentioned)) {
                         WFCMessage.User user = getUserInfo(mentioned);
@@ -799,7 +803,7 @@ public class MemoryMessagesStore implements IMessagesStore {
                     }
                 }
             }
-            if (message.getContent().getMentionedTargetCount() > 0) {
+            if (mRobotMentionExternalRobot && message.getContent().getMentionedTargetCount() > 0) {
                 for (String mentioned : message.getContent().getMentionedTargetList()) {
                     if (!notifyReceivers.contains(mentioned)) {
                         WFCMessage.User user = getUserInfo(mentioned);
@@ -4920,6 +4924,11 @@ public class MemoryMessagesStore implements IMessagesStore {
     @Override
     public boolean isRobotCallbackWithTargetInfo() {
         return mRobotCallbackWithTargetInfo;
+    }
+
+    @Override
+    public boolean isRobotMentionExternalRobot() {
+        return mRobotMentionExternalRobot;
     }
 
     @Override
