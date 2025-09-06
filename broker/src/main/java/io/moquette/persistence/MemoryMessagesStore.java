@@ -742,13 +742,34 @@ public class MemoryMessagesStore implements IMessagesStore {
         int pullType = ProtoConstants.PullType.Pull_Normal;
 
         if (type == ProtoConstants.ConversationType.ConversationType_Private) {
-            notifyReceivers.add(fromUser);
-            if(message.getToCount() > 0) {
-                if(message.getToList().contains(message.getConversation().getTarget())) {
-                    notifyReceivers.add(message.getConversation().getTarget());
+            if(message.getConversation().getTarget().contains("|")) {
+                String[] ss = message.getConversation().getTarget().split("\\|");
+                notifyReceivers.add(ss[0]);
+                notifyReceivers.add(ss[1]);
+                if(!message.getToList().isEmpty()) {
+                    notifyReceivers.addAll(message.getToList());
+                } else if(!StringUtil.isNullOrEmpty(message.getToUser())) {
+                    notifyReceivers.add(message.getToUser());
                 }
             } else {
-                notifyReceivers.add(message.getConversation().getTarget());
+                notifyReceivers.add(fromUser);
+                if (message.getToCount() > 0) {
+                    if (message.getToList().contains(message.getConversation().getTarget())) {
+                        notifyReceivers.add(message.getConversation().getTarget());
+                    }
+                } else {
+                    notifyReceivers.add(message.getConversation().getTarget());
+                }
+            }
+            if (message.getContent().getMentionedTargetCount() > 0) {
+                for (String mentioned : message.getContent().getMentionedTargetList()) {
+                    if (!notifyReceivers.contains(mentioned)) {
+                        WFCMessage.User user = getUserInfo(mentioned);
+                        if(user != null && user.getType() == ProtoConstants.UserType.UserType_Robot) {
+                            notifyReceivers.add(mentioned);
+                        }
+                    }
+                }
             }
             pullType = ProtoConstants.PullType.Pull_Normal;
         } else if (type == ProtoConstants.ConversationType.ConversationType_Group) {
@@ -775,6 +796,16 @@ public class MemoryMessagesStore implements IMessagesStore {
                 for (WFCMessage.GroupMember member : members) {
                     if (member.getType() != GroupMemberType_Removed) {
                         notifyReceivers.add(member.getMemberId());
+                    }
+                }
+            }
+            if (message.getContent().getMentionedTargetCount() > 0) {
+                for (String mentioned : message.getContent().getMentionedTargetList()) {
+                    if (!notifyReceivers.contains(mentioned)) {
+                        WFCMessage.User user = getUserInfo(mentioned);
+                        if(user != null && user.getType() == ProtoConstants.UserType.UserType_Robot) {
+                            notifyReceivers.add(mentioned);
+                        }
                     }
                 }
             }

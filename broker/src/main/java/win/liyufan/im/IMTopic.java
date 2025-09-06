@@ -10,6 +10,7 @@ package win.liyufan.im;
 
 public interface IMTopic {
 	String SendMessageTopic = "MS";
+    String RobotReplyMessageTopic = "RRM";
     String MultiCastMessageTopic = "MMC";
     String RecallMessageTopic = "MR";
     String RecallMultiCastMessageTopic = "MRMC";
