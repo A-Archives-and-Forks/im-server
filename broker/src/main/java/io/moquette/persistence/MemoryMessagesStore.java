@@ -745,8 +745,8 @@ public class MemoryMessagesStore implements IMessagesStore {
         int type = message.getConversation().getType();
         int pullType = ProtoConstants.PullType.Pull_Normal;
 
-        if (mRobotMentionExternalRobot && type == ProtoConstants.ConversationType.ConversationType_Private) {
-            if(message.getConversation().getTarget().contains("|")) {
+        if (type == ProtoConstants.ConversationType.ConversationType_Private) {
+            if(mRobotMentionExternalRobot && message.getConversation().getTarget().contains("|")) {
                 String[] ss = message.getConversation().getTarget().split("\\|");
                 notifyReceivers.add(ss[0]);
                 notifyReceivers.add(ss[1]);
