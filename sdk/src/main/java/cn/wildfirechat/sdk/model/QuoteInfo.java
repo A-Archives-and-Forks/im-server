@@ -50,13 +50,18 @@ public class QuoteInfo {
         object.put("i", userId);
         object.put("n", userDisplayName);
         object.put("d", messageDigest);
-        return object;
+        JSONObject quote = new JSONObject();
+        quote.put("quote", object);
+        return quote;
     }
 
     public void decode(JSONObject object) {
-        messageUid = (long) object.get("u");
-        userId = (String) object.get("i");
-        userDisplayName = (String) object.get("n");
-        messageDigest = (String) object.get("d");
+        JSONObject quote = (JSONObject)object.get("quote");
+        if(quote != null) {
+            messageUid = (long) quote.get("u");
+            userId = (String) quote.get("i");
+            userDisplayName = (String) quote.get("n");
+            messageDigest = (String) quote.get("d");
+        }
     }
 }
