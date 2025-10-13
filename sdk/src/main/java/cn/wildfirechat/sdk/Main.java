@@ -21,7 +21,7 @@ import static cn.wildfirechat.proto.ProtoConstants.ChannelState.*;
 import static cn.wildfirechat.proto.ProtoConstants.SystemSettingType.Group_Max_Member_Count;
 
 public class Main {
-    private static boolean commercialServer = true;
+    private static boolean commercialServer = false;
     private static boolean advanceVoip = false;
     private static boolean robotMomentsEnabled = false;
     private static boolean momentsEnabled = false;
