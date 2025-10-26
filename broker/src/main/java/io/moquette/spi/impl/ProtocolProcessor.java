@@ -284,7 +284,7 @@ public class ProtocolProcessor {
                             sessionstatus = 0;
                         }
 
-                        userOnlineStatus.sessions.add(new OutputCheckUserOnline.Session(userId, session.getClientID(), session.getPlatform(), sessionstatus, session.getLastActiveTime(), session.getAppName()));
+                        userOnlineStatus.sessions.add(new OutputCheckUserOnline.Session(userId, session.getClientID(), session.getPlatform(), sessionstatus, session.getLastActiveTime(), session.getAppName(), session.getIp()));
                     }
 
                     HttpUtils.httpJsonPost(mUserOnlineStatusCallback, GsonUtil.gson.toJson(userOnlineStatus), HttpUtils.HttpPostType.POST_TYPE_User_Online_Event_Callback);

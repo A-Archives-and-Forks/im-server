@@ -61,6 +61,7 @@ public class MemorySessionStore implements ISessionsStore {
         private int deleted;
 
         private boolean pullHistoryMsg;
+        private String ip;
 
         public int getDeleted() {
             return deleted;
@@ -157,6 +158,14 @@ public class MemorySessionStore implements ISessionsStore {
             if (this.lastActiveTime == 0) {
                 this.lastActiveTime = updateDt;
             }
+        }
+
+        public String getIp() {
+            return ip;
+        }
+
+        public void setIp(String ip) {
+            this.ip = ip;
         }
 
         private int pushType;
@@ -542,6 +551,15 @@ public class MemorySessionStore implements ISessionsStore {
         }
 
         return session.clientSession;
+    }
+
+    @Override
+    public void updateSessionIp(String username, String clientID, String ip) {
+        Session session = getSession(clientID);
+        if(session != null && session.getDeleted() == 0) {
+            session.setIp(ip);
+            databaseStore.updateSessionIp(username, clientID, ip);
+        }
     }
 
     @Override

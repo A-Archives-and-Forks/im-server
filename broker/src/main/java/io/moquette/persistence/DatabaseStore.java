@@ -1832,6 +1832,31 @@ public class DatabaseStore {
         });
     }
 
+    void updateSessionIp(String uid, String cid, String ip) {
+        mScheduler.execute(()->{
+            Connection connection = null;
+            PreparedStatement statement = null;
+            try {
+                connection = DBUtil.getConnection();
+                String sql = "update t_user_session set _ip = ?  where `_uid` = ? and `_cid` = ?";
+                statement = connection.prepareStatement(sql);
+                int index = 1;
+                statement.setString(index++, ip);
+                statement.setString(index++, uid);
+                statement.setString(index++, cid);
+
+                int c = statement.executeUpdate();
+                LOG.info("Update rows {}", c);
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                Utility.printExecption(LOG, e, RDBS_Exception);
+            } finally {
+                DBUtil.closeDB(connection, statement);
+            }
+        });
+    }
+
     void clearMultiEndpoint(String uid, String clientId, int platform) {
         LOG.info("clearMultiEndpoint {}, {}", uid, clientId);
         Connection connection = null;

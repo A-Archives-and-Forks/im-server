@@ -43,7 +43,7 @@ public interface ISessionsStore {
     ErrorCode loadActiveSession(String username, String clientID);
 
     ClientSession updateExistSession(String username, String clientID, WFCMessage.RouteRequest endpoint, boolean cleanSession);
-
+    void updateSessionIp(String username, String clientID, String ip);
     Session getSession(String clientID);
 
     void cleanDuplatedToken(String cid, int pushType, String token, boolean isVoip, String packageName);

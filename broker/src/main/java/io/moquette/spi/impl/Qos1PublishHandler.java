@@ -141,7 +141,7 @@ public class Qos1PublishHandler extends QosPublishHandler {
                     status = 0;
                 }
 
-                out.addSession(userId, session.getClientID(), session.getPlatform(), status, session.getLastActiveTime(), session.getAppName());
+                out.addSession(userId, session.getClientID(), session.getPlatform(), status, session.getLastActiveTime(), session.getAppName(), session.getIp());
             }
 
             callback.onRouteHandled(GsonUtil.gson.toJson(out).getBytes());

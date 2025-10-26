@@ -20,22 +20,24 @@ public class OutputCheckUserOnline {
         public int status; //0 online, 1 have session offline
         public long lastSeen;
         public String packageName;
+        public String ip;
 
         public Session() {
         }
 
-        public Session(String clientId, String userId, int platform, int status, long lastSeen, String packageName) {
+        public Session(String clientId, String userId, int platform, int status, long lastSeen, String packageName, String ip) {
             this.clientId = clientId;
             this.userId = userId;
             this.platform = platform;
             this.status = status;
             this.lastSeen = lastSeen;
             this.packageName = packageName;
+            this.ip = ip;
         }
     }
 
-    public void addSession(String userId, String clientId, int platform, int status, long lastSeen, String packageName) {
-        Session session = new Session(clientId, userId, platform, status, lastSeen, packageName);
+    public void addSession(String userId, String clientId, int platform, int status, long lastSeen, String packageName, String ip) {
+        Session session = new Session(clientId, userId, platform, status, lastSeen, packageName, ip);
         sessions.add(session);
     }
 
