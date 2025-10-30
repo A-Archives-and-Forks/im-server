@@ -332,7 +332,7 @@ public class MemoryMessagesStore implements IMessagesStore {
             printMissConfigLog(FRIEND_Disable_NickName_Search, mDisableNicknameSearch + "");
         }
         try {
-            mDisableUserIdSearch = Boolean.parseBoolean(m_Server.getConfig().getProperty(BrokerConstants.FRIEND_Disable_UserId_Search, "true"));
+            mDisableUserIdSearch = Boolean.parseBoolean(m_Server.getConfig().getProperty(BrokerConstants.FRIEND_Disable_UserId_Search, "false"));
         } catch (Exception e) {
 
         }
