@@ -8,11 +8,38 @@ import cn.wildfirechat.sdk.utilities.ClassUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MessageContentFactory {
     private static final Map<Integer, Class<? extends MessageContent>> contentClassMap = new ConcurrentHashMap<>();
+
+    private static List<Class> buildinMessageContents = Arrays.asList(
+        ArticlesMessageContent.class,
+        StreamTextGeneratedMessageContent.class,
+        CallStartMessageContent.class,
+        StreamTextGeneratingMessageContent.class,
+        CardMessageContent.class,
+        MultiCallOngoingMessageContent.class,
+        TextMessageContent.class,
+        DeleteMessageContent.class,
+        NotDeliveredMessageContent.class,
+        TipNotificationMessageContent.class,
+        FileMessageContent.class,
+        PTTSoundMessageContent.class,
+        TypingMessageContent.class,
+        ImageMessageContent.class,
+        RecallMessageContent.class,
+        UnknownMessageContent.class,
+        LinkMessageContent.class,
+        RichNotificationMessageContent.class,
+        VideoMessageContent.class,
+        LocationMessageContent.class,
+        SoundMessageContent.class,
+        StickerMessageContent.class
+    );
 
     static  {
         registerAllMessageContent();
@@ -59,6 +86,15 @@ public class MessageContentFactory {
     }
 
     private static void registerAllMessageContent() {
+        try {
+            for (Class buildinMessageContent : buildinMessageContents) {
+                MessageContent content = (MessageContent)buildinMessageContent.newInstance();
+                contentClassMap.put(content.getContentType(), buildinMessageContent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         try {
             for (Class cls : ClassUtil.getAllAssignedClass(MessageContent.class)) {
                 if(!Modifier.isAbstract(cls.getModifiers())) {
