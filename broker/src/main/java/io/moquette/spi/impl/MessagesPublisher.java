@@ -230,6 +230,7 @@ public class MessagesPublisher {
                 }
             }
 
+            boolean unreadCountIncreased = false;
             for (Session targetSession : sessions) {
                 //超过7天不活跃的用户忽略
                 if(System.currentTimeMillis() - targetSession.getLastActiveTime() > m_messagesStore.getPushExpiredTimes()) {
@@ -314,8 +315,9 @@ public class MessagesPublisher {
                     }
 
                     if (!StringUtil.isNullOrEmpty(pushContent) || messageContentType == 400) {
-                        if (!isConvSilent && (persistFlag & 0x02) > 0) {
+                        if (!isConvSilent && (persistFlag & 0x02) > 0 && !unreadCountIncreased) {
                             m_messagesStore.increaseUnreceivedMsgCount(user);
+                            unreadCountIncreased = true;
                         }
                     }
                 }
