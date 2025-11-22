@@ -202,6 +202,10 @@ public class MemoryMessagesStore implements IMessagesStore {
     private int mGroupForbiddenClientOperation;
     private int mSyncDataPartSize = 0;
     private boolean keepDisplayNameWhenDestroyUser = true;
+    private boolean keepFullInfoWhenDestroyUser = false;
+    private boolean keepMobileWhenDestroyUser = false;
+    private boolean keepMessagesWhenDestroyUser = false;
+
     private String mRecallForwardUrl = null;
 
     private boolean mBroadcastTargetFromUserTable = false;
@@ -600,6 +604,17 @@ public class MemoryMessagesStore implements IMessagesStore {
         } catch (Exception e) {
 
         }
+        try {
+            keepFullInfoWhenDestroyUser = "true".equals(server.getConfig().getProperty(USER_KEEP_FULL_INFO_WHEN_DESTROY));
+        } catch (Exception e) {}
+
+        try {
+            keepMobileWhenDestroyUser = "true".equals(server.getConfig().getProperty(USER_KEEP_MOBILE_WHEN_DESTROY));
+        } catch (Exception e) {}
+
+        try {
+            keepMessagesWhenDestroyUser = "true".equals(server.getConfig().getProperty(USER_KEEP_MESSAGES_WHEN_DESTROY));
+        } catch (Exception e) {}
 
 
         try {
@@ -2758,8 +2773,9 @@ public class MemoryMessagesStore implements IMessagesStore {
         } finally {
             mWriteLock.unlock();
         }
-
-        databaseStore.clearUserMessage(userId);
+        if(!keepMessagesWhenDestroyUser) {
+            databaseStore.clearUserMessage(userId);
+        }
     }
 
     @Override
@@ -3137,37 +3153,29 @@ public class MemoryMessagesStore implements IMessagesStore {
         IMap<String, WFCMessage.User> mUserMap = hzInstance.getMap(USERS);
         WFCMessage.User us = mUserMap.get(userId);
         if (us != null) {
-            if (keepDisplayNameWhenDestroyUser) {
-                us = WFCMessage.User.newBuilder()
-                    .setUid(userId)
-                    .setUpdateDt(System.currentTimeMillis())
-                    .setName(userId)
-                    .setDeleted(1)
-                    .clearAddress()
-                    .clearCompany()
-                    .clearEmail()
-                    .clearExtra()
-                    .clearMobile()
-                    .clearPortrait()
-                    .clearSocial()
-                    .build();
+            WFCMessage.User.Builder builder = WFCMessage.User.newBuilder().setUpdateDt(System.currentTimeMillis()).setDeleted(1);
+
+            if(keepFullInfoWhenDestroyUser) {
+                if(!keepMobileWhenDestroyUser) {
+                    builder.clearMobile();
+                }
             } else {
-                us = WFCMessage.User.newBuilder()
-                    .setUid(userId)
-                    .setUpdateDt(System.currentTimeMillis())
+                builder.setUid(userId)
                     .setName(userId)
-                    .setDeleted(1)
-                    .clearDisplayName()
                     .clearAddress()
                     .clearCompany()
                     .clearEmail()
                     .clearExtra()
                     .clearMobile()
                     .clearPortrait()
-                    .clearSocial()
-                    .build();
+                    .clearGender()
+                    .clearSocial();
+                if (!keepDisplayNameWhenDestroyUser) {
+                    builder.clearDisplayName();
+                }
             }
 
+            us = builder.build();
             try {
                 databaseStore.updateUser(us);
             } catch (Exception e) {
@@ -3176,8 +3184,8 @@ public class MemoryMessagesStore implements IMessagesStore {
             }
             mUserMap.put(userId, us);
         }
-
     }
+
     @Override
     public void updateUserInfo(WFCMessage.User user) throws Exception {
         HazelcastInstance hzInstance = m_Server.getHazelcastInstance();

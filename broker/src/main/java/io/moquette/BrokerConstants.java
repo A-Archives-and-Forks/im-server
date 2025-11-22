@@ -213,6 +213,9 @@ public final class BrokerConstants {
 
     public static final String USER_HIDE_PROPERTIES = "user.hide_properties";
     public static final String USER_KEEP_DISPLAY_NAME_WHEN_DESTROY = "user.keep_display_name_when_destroy";
+    public static final String USER_KEEP_FULL_INFO_WHEN_DESTROY = "user.keep_full_info_when_destroy";
+    public static final String USER_KEEP_MOBILE_WHEN_DESTROY = "user.keep_mobile_when_destroy";
+    public static final String USER_KEEP_MESSAGES_WHEN_DESTROY = "user.keep_messages_when_destroy";
 
     public static final String SYNC_Data_Part_Size = "sync.data_part_size";
 
