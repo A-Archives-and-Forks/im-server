@@ -190,6 +190,8 @@ public final class BrokerConstants {
     public static final String FRIEND_Reject_Request_Duration = "friend.reject_request_duration";
     public static final String FRIEND_Request_Expiration_Duration = "friend.request_expiration_duration";
     public static final String FRIEND_Request_Rate_Limit = "friend.request_rate_limit";
+    public static final String FRIEND_Search_Mobile_Empty_Rate_Limit = "friend.search_mobile_empty_rate_limit";
+    public static final String FRIEND_Search_Rate_Limit = "friend.search_rate_limit";
     public static final String FRIEND_Request_Robot_Auto_Accept = "friend.robot_auto_accept";
 
 

@@ -58,6 +58,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static cn.wildfirechat.common.IMExceptionEvent.EventType.EVENT_CALLBACK_Exception;
 import static cn.wildfirechat.proto.ProtoConstants.ChannelState.*;
@@ -157,6 +159,8 @@ public class MemoryMessagesStore implements IMessagesStore {
     private long mFriendRejectDuration = 30 * 24 * 60 * 60 * 1000;
     private long mFriendRequestExpiration = 7 * 24 * 60 * 60 * 1000;
     private RateLimiter mFriendRateLimiter;
+    private RateLimiter mFriendSearchEmpthMobileRateLimiter;
+    private RateLimiter mFriendSearchRateLimiter;
     private boolean mFriendRobotAutoAccept = true;
 
     private long mPushExpiredTimes = 604800000L;
@@ -377,6 +381,21 @@ public class MemoryMessagesStore implements IMessagesStore {
             int friendRequestRateLimit = Integer.parseInt(m_Server.getConfig().getProperty(FRIEND_Request_Rate_Limit, "0"));
             if(friendRequestRateLimit > 0) {
                 mFriendRateLimiter = new RateLimiter(86400, friendRequestRateLimit);
+            }
+        } catch (Exception e) {
+        }
+        try {
+            int rateLimit = Integer.parseInt(m_Server.getConfig().getProperty(FRIEND_Search_Mobile_Empty_Rate_Limit, "0"));
+            if(rateLimit > 0) {
+                mFriendSearchEmpthMobileRateLimiter = new RateLimiter(86400, rateLimit);
+            }
+        } catch (Exception e) {
+        }
+
+        try {
+            int rateLimit = Integer.parseInt(m_Server.getConfig().getProperty(FRIEND_Search_Rate_Limit, "0"));
+            if(rateLimit > 0) {
+                mFriendSearchRateLimiter = new RateLimiter(86400, rateLimit);
             }
         } catch (Exception e) {
         }
@@ -3230,10 +3249,42 @@ public class MemoryMessagesStore implements IMessagesStore {
         return databaseStore.getAllUsers(count, offset);
     }
 
+    // 电话号码校验正则表达式（支持中国大陆手机号和固话）
+    private static final String PHONE_REGEX = "^\\s*" +  // 允许开头空白
+        "(?:" +
+        "(1[0-9])\\d{9}" +
+        "|" +
+        "((0\\d{2,3})|(\\(0\\d{2,3}\\)))" +
+        "[-\\s.]?" +
+        "\\d{7,8}" +
+        "|" +
+        "\\d{7,8}" +
+        ")\\s*$";
+
+    private static final Pattern PHONE_PATTERN = Pattern.compile(PHONE_REGEX);
+    private static final Pattern PHONE_PART_PATTERN = Pattern.compile("^1\\d{0,10}$");
+
+    public static boolean isPhoneNumber(String phone) {
+        if (phone == null || phone.trim().isEmpty()) {
+            return false;
+        }
+        Matcher matcher = PHONE_PATTERN.matcher(phone);
+        return matcher.matches();
+    }
+
+    public static boolean isPhoneNumberPart(String str) {
+        if (str == null || str.trim().isEmpty()) {
+            return false;
+        }
+
+        Matcher matcher = PHONE_PART_PATTERN.matcher(str);
+        return matcher.matches();
+    }
+
     @Override
-    public List<WFCMessage.User> searchUser(String keyword, int searchType, int userType, int page) {
+    public ErrorCode searchUser(String userId, String keyword, int searchType, int userType, int page, List<WFCMessage.User> users) {
         if (mDisableSearch) {
-            return new ArrayList<>();
+            return ErrorCode.ERROR_CODE_NOT_IMPLEMENT;
         }
 
         if (mDisableNicknameSearch && searchType == ProtoConstants.SearchUserType.SearchUserType_General) {
@@ -3249,10 +3300,29 @@ public class MemoryMessagesStore implements IMessagesStore {
         }
 
         if(mDisableUserIdSearch && searchType == ProtoConstants.SearchUserType.SearchUserType_UserId) {
-            return new ArrayList<>();
+            return ErrorCode.ERROR_CODE_NOT_IMPLEMENT;
         }
 
-        return databaseStore.searchUserFromDB(keyword, searchType, userType, page);
+        if(mFriendSearchRateLimiter != null && !isPhoneNumberPart(keyword)) {
+            //非电话号码，允许多少次搜索。
+            if(!mFriendSearchRateLimiter.isGranted(userId)) {
+                LOG.error("User {} search user mobile over frequency, keyword {}, searchType {}", userId, keyword, searchType);
+                return ErrorCode.ERROR_CODE_OVER_FREQUENCY;
+            }
+        }
+
+        List<WFCMessage.User> matchedUsers = databaseStore.searchUserFromDB(keyword, searchType, userType, page);
+        if(mFriendSearchEmpthMobileRateLimiter != null && matchedUsers.isEmpty() && isPhoneNumber(keyword)) {
+            //查电话号码为空
+            if(!mFriendSearchEmpthMobileRateLimiter.isGranted(userId)) {
+                LOG.error("User {} search user over frequency, keyword {}, searchType {}", userId, keyword, searchType);
+                return ErrorCode.ERROR_CODE_OVER_FREQUENCY;
+            }
+        }
+
+        users.addAll(matchedUsers);
+
+        return ErrorCode.ERROR_CODE_SUCCESS;
     }
 
     @Override

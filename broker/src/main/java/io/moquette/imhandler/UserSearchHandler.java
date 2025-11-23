@@ -15,13 +15,18 @@ import io.netty.buffer.ByteBuf;
 import cn.wildfirechat.common.ErrorCode;
 import win.liyufan.im.IMTopic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Handler(IMTopic.UserSearchTopic)
 public class UserSearchHandler extends IMHandler<WFCMessage.SearchUserRequest> {
     @Override
     public ErrorCode action(ByteBuf ackPayload, String clientID, String fromUser, ProtoConstants.RequestSourceType requestSourceType, WFCMessage.SearchUserRequest request, Qos1PublishHandler.IMCallback callback) {
-        List<WFCMessage.User> users = m_messagesStore.searchUser(request.getKeyword(), request.getFuzzy(), request.getType(), request.getPage());
+        List<WFCMessage.User> users = new ArrayList<>();
+        ErrorCode errorCode = m_messagesStore.searchUser(fromUser, request.getKeyword(), request.getFuzzy(), request.getType(), request.getPage(), users);
+        if(errorCode != ErrorCode.ERROR_CODE_SUCCESS) {
+            return errorCode;
+        }
         WFCMessage.SearchUserResult.Builder builder = WFCMessage.SearchUserResult.newBuilder();
         builder.addAllEntry(users);
         byte[] data = builder.build().toByteArray();
