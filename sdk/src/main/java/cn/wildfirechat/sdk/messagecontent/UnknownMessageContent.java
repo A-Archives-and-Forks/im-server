@@ -12,7 +12,7 @@ public class UnknownMessageContent extends MessageContent {
 
     @Override
     public int getContentType() {
-        return ProtoConstants.ContentType.Text;
+        return ProtoConstants.ContentType.Unknown;
     }
 
     @Override
