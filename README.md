@@ -163,6 +163,9 @@ mvn clean package
 
 如果是专业版IM服务，普通群性能会有些加强，但也不会提高太多，所以我们就开发了超级群，可以支持上万群成员。关于超级群，请参考[野火超级群组](https://mp.weixin.qq.com/s/ov5ZiaEIUZuvgFBXOrcjbg)。现有客户有接近10W的群组成员能够流畅稳定地运行。
 
+## 网络问题
+如果是自建机房或者私有网络，可能会有跨运营商瓶颈，详情请参考[《从野火 IM 的网络踩坑经历，聊聊跨运营商访问的那些坑》](https://mp.weixin.qq.com/s/Pa8b93oMk58fjMgwtwmePQ)。
+
 ## 常见问题
 请参考文档[常见问题](https://docs.wildfirechat.cn/faq/server.html)
 
