@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -213,7 +215,7 @@ public class UploadFileAction extends Action {
                     return false;
                 }
 
-
+                remoteFileName = getSafeFileName(remoteFileName);
 
                 String remoteFileExt = "";
                 if (remoteFileName.lastIndexOf(".") == -1) {
@@ -337,6 +339,15 @@ public class UploadFileAction extends Action {
             return false;
         }
         return true;
+    }
+
+    private static String getSafeFileName(String originalFilename) {
+        // Paths.get() 会解析路径，getFileName() 只取最后一部分（纯文件名）
+        Path filenamePath = Paths.get(originalFilename.trim());
+        String safeFilename = filenamePath.getFileName().toString();
+        // 额外过滤特殊字符（可选，根据业务需要）
+        safeFilename = safeFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+        return safeFilename.isEmpty() ? "default_file_" + System.currentTimeMillis() : safeFilename;
     }
 
     public static void put(File file, long pos, byte[] data) throws Exception {
