@@ -45,20 +45,20 @@ public class HandleFriendRequestHandler extends IMHandler<WFCMessage.HandleFrien
                         contentBuilder.setType(92);
 
                         builder = WFCMessage.Message.newBuilder();
-                        builder.setFromUser(request.getTargetUid());
-                        builder.setConversation(WFCMessage.Conversation.newBuilder().setTarget(fromUser).setLine(0).setType(ProtoConstants.ConversationType.ConversationType_Private).build());
+                        builder.setFromUser(fromUser);
+                        builder.setConversation(WFCMessage.Conversation.newBuilder().setTarget(request.getTargetUid()).setLine(0).setType(ProtoConstants.ConversationType.ConversationType_Private).build());
                         builder.setContent(contentBuilder);
                         builder.setServerTimestamp(++timestamp);
 
                         messageId = MessageShardingUtil.generateId();
                         builder.setMessageId(messageId);
-                        saveAndPublish(request.getTargetUid(), null, builder.build(), requestSourceType);
+                        saveAndPublish(fromUser, null, builder.build(), requestSourceType);
                         contentBuilder.setType(93);
                         builder.setContent(contentBuilder);
                         messageId = MessageShardingUtil.generateId();
                         builder.setMessageId(messageId);
                         builder.setServerTimestamp(++timestamp);
-                        saveAndPublish(request.getTargetUid(), null, builder.build(), requestSourceType);
+                        saveAndPublish(fromUser, null, builder.build(), requestSourceType);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
