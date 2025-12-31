@@ -114,6 +114,9 @@ public interface APIPath {
     String Put_System_Setting = "/admin/system/put_setting";
     String GET_CUSTOMER = "/admin/customer";
     String Health = "/admin/health";
+    String Get_Conversation_Files = "/admin/file/conversation_files";
+    String Get_User_Files = "/admin/file/user_files";
+    String Get_Message_File = "/admin/file/message_file";
 
     String Conference_List = "/admin/conference/list";
     String Conference_Exist = "/admin/conference/exist";

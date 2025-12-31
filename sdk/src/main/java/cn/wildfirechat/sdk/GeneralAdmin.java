@@ -82,6 +82,37 @@ public class GeneralAdmin {
     }
 
     //以下仅专业版支持
+    //如果是单聊会话，target和userId代表会话的2个用户。如果是其他会话userId无意义
+    public static IMResult<FilesPojo> getConversationFiles(int conversationType, String target, int line, String userId, int offset, boolean desc, int count) throws Exception {
+        String path = APIPath.Get_Conversation_Files;
+        GetConversationFilesPojo input = new GetConversationFilesPojo();
+        input.conversationType = conversationType;
+        input.target = target;
+        input.line = line;
+        input.userId = userId;
+        input.offset = offset;
+        input.desc = desc;
+        input.count = count;
+        return AdminHttpUtils.httpJsonPost(path, input, FilesPojo.class);
+    }
+
+    public static IMResult<FilesPojo> getUserFiles(String userId, int offset, boolean desc, int count) throws Exception {
+        String path = APIPath.Get_User_Files;
+        GetUserFilesPojo input = new GetUserFilesPojo();
+        input.userId = userId;
+        input.offset = offset;
+        input.desc = desc;
+        input.count = count;
+        return AdminHttpUtils.httpJsonPost(path, input, FilesPojo.class);
+    }
+
+    public static IMResult<FilesPojo.FilePojo> getFile(long messageId) throws Exception {
+        String path = APIPath.Get_Message_File;
+        LongPojo input = new LongPojo();
+        input.value = messageId;
+        return AdminHttpUtils.httpJsonPost(path, input, FilesPojo.FilePojo.class);
+    }
+
     public static IMResult<Void> setConversationTop(String userId, int conversationType, String target, int line, boolean isTop) throws Exception {
         String key = conversationType + "-" + line + "-" + target;
         String value = isTop?"1":"0";

@@ -7,6 +7,7 @@ public class GetOnlineUserResult {
         public String userId;
         public String clientId;
         public int platform;
+        public String ip;
     }
 
     public ArrayList<GetOnlineUserResult.UserClient> userClients;

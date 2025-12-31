@@ -2146,7 +2146,7 @@ public class Main {
     会议相关接口，仅音视频高级版服务支持
      */
     public static void testConference() throws Exception {
-        IMResult<PojoConferenceInfoList> listResult = ConferenceAdmin.listConferences();
+        IMResult<PojoConferenceInfoList> listResult = ConferenceAdmin.listConferences(100, 0);
         if(listResult == null || listResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("get conference list failure");
             System.exit(-1);
@@ -2164,7 +2164,7 @@ public class Main {
             }
         }
 
-        listResult = ConferenceAdmin.listConferences();
+        listResult = ConferenceAdmin.listConferences(100, 0);
         if(listResult == null || listResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("get conference list failure");
             System.exit(-1);
@@ -2204,7 +2204,7 @@ public class Main {
             System.out.println("recording conference success");
         }
 
-        listResult = ConferenceAdmin.listConferences();
+        listResult = ConferenceAdmin.listConferences(100, 0);
         if(listResult == null || listResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("get conference list failure");
             System.exit(-1);

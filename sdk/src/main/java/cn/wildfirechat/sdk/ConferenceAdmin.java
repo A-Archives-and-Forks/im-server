@@ -6,9 +6,12 @@ import cn.wildfirechat.sdk.model.IMResult;
 import cn.wildfirechat.sdk.utilities.AdminHttpUtils;
 
 public class ConferenceAdmin {
-    public static IMResult<PojoConferenceInfoList> listConferences() throws Exception {
+    public static IMResult<PojoConferenceInfoList> listConferences(int count, int offset) throws Exception {
         String path = APIPath.Conference_List;
-        return AdminHttpUtils.httpJsonPost(path, null, PojoConferenceInfoList.class);
+        InputCountOffset inputCountOffset = new InputCountOffset();
+        inputCountOffset.count = count;
+        inputCountOffset.offset = offset;
+        return AdminHttpUtils.httpJsonPost(path, inputCountOffset, PojoConferenceInfoList.class);
     }
 
     public static IMResult<Boolean> existsConferences(String conferenceId) throws Exception {
