@@ -30,9 +30,8 @@ import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 
-public class ChannelHttpUtils extends JsonUtils implements Closeable {
+public class ChannelHttpUtils extends HttpUtils implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(ChannelHttpUtils.class);
-    public static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private String imurl;
     private String channelId;
@@ -88,71 +87,19 @@ public class ChannelHttpUtils extends JsonUtils implements Closeable {
     }
 
     public <T> IMResult<T> httpJsonPost(String path, Object object, Class<T> clazz) throws Exception{
-        if (isNullOrEmpty(imurl) || isNullOrEmpty(path)) {
-            LOG.error("Not init IM SDK correctly. Do you forget init it?");
-            throw new Exception("SDK url or secret lack!");
-        }
-
-        String url = imurl + path;
-        HttpPost post = null;
-        try {
+        return httpJsonPost(imurl, channelId, httpClient, path, object, clazz, post -> {
             int nonce = (int)(Math.random() * 100000 + 3);
             long timestamp = System.currentTimeMillis();
             String str = nonce + "|" + channelSecret + "|" + timestamp;
             String sign = DigestUtils.sha1Hex(str);
 
-
-            post = new HttpPost(url);
             post.setHeader("Content-type", "application/json; charset=utf-8");
             post.setHeader("Connection", "Keep-Alive");
             post.setHeader("nonce", nonce + "");
             post.setHeader("timestamp", "" + timestamp);
             post.setHeader("cid", channelId);
             post.setHeader("sign", sign);
-
-
-            String jsonStr = "";
-            if (object != null) {
-                jsonStr = gson.toJson(object);
-            }
-            LOG.info("http request:{} content: {}", url, jsonStr);
-
-            StringEntity entity = new StringEntity(jsonStr, Charset.forName("UTF-8"));
-            entity.setContentEncoding("UTF-8");
-            entity.setContentType("application/json");
-            post.setEntity(entity);
-            HttpResponse response = httpClient.execute(post);
-
-            int statusCode = response.getStatusLine().getStatusCode();
-            if(statusCode != HttpStatus.SC_OK){
-                LOG.info("Request error: "+statusCode);
-                throw new Exception("Http request error with code:" + statusCode);
-            }else{
-                BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity()
-                    .getContent(),"utf-8"));
-                StringBuffer sb = new StringBuffer();
-                String line;
-                String NL = System.getProperty("line.separator");
-                while ((line = in.readLine()) != null) {
-                    sb.append(line + NL);
-                }
-
-                in.close();
-
-                String content = sb.toString();
-                LOG.info("http request response content: {}", content);
-
-                return fromJsonObject(content, clazz);
-            }
-        } catch (Exception e) {
-            checkPort();
-            e.printStackTrace();
-            throw e;
-        }finally{
-            if(post != null){
-                post.releaseConnection();
-            }
-        }
+        });
     }
 
     public String getChannelId() {

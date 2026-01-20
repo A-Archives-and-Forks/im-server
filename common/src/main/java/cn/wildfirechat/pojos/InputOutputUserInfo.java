@@ -196,4 +196,16 @@ public class InputOutputUserInfo {
     public void setDeleted(int deleted) {
         this.deleted = deleted;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+            "userId='" + userId + '\'' +
+            ", name='" + name + '\'' +
+            ", displayName='" + displayName + '\'' +
+            ", portrait='" + portrait + '\'' +
+            ", mobile='" + mobile + '\'' +
+            ", updateDt=" + updateDt +
+            '}';
+    }
 }
