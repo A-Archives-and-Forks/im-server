@@ -82,11 +82,12 @@ public class MeshAdmin {
         return AdminHttpUtils.httpJsonPost(path, messageData, SendMessageResult.class);
     }
 
-    public static IMResult<SendMessageResult> publishMessage(SendMessageData messageData, List<String> receivers) throws Exception {
+    public static IMResult<SendMessageResult> publishMessage(SendMessageData messageData, List<String> receivers, long messageId) throws Exception {
         String path = APIPath.Msg_Publish;
         PojoPublishMessageReq req = new PojoPublishMessageReq();
         req.messageData = messageData;
         req.receivers = receivers;
+        req.messageId = messageId;
         return AdminHttpUtils.httpJsonPost(path, req, SendMessageResult.class);
     }
 
