@@ -52,6 +52,7 @@ public interface IMTopic {
     String FriendRequestPullTopic = "FRP";
     String NotifyFriendRequestTopic = "FRN";
     String RriendRequestUnreadSyncTopic = "FRUS";
+    String SetFriendExtraTopic = "FES";
 
     String DeleteFriendTopic = "FDL";
     String FriendPullTopic = "FP";
