@@ -56,7 +56,7 @@ public class CreateUserAction extends AdminAction {
                 if (inputCreateUser.getName() != null)
                     newUserBuilder.setName(inputCreateUser.getName());
                 if (inputCreateUser.getDisplayName() != null)
-                    newUserBuilder.setDisplayName(StringUtil.isNullOrEmpty(inputCreateUser.getDisplayName()) ? inputCreateUser.getName() : inputCreateUser.getDisplayName());
+                    newUserBuilder.setDisplayName(inputCreateUser.getDisplayName());
                 if (inputCreateUser.getPortrait() != null)
                     newUserBuilder.setPortrait(inputCreateUser.getPortrait());
                 if (inputCreateUser.getEmail() != null)
@@ -65,11 +65,8 @@ public class CreateUserAction extends AdminAction {
                     newUserBuilder.setAddress(inputCreateUser.getAddress());
                 if (inputCreateUser.getCompany() != null)
                     newUserBuilder.setCompany(inputCreateUser.getCompany());
-
                 if (inputCreateUser.getSocial() != null)
                     newUserBuilder.setSocial(inputCreateUser.getSocial());
-
-
                 if (inputCreateUser.getMobile() != null)
                     newUserBuilder.setMobile(inputCreateUser.getMobile());
                 newUserBuilder.setGender(inputCreateUser.getGender());
