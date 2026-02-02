@@ -3177,6 +3177,34 @@ public class DatabaseStore {
         return outList;
     }
 
+    List<String> getUserRobotIds(String userId) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        List<String> outList = new ArrayList<>();
+        try {
+            connection = DBUtil.getConnection();
+            String sql = "select _uid from t_robot where _owner = ? and _state = 0";
+            statement = connection.prepareStatement(sql);
+
+            int index = 1;
+            statement.setString(1, userId);
+
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                outList.add(rs.getString(1));
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Utility.printExecption(LOG, e, RDBS_Exception);
+        } finally {
+            DBUtil.closeDB(connection, statement, rs);
+        }
+        return outList;
+    }
+
+
     Set<String> getAllEnds(boolean fromUserTable) {
         Connection connection = null;
         PreparedStatement statement = null;

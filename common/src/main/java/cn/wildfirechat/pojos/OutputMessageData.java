@@ -27,6 +27,8 @@ public class OutputMessageData {
     private PojoGroupInfo targetGroupInfo;
     private OutputGetChannelInfo targetChannelInfo;
 
+    private String toRobotId;
+
     public String getSender() {
         return sender;
     }
@@ -117,6 +119,14 @@ public class OutputMessageData {
 
     public static OutputMessageData fromProtoMessage(WFCMessage.Message protoMessage) {
         return fromProtoMessage(protoMessage, null);
+    }
+
+    public String getToRobotId() {
+        return toRobotId;
+    }
+
+    public void setToRobotId(String toRobotId) {
+        this.toRobotId = toRobotId;
     }
 
     public static OutputMessageData fromProtoMessage(WFCMessage.Message protoMessage, OutputClient fromClient) {

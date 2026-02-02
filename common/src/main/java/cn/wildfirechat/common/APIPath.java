@@ -38,6 +38,7 @@ public interface APIPath {
     String User_Get_Email_Info = "/admin/user/get_info_by_email";
     String User_Get_All = "/admin/user/all";
     String User_Get_Robot_Info = "/admin/user/get_robot_info";
+    String User_Get_User_Robots = "/admin/user/get_user_robots";
     String User_Get_Blocked_List = "/admin/user/get_blocked_list";
     String User_Check_Block_Status = "/admin/user/check_block_status";
     String User_Get_Online_Status = "/admin/user/onlinestatus";
@@ -95,6 +96,7 @@ public interface APIPath {
     String Group_Set_Manager = "/admin/group/manager/set";
     String Group_Mute_Member = "/admin/group/manager/mute";
     String Group_Allow_Member = "/admin/group/manager/allow";
+    String Group_Join_Request_Add = "/admin/group/join_request/add";
     String Get_User_Groups = "/admin/group/of_user";
     String Get_User_Groups_By_Type = "/admin/group/of_user_by_type";
     String Group_Set_Member_Alias = "/admin/group/member/set_alias";

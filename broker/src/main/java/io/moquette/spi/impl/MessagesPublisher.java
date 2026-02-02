@@ -179,6 +179,7 @@ public class MessagesPublisher {
                             message = m_messagesStore.getMessage(messageId);
                         }
                         OutputMessageData outputMessageData = getOutputMessageWithExtraInfo(message, exceptClientId, m_messagesStore.isRobotCallbackWithClientInfo() , m_messagesStore.isRobotCallbackWithSenderInfo(), m_messagesStore.isRobotCallbackWithTargetInfo());
+                        outputMessageData.setToRobotId(robot.getUid());
                         Server.getServer().getCallbackScheduler().execute(() -> {
                             try {
                                 HttpUtils.httpJsonPost(robot.getCallback(), GsonUtil.gson.toJson(outputMessageData, OutputMessageData.class), HttpUtils.HttpPostType.POST_TYPE_Robot_Message_Callback);

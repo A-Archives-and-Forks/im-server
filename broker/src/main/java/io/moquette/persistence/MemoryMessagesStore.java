@@ -3249,6 +3249,11 @@ public class MemoryMessagesStore implements IMessagesStore {
         return databaseStore.getAllUsers(count, offset);
     }
 
+    @Override
+    public List<String> getUserRobotIds(String userId) {
+        return databaseStore.getUserRobotIds(userId);
+    }
+
     // 电话号码校验正则表达式（支持中国大陆手机号和固话）
     private static final String PHONE_REGEX = "^\\s*" +  // 允许开头空白
         "(?:" +

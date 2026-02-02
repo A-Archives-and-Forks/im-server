@@ -141,6 +141,17 @@ public class MeshAdmin {
         return AdminHttpUtils.httpJsonPost(path, addGroupMember, Void.class);
     }
 
+    public static IMResult<Void> addJoinGroupRequest(String operator, String groupId, List<String> userIds, String reason, String extra) throws Exception {
+        String path = APIPath.Group_Join_Request_Add;
+        PojoAddJoinGroupRequest addGroupMember = new PojoAddJoinGroupRequest();
+        addGroupMember.operator = operator;
+        addGroupMember.group_id = groupId;
+        addGroupMember.userIds = userIds;
+        addGroupMember.reason = reason;
+        addGroupMember.extra = extra;
+        return AdminHttpUtils.httpJsonPost(path, addGroupMember, Void.class);
+    }
+
     public static IMResult<PojoGroupInfoList> batchGroupInfos(List<String> groupIds) throws Exception {
         return GroupAdmin.batchGroupInfos(groupIds);
     }
