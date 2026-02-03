@@ -9,18 +9,30 @@ import java.util.List;
 
 public class UserAdmin {
     public static IMResult<InputOutputUserInfo> getUserByName(String name) throws Exception {
+        return getUserByName(name, false);
+    }
+
+    public static IMResult<InputOutputUserInfo> getUserByName(String name, boolean includeDeleted) throws Exception {
         String path = APIPath.User_Get_Info;
-        InputGetUserInfo getUserInfo = new InputGetUserInfo(null, name, null);
+        InputGetUserInfo getUserInfo = new InputGetUserInfo(null, name, null, includeDeleted);
         return AdminHttpUtils.httpJsonPost(path, getUserInfo, InputOutputUserInfo.class);
     }
 
     public static IMResult<InputOutputUserInfo> getUserByUserId(String userId) throws Exception {
+        return getUserByUserId(userId, false);
+    }
+
+    public static IMResult<InputOutputUserInfo> getUserByUserId(String userId, boolean includeDeleted) throws Exception {
         String path = APIPath.User_Get_Info;
-        InputGetUserInfo getUserInfo = new InputGetUserInfo(userId, null, null);
+        InputGetUserInfo getUserInfo = new InputGetUserInfo(userId, null, null, includeDeleted);
         return AdminHttpUtils.httpJsonPost(path, getUserInfo, InputOutputUserInfo.class);
     }
 
     public static IMResult<InputOutputUserInfo> getUserByMobile(String mobile) throws Exception {
+        return getUserByMobile(mobile, false);
+    }
+
+    public static IMResult<InputOutputUserInfo> getUserByMobile(String mobile, boolean includeDeleted) throws Exception {
         String path = APIPath.User_Get_Info;
         InputGetUserInfo getUserInfo = new InputGetUserInfo(null, null, mobile);
         return AdminHttpUtils.httpJsonPost(path, getUserInfo, InputOutputUserInfo.class);

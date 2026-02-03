@@ -35,6 +35,9 @@ public class ThreadPoolExecutorWrapper {
         executor.execute(() -> {
             try {
                 task.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+                LOG.info("execute error = {}", e.toString());
             } finally {
                 int endCount = runCounter.decrementAndGet();
                 LOG.debug("Finish task and current task count {} use time {}", endCount, System.currentTimeMillis()-startTime);

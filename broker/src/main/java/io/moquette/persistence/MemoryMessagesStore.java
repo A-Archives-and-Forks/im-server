@@ -3176,7 +3176,7 @@ public class MemoryMessagesStore implements IMessagesStore {
         IMap<String, WFCMessage.User> mUserMap = hzInstance.getMap(USERS);
         WFCMessage.User us = mUserMap.get(userId);
         if (us != null) {
-            WFCMessage.User.Builder builder = WFCMessage.User.newBuilder().setUpdateDt(System.currentTimeMillis()).setDeleted(1);
+            WFCMessage.User.Builder builder = us.toBuilder().setUpdateDt(System.currentTimeMillis()).setDeleted(1);
 
             if(keepFullInfoWhenDestroyUser) {
                 if(!keepMobileWhenDestroyUser) {

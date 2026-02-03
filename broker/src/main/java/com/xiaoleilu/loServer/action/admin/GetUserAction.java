@@ -49,7 +49,7 @@ public class GetUserAction extends AdminAction {
                 }
 
                 RestResult result;
-                if (user == null || user.getDeleted() > 0) {
+                if (user == null || (user.getDeleted() > 0 && !inputUserId.isIncludeDeleted())) {
                     result = RestResult.resultOf(ErrorCode.ERROR_CODE_NOT_EXIST);
                 } else {
                     result = RestResult.ok(InputOutputUserInfo.fromPbUser(user));

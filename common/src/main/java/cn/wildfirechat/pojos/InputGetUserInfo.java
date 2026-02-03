@@ -12,6 +12,7 @@ public class InputGetUserInfo {
     private String userId;
     private String name;
     private String mobile;
+    private boolean includeDeleted;
 
     public InputGetUserInfo() {
     }
@@ -20,6 +21,13 @@ public class InputGetUserInfo {
         this.userId = userId;
         this.name = name;
         this.mobile = mobile;
+    }
+
+    public InputGetUserInfo(String userId, String name, String mobile, boolean includeDeleted) {
+        this.userId = userId;
+        this.name = name;
+        this.mobile = mobile;
+        this.includeDeleted = includeDeleted;
     }
 
     public String getMobile() {
@@ -44,5 +52,13 @@ public class InputGetUserInfo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isIncludeDeleted() {
+        return includeDeleted;
+    }
+
+    public void setIncludeDeleted(boolean includeDeleted) {
+        this.includeDeleted = includeDeleted;
     }
 }
