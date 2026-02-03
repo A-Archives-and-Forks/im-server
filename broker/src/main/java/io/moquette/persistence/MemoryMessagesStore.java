@@ -222,6 +222,7 @@ public class MemoryMessagesStore implements IMessagesStore {
     private boolean mRobotCallbackWithSenderInfo = false;
     private boolean mRobotCallbackWithTargetInfo = false;
     private boolean mRobotMentionExternalRobot = false;
+    private int mRobotGetUserInfoMask = 0;
 
     private boolean mChannelCallbackWithClientInfo = false;
     private boolean mChannelCallbackWithSenderInfo = false;
@@ -683,6 +684,9 @@ public class MemoryMessagesStore implements IMessagesStore {
         } catch (Exception e) {}
         try {
             mRobotMentionExternalRobot = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.ROBOT_Mention_External_Robot, "false"));
+        } catch (Exception e) {}
+        try {
+            mRobotGetUserInfoMask = Integer.parseInt(server.getConfig().getProperty(BrokerConstants.ROBOT_Get_User_Info_Mask, "0"));
         } catch (Exception e) {}
 
         try {
@@ -5012,6 +5016,11 @@ public class MemoryMessagesStore implements IMessagesStore {
     @Override
     public boolean isRobotMentionExternalRobot() {
         return mRobotMentionExternalRobot;
+    }
+
+    @Override
+    public int getRobotGetUserInfoMask() {
+        return mRobotGetUserInfoMask;
     }
 
     @Override

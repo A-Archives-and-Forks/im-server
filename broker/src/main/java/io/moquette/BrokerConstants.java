@@ -181,7 +181,7 @@ public final class BrokerConstants {
     public static final String ROBOT_Callback_With_Sender_Info = "robot.callback_with_sender_info";
     public static final String ROBOT_Callback_With_Target_Info = "robot.callback_with_target_info";
     public static final String ROBOT_Mention_External_Robot = "robot.mention_external_robot";
-
+    public static final String ROBOT_Get_User_Info_Mask = "robot.get_user_info_mask";
 
     public static final String CHANNEL_Callback_With_Client_Info = "channel.callback_with_client_info";
     public static final String CHANNEL_Callback_With_Sender_Info = "channel.callback_with_sender_info";
