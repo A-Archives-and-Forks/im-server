@@ -34,7 +34,7 @@ public class UserAdmin {
 
     public static IMResult<InputOutputUserInfo> getUserByMobile(String mobile, boolean includeDeleted) throws Exception {
         String path = APIPath.User_Get_Info;
-        InputGetUserInfo getUserInfo = new InputGetUserInfo(null, null, mobile);
+        InputGetUserInfo getUserInfo = new InputGetUserInfo(null, null, mobile, includeDeleted);
         return AdminHttpUtils.httpJsonPost(path, getUserInfo, InputOutputUserInfo.class);
     }
 
