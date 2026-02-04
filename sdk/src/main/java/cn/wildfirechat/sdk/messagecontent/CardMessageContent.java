@@ -17,6 +17,12 @@ import org.json.simple.parser.ParseException;
 
 import java.util.Base64;
 
+/**
+ * 名片消息内容类
+ * <p>
+ * 表示分享的名片消息，可以是用户名片、群组名片、聊天室名片或频道名片。
+ * </p>
+ */
 public class CardMessageContent extends MessageContent {
     /**
      * 0，用户；1，群组；2，聊天室；3，频道

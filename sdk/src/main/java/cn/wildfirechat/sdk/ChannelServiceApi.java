@@ -15,10 +15,28 @@ import java.util.List;
 
 import static cn.wildfirechat.proto.ProtoConstants.ApplicationType.ApplicationType_Channel;
 
-//仅专业版支持，社区版不支持
+/**
+ * 频道服务类（仅专业版支持，社区版不支持）
+ * <p>
+ * 提供频道相关的功能，包括：
+ * <ul>
+ * <li>获取用户信息</li>
+ * <li>修改频道信息</li>
+ * <li>发送和撤回消息</li>
+ * <li>用户订阅管理</li>
+ * <li>订阅者列表查询</li>
+ * </ul>
+ * </p>
+ */
 public class ChannelServiceApi implements Closeable {
     private final ChannelHttpUtils channelHttpUtils;
 
+    /**
+     * 创建频道服务实例
+     * @param imurl IM服务器地址
+     * @param channelId 频道ID
+     * @param secret 频道密钥
+     */
     public ChannelServiceApi(String imurl, String channelId, String secret) {
         channelHttpUtils = new ChannelHttpUtils(imurl, channelId, secret);
     }

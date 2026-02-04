@@ -16,6 +16,13 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+/**
+ * 消息未送达通知类
+ * <p>
+ * 表示消息未能成功送达的通知，包含失败原因和失败用户列表。
+ * 用于跨域消息投递失败的场景。
+ * </p>
+ */
 public class NotDeliveredMessageContent extends MessageContent {
     // 请求的类型，1 发送消息，2 撤回消息，3 删除消息
     private int type;

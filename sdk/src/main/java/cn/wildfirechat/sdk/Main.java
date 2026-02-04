@@ -20,27 +20,54 @@ import static cn.wildfirechat.pojos.MyInfoType.Modify_DisplayName;
 import static cn.wildfirechat.proto.ProtoConstants.ChannelState.*;
 import static cn.wildfirechat.proto.ProtoConstants.SystemSettingType.Group_Max_Member_Count;
 
+/**
+ * 野火IM Server SDK示例程序主类
+ * <p>
+ * 提供SDK功能演示的示例代码，包括：
+ * <ul>
+ * <li>用户管理操作</li>
+ * <li>群组管理操作</li>
+ * <li>消息发送操作</li>
+ * <li>好友关系管理</li>
+ * <li>朋友圈功能</li>
+ * <li>机器人功能</li>
+ * </ul>
+ * </p>
+ */
 public class Main {
+    /** 是否为商业版服务器 */
     private static boolean commercialServer = false;
+    /** 是否启用高级音视频功能 */
     private static boolean advanceVoip = false;
+    /** 是否启用机器人朋友圈功能 */
     private static boolean robotMomentsEnabled = false;
+    /** 是否启用朋友圈功能 */
     private static boolean momentsEnabled = false;
-    //管理端口是8080
+    /** 管理端口是18080 */
     private static String AdminUrl = "http://localhost:18080";
+    /** 管理员密钥 */
     private static String AdminSecret = "123456";
 
-    //机器人和频道使用IM服务的公开端口80，注意不是18080
+    /** 机器人和频道使用IM服务的公开端口80，注意不是18080 */
     private static String IMUrl = "http://localhost";
 
 
+    /**
+     * 程序主入口
+     * @param args 命令行参数，包括：adminUrl、adminSecret、imUrl、commercialServer、advanceVoip
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     public static void main(String[] args) throws Exception {
+        // 解析命令行参数
         if (args.length == 5) {
+            // 从命令行参数获取配置信息
             AdminUrl = args[0];
             AdminSecret = args[1];
             IMUrl = args[2];
             commercialServer = Boolean.parseBoolean(args[3]);
             advanceVoip = Boolean.parseBoolean(args[4]);
         } else {
+            // 显示帮助信息或使用默认值
             if(args.length == 1 && (args[0].equals("-h") || args[0].equals("--help") || args[0].equals("-help"))) {
                 System.out.println("Usage: java -jar checker.jar adminUrl adminSecret imUrl commercialServer advanceVoip \n      e.g. java -jar checker.jar http://192.168.1.80:18080 123456 http://192.168.1.80 false false");
                 return;
@@ -53,6 +80,7 @@ public class Main {
 
 
         //admin使用的是18080端口，超级管理接口，理论上不能对外开放端口，也不能让非内部服务知悉密钥。
+        // 执行管理员API测试
         testAdmin();
 
         //测试解析数据库中消息内容
@@ -62,32 +90,62 @@ public class Main {
         testMessageSharding();
 
         //Robot和Channel都是使用的80端口，第三方可以创建或者为第三方创建，第三方可以使用robot或者channel与IM系统进行对接。
+        // 测试机器人功能
         testRobot();
+        // 测试频道功能
         testChannel();
     }
 
 
+    /**
+     * 管理员API测试总入口
+     * <p>
+     * 测试所有管理员功能，包括：
+     * <ul>
+     * <li>用户管理</li>
+     * <li>用户关系管理</li>
+     * <li>群组管理</li>
+     * <li>聊天室管理</li>
+     * <li>消息管理</li>
+     * <li>消息内容测试</li>
+     * <li>频道API测试</li>
+     * <li>通用API测试</li>
+     * <li>敏感词API测试</li>
+     * <li>设备管理测试(仅商业版)</li>
+     * <li>会议功能测试(仅高级音视频版)</li>
+     * <li>朋友圈功能测试(仅启用时)</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testAdmin() throws Exception {
-        //初始化服务API
+        //初始化服务API，使用管理员URL和密钥
         AdminConfig.initAdmin(AdminUrl, AdminSecret);
 
-        testUser();
-        testUserRelation();
-        testGroup();
-        testChatroom();
-        testMessage();
-        testMessageContent();
-        testChannelApi();
-        testGeneralApi();
-        testSensitiveApi();
+        // 执行各类管理员API测试
+        testUser();           // 用户管理测试
+        testUserRelation();   // 用户关系测试
+        testGroup();          // 群组管理测试
+        testChatroom();       // 聊天室测试
+        testMessage();        // 消息发送测试
+        testMessageContent(); // 消息内容编码测试
+        testChannelApi();     // 频道API测试
+        testGeneralApi();     // 通用API测试
+        testSensitiveApi();   // 敏感词API测试
+
+        // 商业版功能测试
         if (commercialServer) {
-            testDevice();
+            testDevice();     // 设备测试(仅商业版)
         }
+
+        // 高级音视频功能测试
         if(advanceVoip) {
-            testConference();
+            testConference(); // 会议功能测试(仅高级音视频版)
         }
+
+        // 朋友圈功能测试
         if (momentsEnabled) {
-            testMomentsApi();
+            testMomentsApi(); // 朋友圈API测试
         }
 
         System.out.println("Congratulation, all admin test case passed!!!!!!!");
@@ -96,7 +154,29 @@ public class Main {
     //***********************************************
     //****  用户相关的API
     //***********************************************
+    /**
+     * 用户管理API测试
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>创建普通用户</li>
+     * <li>创建和删除机器人</li>
+     * <li>获取用户信息（按用户名、手机号、用户ID、邮箱）</li>
+     * <li>批量获取用户信息</li>
+     * <li>更新用户信息</li>
+     * <li>获取用户IM Token</li>
+     * <li>用户封禁/解封</li>
+     * <li>检查用户在线状态</li>
+     * <li>销毁用户（慎用）</li>
+     * <li>获取所有用户列表</li>
+     * <li>获取在线用户数量和列表（仅商业版）</li>
+     * <li>获取用户会话信息（仅商业版）</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testUser() throws Exception {
+        // 创建用户信息对象
         InputOutputUserInfo userInfo = new InputOutputUserInfo();
         //用户ID，必须保证唯一性
         userInfo.setUserId("userId1");
@@ -105,6 +185,7 @@ public class Main {
         userInfo.setMobile("13900000000");
         userInfo.setDisplayName("user 1");
 
+        // 调用SDK创建用户
         IMResult<OutputCreateUser> resultCreateUser = UserAdmin.createUser(userInfo);
         if (resultCreateUser != null && resultCreateUser.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("Create user " + resultCreateUser.getResult().getName() + " success");
@@ -113,6 +194,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 创建机器人信息对象
         InputCreateRobot createRobot = new InputCreateRobot();
         createRobot.setUserId("robot1");
         createRobot.setName("robot1");
@@ -120,6 +202,7 @@ public class Main {
         createRobot.setOwner("userId1");
         createRobot.setSecret("123456");
         createRobot.setCallback("http://127.0.0.1:8883/robot/recvmsg");
+        // 调用SDK创建机器人
         IMResult<OutputCreateRobot> resultCreateRobot = UserAdmin.createRobot(createRobot);
         if (resultCreateRobot != null && resultCreateRobot.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("Create robot " + resultCreateRobot.getResult().getUserId() + " success");
@@ -128,6 +211,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 获取机器人信息
         IMResult<OutputRobot> outputRobotIMResult = UserAdmin.getRobotInfo("robot1");
         if(outputRobotIMResult != null && outputRobotIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("Get robot success");
@@ -136,6 +220,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 销毁机器人
         IMResult<Void> destroyResult = UserAdmin.destroyRobot("robot1");
         if(destroyResult != null && destroyResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("success");
@@ -144,6 +229,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 通过用户名获取用户信息
         IMResult<InputOutputUserInfo> resultGetUserInfo1 = UserAdmin.getUserByName(userInfo.getName());
         if (resultGetUserInfo1 != null && resultGetUserInfo1.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             if (userInfo.getUserId().equals(resultGetUserInfo1.getResult().getUserId())
@@ -160,6 +246,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 通过手机号获取用户信息
         IMResult<InputOutputUserInfo> resultGetUserInfo2 = UserAdmin.getUserByMobile(userInfo.getMobile());
         if (resultGetUserInfo2 != null && resultGetUserInfo2.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             if (userInfo.getUserId().equals(resultGetUserInfo2.getResult().getUserId())
@@ -176,6 +263,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 通过用户ID获取用户信息
         IMResult<InputOutputUserInfo> resultGetUserInfo3 = UserAdmin.getUserByUserId(userInfo.getUserId());
         if (resultGetUserInfo3 != null && resultGetUserInfo3.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             if (userInfo.getUserId().equals(resultGetUserInfo3.getResult().getUserId())
@@ -192,6 +280,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 通过邮箱获取用户信息（允许用户不存在）
         IMResult<OutputUserInfoList> userInfoListIMResult = UserAdmin.getUserByEmail("13900000001@139.com");
         if(userInfoListIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS || userInfoListIMResult.getErrorCode() == ErrorCode.ERROR_CODE_NOT_EXIST) {
             System.out.println("getUserByEmail success");
@@ -200,6 +289,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 批量获取用户信息
         IMResult<OutputUserInfoList> batchGetUsers = UserAdmin.getBatchUsers(Arrays.asList("userId1", "admin", "FireRobot", "TestUser"));
         if (batchGetUsers.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("get batch user success");
@@ -208,10 +298,12 @@ public class Main {
             System.exit(-1);
         }
 
+        // 准备更新用户信息（先测试不存在的用户ID）
         InputOutputUserInfo updateUserInfo = new InputOutputUserInfo();
         updateUserInfo.setUserId(System.currentTimeMillis()+"");
         updateUserInfo.setDisplayName("updatedUserName");
         updateUserInfo.setPortrait("updatedUserPortrait");
+        // 设置更新标志：更新显示名称和头像
         int updateUserFlag = ProtoConstants.UpdateUserInfoMask.Update_User_DisplayName | ProtoConstants.UpdateUserInfoMask.Update_User_Portrait;
         IMResult<Void> result = UserAdmin.updateUserInfo(updateUserInfo, updateUserFlag);
         if(result != null && result.getErrorCode() == ErrorCode.ERROR_CODE_NOT_EXIST) {
@@ -221,6 +313,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 更新存在的用户信息
         updateUserInfo.setUserId(userInfo.getUserId());
         result = UserAdmin.updateUserInfo(updateUserInfo, updateUserFlag);
         if(result != null && result.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
@@ -230,6 +323,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 验证用户信息是否更新成功
         IMResult<InputOutputUserInfo> resultGetUserInfo4 = UserAdmin.getUserByUserId(userInfo.getUserId());
         if (resultGetUserInfo4 != null && resultGetUserInfo4.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             if (userInfo.getUserId().equals(resultGetUserInfo4.getResult().getUserId())
@@ -245,6 +339,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 获取用户的IM Token，用于客户端登录
         IMResult<OutputGetIMTokenData> resultGetToken = UserAdmin.getUserToken(userInfo.getUserId(), "client111", ProtoConstants.Platform.Platform_Android);
         if (resultGetToken != null && resultGetToken.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("get token success: " + resultGetToken.getResult().getToken());
@@ -253,6 +348,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 封禁用户（状态码：2表示封禁）
         IMResult<Void> resultVoid =UserAdmin.updateUserBlockStatus(userInfo.getUserId(), 2);
         if (resultVoid != null && resultVoid.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("block user done");
@@ -261,6 +357,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 检查用户封禁状态
         IMResult<OutputUserStatus> resultCheckUserStatus = UserAdmin.checkUserBlockStatus(userInfo.getUserId());
         if (resultCheckUserStatus != null && resultCheckUserStatus.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             if (resultCheckUserStatus.getResult().getStatus() == 2) {
@@ -274,6 +371,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 获取所有被封禁用户列表
         IMResult<OutputUserBlockStatusList> resultBlockStatusList = UserAdmin.getBlockedList();
         if (resultBlockStatusList != null && resultBlockStatusList.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             boolean success = false;
@@ -293,6 +391,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 解封用户（状态码：0表示正常）
         resultVoid =UserAdmin.updateUserBlockStatus(userInfo.getUserId(), 0);
         if (resultVoid != null && resultVoid.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("block user done");
@@ -301,6 +400,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 再次检查用户状态，确认已解封
         resultCheckUserStatus = UserAdmin.checkUserBlockStatus(userInfo.getUserId());
         if (resultCheckUserStatus != null && resultCheckUserStatus.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             if (resultCheckUserStatus.getResult().getStatus() == 0) {
@@ -314,6 +414,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 检查用户在线状态
         IMResult<OutputCheckUserOnline> outputCheckUserOnline = UserAdmin.checkUserOnlineStatus(userInfo.getUserId());
         if (outputCheckUserOnline != null && outputCheckUserOnline.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("check user online status success:" + outputCheckUserOnline.getResult().getSessions().size());
@@ -323,6 +424,7 @@ public class Main {
         }
 
         //慎用，这个方法可能功能不完全，如果用户不在需要，建议使用block功能屏蔽用户
+        // 销毁用户（物理删除，不可恢复）
         IMResult<Void> voidIMResult = UserAdmin.destroyUser("user11");
         if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("destroy user success");
@@ -331,6 +433,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 获取所有用户列表（分页：每页100条，第0页）
         IMResult<OutputGetUserList> getUserListIMResult = UserAdmin.getAllUsers(100, 0);
         if (getUserListIMResult != null && getUserListIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("getUserListIMResult success");
@@ -339,7 +442,9 @@ public class Main {
             System.exit(-1);
         }
 
+        // 商业版专属功能
         if (commercialServer) {
+            // 获取在线用户总数
             IMResult<GetOnlineUserCountResult> getOnlineUserCountResultIMResult = UserAdmin.getOnlineUserCount();
             if (getOnlineUserCountResultIMResult != null && getOnlineUserCountResultIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
                 System.out.println("get user online count success");
@@ -348,6 +453,7 @@ public class Main {
                 System.exit(-1);
             }
 
+            // 获取在线用户列表（分页：第1页，从0开始，每页100条）
             IMResult<GetOnlineUserResult> getOnlineUserResultIMResult = UserAdmin.getOnlineUser(1, 0, 100);
             if (getOnlineUserResultIMResult != null && getOnlineUserResultIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
                 System.out.println("get user online success");
@@ -356,6 +462,7 @@ public class Main {
                 System.exit(-1);
             }
 
+            // 获取指定用户的会话信息
             IMResult<GetUserSessionResult> getUserSessionResultIMResult = UserAdmin.getUserSession("hygqmws2k");
             if (getUserSessionResultIMResult != null && getUserSessionResultIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
                 System.out.println("get user session success");
@@ -369,15 +476,33 @@ public class Main {
     //***********************************************
     //****  用户关系相关的API
     //***********************************************
+    /**
+     * 用户关系管理API测试
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>发送好友请求</li>
+     * <li>设置好友关系</li>
+     * <li>获取好友列表</li>
+     * <li>解除好友关系</li>
+     * <li>黑名单管理</li>
+     * <li>好友备注（别名）管理</li>
+     * <li>好友额外信息管理</li>
+     * <li>获取好友关系详情</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testUserRelation() throws Exception {
 
-        //先创建2个用户
+        //先创建2个用户用于测试好友关系
         InputOutputUserInfo userInfo = new InputOutputUserInfo();
         userInfo.setUserId("ff1");
         userInfo.setName("ff1");
         userInfo.setMobile("13800000000");
         userInfo.setDisplayName("ff1");
 
+        // 调用SDK创建第一个用户
         IMResult<OutputCreateUser> resultCreateUser = UserAdmin.createUser(userInfo);
         if (resultCreateUser != null && resultCreateUser.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("Create user " + resultCreateUser.getResult().getName() + " success");
@@ -386,12 +511,14 @@ public class Main {
             System.exit(-1);
         }
 
+        // 创建第二个用户
         userInfo = new InputOutputUserInfo();
         userInfo.setUserId("ff2");
         userInfo.setName("ff2");
         userInfo.setMobile("13800000001");
         userInfo.setDisplayName("ff2");
 
+        // 调用SDK创建第二个用户
         resultCreateUser = UserAdmin.createUser(userInfo);
         if (resultCreateUser != null && resultCreateUser.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("Create user " + resultCreateUser.getResult().getName() + " success");
@@ -400,6 +527,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 发送好友请求：ff1向ff2发送好友请求，附带问候语"hello"，直接设为好友
         IMResult<Void> result = RelationAdmin.sendFriendRequest("ff1", "ff2", "hello", true);
         if (result != null && (result.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS || result.getErrorCode() == ErrorCode.ERROR_CODE_ALREADY_FRIENDS)) {
             System.out.println("send friend request success");
@@ -408,6 +536,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 设置好友关系：ff1把ff2设为好友，并附带额外信息
         IMResult<Void> updateFriendStatusResult = RelationAdmin.setUserFriend("ff1", "ff2", true, "{\"from\":1}");
         if (updateFriendStatusResult != null && updateFriendStatusResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("update friend status success");
@@ -416,6 +545,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 获取ff1的好友列表
         IMResult<OutputStringList> resultGetFriendList = RelationAdmin.getFriendList("ff1");
         if (resultGetFriendList != null && resultGetFriendList.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && resultGetFriendList.getResult().getList().contains("ff2")) {
             System.out.println("get friend status success");
@@ -424,6 +554,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 解除好友关系：ff1删除ff2
         updateFriendStatusResult = RelationAdmin.setUserFriend("ff1", "ff2", false, null);
         if (updateFriendStatusResult != null && updateFriendStatusResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("update friend status success");
@@ -432,6 +563,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 再次获取好友列表，确认ff2已被删除
         resultGetFriendList = RelationAdmin.getFriendList("ff1");
         if (resultGetFriendList != null && resultGetFriendList.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && !resultGetFriendList.getResult().getList().contains("ff2")) {
             System.out.println("get friend status success");
@@ -441,6 +573,7 @@ public class Main {
         }
 
 
+        // 将ff2加入黑名单：ff1把ff2加入黑名单
         IMResult<Void> updateBlacklistStatusResult = RelationAdmin.setUserBlacklist("ff1", "ff2", true);
         if (updateBlacklistStatusResult != null && updateBlacklistStatusResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("update blacklist status success");
@@ -449,6 +582,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 获取黑名单列表
         resultGetFriendList = RelationAdmin.getUserBlacklist("ff1");
         if (resultGetFriendList != null && resultGetFriendList.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && resultGetFriendList.getResult().getList().contains("ff2")) {
             System.out.println("get blacklist status success");
@@ -457,6 +591,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 设置好友备注（别名）
         String alias = "hello" + System.currentTimeMillis();
         IMResult<Void> updateFriendAlias = RelationAdmin.updateFriendAlias("ff1", "ff2", alias);
         if (updateFriendAlias != null && updateFriendAlias.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
@@ -466,6 +601,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 获取好友备注（别名）
         IMResult<OutputGetAlias> getFriendAlias = RelationAdmin.getFriendAlias("ff1", "ff2");
         if (getFriendAlias != null && getFriendAlias.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && getFriendAlias.getResult().getAlias().equals(alias)) {
             System.out.println("get friend alias success");
@@ -474,6 +610,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 设置好友额外信息（可以存储自定义数据）
         String friendExtra = "hello friend extra";
         IMResult<Void> setExtraResult = RelationAdmin.updateFriendExtra("ff1", "ff2", friendExtra);
         if (setExtraResult != null && setExtraResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
@@ -483,6 +620,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 获取好友关系详情（包括额外信息等）
         IMResult<RelationPojo> getRelation = RelationAdmin.getRelation("ff1", "ff2");
         if (getRelation != null && getRelation.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("get friend relation success");
@@ -491,6 +629,7 @@ public class Main {
             System.exit(-1);
         }
 
+        // 验证好友额外信息是否正确
         if(!friendExtra.equals(getRelation.getResult().extra)) {
             System.out.println("set friend extra failure");
             System.exit(-1);
@@ -499,8 +638,31 @@ public class Main {
     //***********************************************
     //****  群组相关功能
     //***********************************************
+    /**
+     * 群组管理API测试
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>创建群组</li>
+     * <li>获取群组信息</li>
+     * <li>转移群主</li>
+     * <li>修改群组信息（名称、扩展字段）</li>
+     * <li>获取群成员列表</li>
+     * <li>添加群成员</li>
+     * <li>踢出群成员</li>
+     * <li>设置群成员别名和扩展信息</li>
+     * <li>设置/取消群管理员（仅商业版）</li>
+     * <li>退出群组</li>
+     * <li>获取用户的群组列表</li>
+     * <li>获取共同群组</li>
+     * <li>群成员禁言/白名单管理（仅商业版）</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testGroup() throws Exception {
 
+        // 先解散可能存在的测试群组
         IMResult<Void> voidIMResult1 = GroupAdmin.dismissGroup("user1", "groupId1", null, null);
 
         PojoGroupInfo groupInfo = new PojoGroupInfo();
@@ -748,10 +910,33 @@ public class Main {
     //***********************************************
     //****  消息相关功能
     //***********************************************
+    /**
+     * 消息管理API测试
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>发送单聊消息</li>
+     * <li>获取消息详情</li>
+     * <li>撤回消息</li>
+     * <li>删除消息（仅商业版）</li>
+     * <li>更新消息内容（仅商业版）</li>
+     * <li>广播消息（仅商业版）</li>
+     * <li>撤回广播消息（仅商业版）</li>
+     * <li>获取会话已读时间戳（仅商业版）</li>
+     * <li>获取消息投递状态（仅商业版）</li>
+     * <li>清除会话（仅商业版）</li>
+     * <li>群发消息</li>
+     * <li>撤回群发消息</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testMessage() throws Exception {
+        // 创建会话对象：目标用户ff2，会话类型为私聊
         Conversation conversation = new Conversation();
         conversation.setTarget("ff2");
         conversation.setType(ProtoConstants.ConversationType.ConversationType_Private);
+        // 创建文本消息内容并编码为MessagePayload
         TextMessageContent textMessageContent = new TextMessageContent("Hello world");
         MessagePayload payload = textMessageContent.encode();
 
@@ -868,8 +1053,31 @@ public class Main {
     //***********************************************
     //****  发送各种消息。
     //***********************************************
+    /**
+     * 消息内容编码测试
+     * <p>
+     * 测试各种类型消息的编码和发送：
+     * <ul>
+     * <li>文本消息</li>
+     * <li>语音消息</li>
+     * <li>图片消息</li>
+     * <li>视频消息</li>
+     * <li>位置消息</li>
+     * <li>文件消息</li>
+     * <li>动态表情消息</li>
+     * <li>链接消息</li>
+     * <li>名片消息</li>
+     * <li>提醒消息</li>
+     * <li>富通知消息</li>
+     * <li>流式文本消息</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testMessageContent() throws Exception {
+        // 设置发送者
         String sender = "userId2";
+        // 创建会话对象
         Conversation conversation = new Conversation();
         conversation.setTarget("3ygqmws2k");
         conversation.setType(ProtoConstants.ConversationType.ConversationType_Private);
@@ -1007,12 +1215,24 @@ public class Main {
     }
 
     //消息相关表分为2类，分表是:t_messages_x和t_user_messages_y，并且是分表存储的。表内存储数据和分表规则请参考 https://docs.wildfirechat.cn/faq/server.html 问题2
+    /**
+     * 消息分表计算测试
+     * <p>
+     * 演示如何计算消息存储的分表名称：
+     * <ul>
+     * <li>用户消息表：t_user_messages_x (x为用户ID哈希值%128)</li>
+     * <li>消息表：t_messages_y (y为年份*12+月份)</li>
+     * </ul>
+     * </p>
+     */
     static void testMessageSharding() {
         String userId = "user1";
+        // 计算用户消息表：使用用户ID的哈希值对128取模
         int hashId = Math.abs(userId.hashCode())%128;
         String userMessageTable = "t_user_messages_" + hashId;
         System.out.println("user:" + userId + " user messages table is " + userMessageTable);
 
+        // 计算消息表：使用年份和月份
         Calendar calendar = Calendar.getInstance();
         Date date = new Date();
         calendar.setTime(date);
@@ -1023,6 +1243,19 @@ public class Main {
         System.out.println("This month save message to table " + messageTable);
     }
 
+    /**
+     * 从数据库读取消息内容测试
+     * <p>
+     * 演示如何从数据库的二进制数据解析消息内容：
+     * <ul>
+     * <li>从数据库读取_messageContent字段</li>
+     * <li>解析为协议栈MessageContent对象</li>
+     * <li>使用MessageContentFactory解码为具体消息类型</li>
+     * <li>处理不同类型的消息（文本、图片、语音等）</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当解析过程中发生错误时抛出异常
+     */
     static void testReadMessageContentFromDB() throws Exception {
         //从数据库t_messages_x表中读取到消息内容字段_data的二进制数据为
         byte[] data = {8,1,18,5,72,101,108,108,111,64,3};
@@ -1063,6 +1296,13 @@ public class Main {
         // 比如 MessageContentFactory.registerCustomMessageContent(CustomTextMessageContent.class);
     }
 
+    /**
+     * 检查消息发送结果
+     * <p>
+     * 验证消息是否发送成功，如果失败则退出程序。
+     * </p>
+     * @param resultSendMessage 消息发送结果
+     */
     static void checkSendMessageResult(IMResult<SendMessageResult> resultSendMessage) {
         if (resultSendMessage != null && resultSendMessage.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("send message success");
@@ -1072,7 +1312,22 @@ public class Main {
         }
     }
 
+    /**
+     * 流式文本消息测试
+     * <p>
+     * 演示如何发送流式文本消息，模拟AI逐字生成效果：
+     * <ul>
+     * <li>将长文本分段发送</li>
+     * <li>使用StreamTextGeneratingMessageContent表示正在生成</li>
+     * <li>使用StreamTextGeneratedMessageContent表示生成完成</li>
+     * </ul>
+     * </p>
+     * @param sender 发送者用户ID
+     * @param conversation 会话对象
+     * @throws Exception 当发送过程中发生错误时抛出异常
+     */
     static void testStreamingText(String sender, Conversation conversation) throws Exception {
+        // 准备要发送的长文本
         String fullText = "北京野火无限网络科技有限公司是成立于2019年底的一家科技创新企业，公司的主要目标是为广大企业和单位提供优质可控、私有部署的即时通讯和实时音视频能力，为社会信息化水平提高作出自己的贡献。\n" +
             "\n" +
             "野火IM是公司研发一套自主可控的即时通讯组件，具有全部私有化、功能齐全、协议稳定可靠、全平台支持、安全性高和支持国产化等技术特点。客户端分层设计，既可开箱即用，也可与现有系统深度融合。具有完善的服务端API和自定义消息功能，可以任意扩展功能。代码开源率高，方便二次开发和使用。支持多人实时音视频和会议功能，线上沟通更通畅。\n" +
@@ -1113,6 +1368,21 @@ public class Main {
     //***********************************************
     //****  测试频道功能
     //***********************************************
+    /**
+     * 频道管理API测试
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>创建频道</li>
+     * <li>获取频道信息</li>
+     * <li>关注频道</li>
+     * <li>取消关注频道</li>
+     * <li>检查用户关注状态</li>
+     * <li>销毁频道（标记为已删除状态）</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testChannelApi() throws Exception {
         String channelName = "MyChannel";
         String channelOwner = "user1";
@@ -1194,6 +1464,19 @@ public class Main {
     //***********************************************
     //****  一些其它的功能，比如创建频道，更新用户设置等
     //***********************************************
+    /**
+     * 通用API测试
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>获取系统设置（如群组最大成员数）</li>
+     * <li>修改用户设置</li>
+     * <li>发送用户设置</li>
+     * <li>获取用户设置</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testGeneralApi() throws Exception {
         IMResult<SystemSettingPojo> resultGetSystemSetting  =  GeneralAdmin.getSystemSetting(Group_Max_Member_Count);
         if (resultGetSystemSetting != null && resultGetSystemSetting.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
@@ -1228,6 +1511,23 @@ public class Main {
         }
     }
 
+    /**
+     * 聊天室管理API测试
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>创建聊天室</li>
+     * <li>获取聊天室信息</li>
+     * <li>获取聊天室成员列表</li>
+     * <li>销毁聊天室</li>
+     * <li>获取用户的聊天室</li>
+     * <li>设置聊天室黑名单（仅商业版）</li>
+     * <li>获取聊天室黑名单（仅商业版）</li>
+     * <li>发送聊天室消息</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testChatroom() throws Exception {
         String chatroomId = "chatroomId1";
         String chatroomTitle = "TESTCHATROM";
@@ -1392,6 +1692,32 @@ public class Main {
         }
     }
 
+    /**
+     * 机器人功能测试
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>创建机器人</li>
+     * <li>初始化RobotService（使用IM端口80）</li>
+     * <li>获取机器人信息</li>
+     * <li>发送消息</li>
+     * <li>撤回消息（仅商业版）</li>
+     * <li>更新消息（仅商业版）</li>
+     * <li>获取用户信息</li>
+     * <li>创建群组</li>
+     * <li>发送群组消息</li>
+     * <li>获取群组信息</li>
+     * <li>获取群组成员</li>
+     * <li>修改群组信息</li>
+     * <li>添加群成员</li>
+     * <li>踢出群成员</li>
+     * <li>退出群组</li>
+     * <li>解散群组</li>
+     * <li>销毁机器人</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testRobot() throws Exception {
         String robotId = "robot1";
         String robotSecret = "123456";
@@ -1819,6 +2145,27 @@ public class Main {
     }
 
     //***测试频道API功能，仅专业版支持***
+    /**
+     * 频道功能测试（仅专业版支持）
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>创建频道</li>
+     * <li>获取频道信息</li>
+     * <li>修改频道信息</li>
+     * <li>获取频道列表</li>
+     * <li>关注/取消关注频道</li>
+     * <li>获取频道关注者</li>
+     * <li>设置频道菜单</li>
+     * <li>获取频道菜单</li>
+     * <li>发送频道消息</li>
+     * <li>获取频道历史消息</li>
+     * <li>获取用户关注的频道</li>
+     * <li>删除频道（标记为已删除）</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testChannel() throws Exception {
         //初始化服务API
         AdminConfig.initAdmin(AdminUrl, AdminSecret);
@@ -2046,6 +2393,20 @@ public class Main {
         //使用完需要释放
         channelServiceApi.close();
     }
+
+    /**
+     * 敏感词管理API测试
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>添加敏感词到敏感词库</li>
+     * <li>获取敏感词列表</li>
+     * <li>从敏感词库移除敏感词</li>
+     * <li>验证敏感词添加和移除操作</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testSensitiveApi() throws Exception {
         List<String> words = Arrays.asList("a","b","c");
         IMResult<Void> addResult = SensitiveAdmin.addSensitives(words);
@@ -2084,6 +2445,18 @@ public class Main {
         }
     }
 
+    /**
+     * 朋友圈（动态）API测试
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>发布动态（朋友圈）</li>
+     * <li>发送文本动态内容</li>
+     * <li>验证动态发送结果</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testMomentsApi() throws Exception {
         FeedPojo feedPojo = new FeedPojo();
         feedPojo.sender = "73055b4105de4b70993b7258afbfc387";
@@ -2101,6 +2474,20 @@ public class Main {
     //***********************************************
     //****  物联网相关的API，仅专业版支持
     //***********************************************
+    /**
+     * 物联网设备管理API测试（仅专业版支持）
+     * <p>
+     * 测试以下功能：
+     * <ul>
+     * <li>创建或更新设备</li>
+     * <li>获取设备信息</li>
+     * <li>设备绑定多个所有者</li>
+     * <li>设备ID唯一性验证</li>
+     * <li>销毁设备</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
     static void testDevice() throws Exception {
         InputCreateDevice createDevice = new InputCreateDevice();
         createDevice.setDeviceId("deviceId1");

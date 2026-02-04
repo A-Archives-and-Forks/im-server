@@ -10,6 +10,12 @@ package cn.wildfirechat.pojos;
 
 import java.util.List;
 
+/**
+ * 群组对象类
+ * <p>
+ * 封装创建群组时使用的参数，包含群组信息和成员列表。
+ * </p>
+ */
 public class PojoGroup {
     private PojoGroupInfo group_info;
     private List<PojoGroupMember> members;

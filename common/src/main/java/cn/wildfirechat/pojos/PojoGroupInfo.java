@@ -8,6 +8,19 @@
 
 package cn.wildfirechat.pojos;
 
+/**
+ * 群组信息类
+ * <p>
+ * 封装群组的信息，包括：
+ * <ul>
+ * <li>群组ID、名称、头像、所有者</li>
+ * <li>群组类型、成员数量、最大成员数</li>
+ * <li>群组设置（禁言、加群方式、私聊、可搜索、历史消息）</li>
+ * <li>是否超级群、是否已删除</li>
+ * <li>更新时间</li>
+ * </ul>
+ * </p>
+ */
 public class PojoGroupInfo {
     String target_id;
     String name;

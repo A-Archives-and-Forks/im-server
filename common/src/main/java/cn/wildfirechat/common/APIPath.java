@@ -1,5 +1,12 @@
 package cn.wildfirechat.common;
 
+/**
+ * API路径接口
+ * <p>
+ * 定义了野火IM服务器所有管理接口的API路径。
+ * 包括聊天室、敏感词、域、用户、好友、黑名单、消息、群组、会议、频道等模块的接口路径。
+ * </p>
+ */
 public interface APIPath {
     String Create_Chatroom = "/admin/chatroom/create";
     String Chatroom_Destroy = "/admin/chatroom/del";

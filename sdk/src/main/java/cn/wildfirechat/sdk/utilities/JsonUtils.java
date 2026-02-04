@@ -6,6 +6,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ikidou.reflect.TypeBuilder;
 
+/**
+ * JSON工具类
+ * <p>
+ * 提供JSON序列化和反序列化的工具方法。
+ * </p>
+ */
 public class JsonUtils {
     public static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     public static <T> IMResult<T> fromJsonObject(String content, Class<T> clazz) {

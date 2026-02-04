@@ -20,6 +20,13 @@ import java.util.List;
  * Created by heavyrain lee on 2017/12/6.
  */
 
+/**
+ * 音视频通话消息内容类
+ * <p>
+ * 表示音视频通话相关的消息内容，包含通话ID、参与者、连接时间等信息。
+ * 支持一对一和多人音视频通话。
+ * </p>
+ */
 public class CallStartMessageContent extends MessageContent {
     private String callId;
     // 多人视音频是有效，不包含自己，一对一忽略此参数

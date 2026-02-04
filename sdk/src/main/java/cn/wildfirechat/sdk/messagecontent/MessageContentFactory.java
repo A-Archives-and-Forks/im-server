@@ -13,6 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 消息内容工厂类
+ * <p>
+ * 负责消息内容的编码和解码，维护消息类型到消息内容类的映射关系。
+ * 支持内置消息类型和自定义消息类型的注册。
+ * </p>
+ */
 public class MessageContentFactory {
     private static final Map<Integer, Class<? extends MessageContent>> contentClassMap = new ConcurrentHashMap<>();
 

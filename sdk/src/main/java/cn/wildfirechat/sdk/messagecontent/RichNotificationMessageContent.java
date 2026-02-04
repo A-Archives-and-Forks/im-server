@@ -9,6 +9,13 @@ import org.json.simple.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * 富媒体通知消息内容类
+ * <p>
+ * 表示富媒体类型的消息内容，包含标题、描述、扩展信息等。
+ * 支持自定义数据和扩展字段。
+ * </p>
+ */
 public class RichNotificationMessageContent extends MessageContent {
     private String title;
     private String desc;

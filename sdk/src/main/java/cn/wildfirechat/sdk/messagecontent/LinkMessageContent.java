@@ -14,6 +14,12 @@ import org.json.simple.parser.ParseException;
 
 import java.util.Base64;
 
+/**
+ * 链接消息内容类
+ * <p>
+ * 表示链接分享类型的消息内容，包含标题、描述、URL和缩略图。
+ * </p>
+ */
 public class LinkMessageContent extends MessageContent {
     private String title;
     private String contentDigest;

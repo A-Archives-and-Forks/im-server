@@ -14,21 +14,62 @@ import java.util.List;
 
 import static cn.wildfirechat.proto.ProtoConstants.ApplicationType.ApplicationType_Robot;
 
+/**
+ * 机器人服务类
+ * <p>
+ * 提供机器人相关的功能，包括：
+ * <ul>
+ * <li>发送和回复消息</li>
+ * <li>获取用户信息</li>
+ * <li>群组管理</li>
+ * <li>朋友圈管理</li>
+ * <li>会议控制</li>
+ * <li>回调管理</li>
+ * </ul>
+ * </p>
+ */
 public class RobotService implements Closeable {
     private final RobotHttpUtils robotHttpUtils;
 
+    /**
+     * 创建机器人服务实例
+     * @param url IM服务器地址
+     * @param robotId 机器人ID
+     * @param robotSecret 机器人密钥
+     */
     public RobotService(String url, String robotId, String robotSecret) {
         robotHttpUtils = new RobotHttpUtils(url, robotId, robotSecret);
     }
 
+    /**
+     * 获取机器人ID
+     * @return 机器人ID
+     */
     public String getRobotId() {
         return robotHttpUtils.getRobotId();
     }
 
+    /**
+     * 发送消息
+     * @param sender 发送者用户ID
+     * @param conversation 会话信息
+     * @param payload 消息内容
+     * @return 发送结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<SendMessageResult> sendMessage(String sender, Conversation conversation, MessagePayload payload) throws Exception {
         return sendMessage(sender, conversation, payload, null);
     }
 
+    /**
+     * 发送消息（可指定接收用户）
+     * @param sender 发送者用户ID
+     * @param conversation 会话信息
+     * @param payload 消息内容
+     * @param toUsers 接收用户ID列表
+     * @return 发送结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<SendMessageResult> sendMessage(String sender, Conversation conversation, MessagePayload payload, List<String> toUsers) throws Exception {
         String path = APIPath.Robot_Message_Send;
         SendMessageData messageData = new SendMessageData();

@@ -15,6 +15,13 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+/**
+ * 多人通话进行中消息内容类
+ * <p>
+ * 表示多人音视频通话进行中的状态消息。
+ * 包含通话ID、发起者、是否仅语音、参与者列表等信息。
+ * </p>
+ */
 public class MultiCallOngoingMessageContent extends MessageContent {
     private String callId;
     private String initiator;

@@ -18,6 +18,13 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * 类工具类
+ * <p>
+ * 提供类加载和扫描相关的工具方法，用于获取指定包下的所有类。
+ * 支持从文件系统和JAR包中加载类。
+ * </p>
+ */
 public class ClassUtil {
 
     /**

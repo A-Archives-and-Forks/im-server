@@ -31,6 +31,13 @@ import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 
+/**
+ * 机器人HTTP工具类
+ * <p>
+ * 提供机器人API调用的HTTP工具方法，包括初始化、请求签名、HTTP请求等。
+ * 继承自HttpUtils并实现Closeable接口，专门用于机器人接口的调用。
+ * </p>
+ */
 public class RobotHttpUtils extends HttpUtils implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(RobotHttpUtils.class);
     public static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();

@@ -6,6 +6,12 @@ import cn.wildfirechat.proto.ProtoConstants;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * 删除消息内容类
+ * <p>
+ * 表示消息删除通知，包含被删除消息的ID和操作者信息。
+ * </p>
+ */
 public class DeleteMessageContent extends MessageContent {
     private long messageId;
     private String operatorId;

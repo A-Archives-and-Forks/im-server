@@ -8,6 +8,13 @@ package cn.wildfirechat.sdk.messagecontent;
 import cn.wildfirechat.pojos.MessagePayload;
 import cn.wildfirechat.proto.ProtoConstants;
 
+/**
+ * 文件消息内容类
+ * <p>
+ * 表示文件类型的消息内容，继承自MediaMessageContent。
+ * 包含文件名和文件大小信息。
+ * </p>
+ */
 public class FileMessageContent extends MediaMessageContent {
     private String name;
     private int size;

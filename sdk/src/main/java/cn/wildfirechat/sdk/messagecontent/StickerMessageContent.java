@@ -12,6 +12,13 @@ import org.json.simple.parser.ParseException;
 
 import java.util.Base64;
 
+/**
+ * 动态表情消息内容类
+ * <p>
+ * 表示动态表情（贴纸）类型的消息内容，继承自MediaMessageContent。
+ * 包含表情图片的宽高信息。
+ * </p>
+ */
 public class StickerMessageContent extends MediaMessageContent {
     public int width;
     public int height;

@@ -8,6 +8,25 @@
 
 package cn.wildfirechat.common;
 
+/**
+ * 错误码枚举
+ * <p>
+ * 定义了野火IM系统中所有可能的错误码，包括：
+ * <ul>
+ * <li>通用错误（0-5）</li>
+ * <li>认证错误（6-8）</li>
+ * <li>消息错误（9-10）</li>
+ * <li>群组错误（11-12）</li>
+ * <li>用户错误（16-19）</li>
+ * <li>聊天室错误（20）</li>
+ * <li>频道错误（21-25）</li>
+ * <li>会议错误（60-61）</li>
+ * <li>应用错误（70）</li>
+ * <li>密聊错误（81-87）</li>
+ * <li>其他错误（90-255）</li>
+ * </ul>
+ * </p>
+ */
 public enum ErrorCode {
     //General error
     ERROR_CODE_SUCCESS(0, "success"),

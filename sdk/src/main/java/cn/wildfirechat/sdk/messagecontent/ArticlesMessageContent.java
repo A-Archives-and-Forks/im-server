@@ -16,6 +16,13 @@ import java.util.Base64;
 import java.util.List;
 
 
+/**
+ * 图文消息内容类
+ * <p>
+ * 表示图文链接类型的消息内容，包含一个主文章和多个子文章。
+ * 通常用于公众号文章分享等场景。
+ * </p>
+ */
 public class ArticlesMessageContent extends MessageContent {
     public Article topArticle;
     public ArrayList<Article> subArticles;

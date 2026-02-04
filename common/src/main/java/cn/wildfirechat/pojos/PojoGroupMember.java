@@ -8,6 +8,19 @@
 
 package cn.wildfirechat.pojos;
 
+/**
+ * 群组成员类
+ * <p>
+ * 封装群组成员的信息，包括：
+ * <ul>
+ * <li>成员ID</li>
+ * <li>群组内别名</li>
+ * <li>成员类型</li>
+ * <li>扩展信息</li>
+ * <li>更新时间和创建时间</li>
+ * </ul>
+ * </p>
+ */
 public class PojoGroupMember {
     String member_id;
     String alias;

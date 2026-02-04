@@ -10,6 +10,12 @@ import org.json.simple.parser.ParseException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * 撤回消息内容类
+ * <p>
+ * 表示消息撤回通知，包含被撤回消息的原始信息。
+ * </p>
+ */
 public class RecallMessageContent extends MessageContent {
     private long messageId;
     private String operatorId;

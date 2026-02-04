@@ -6,6 +6,13 @@ package cn.wildfirechat.sdk.model;
 
 import org.json.simple.JSONObject;
 
+/**
+ * 引用消息信息类
+ * <p>
+ * 封装被引用消息的信息，包括消息UID、发送者信息、消息摘要等。
+ * 用于回复消息时引用原消息内容。
+ * </p>
+ */
 public class QuoteInfo {
     private long messageUid;
     private String userId;

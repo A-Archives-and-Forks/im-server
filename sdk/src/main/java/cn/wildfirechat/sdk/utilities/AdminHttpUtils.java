@@ -21,6 +21,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 管理员HTTP工具类
+ * <p>
+ * 提供管理员API调用的HTTP工具方法，包括初始化、请求签名、HTTP请求等。
+ * 继承自HttpUtils，专门用于管理员接口的调用。
+ * </p>
+ */
 public class AdminHttpUtils extends HttpUtils {
     // ======================== 常量定义（消除硬编码）========================
     private static final Logger LOG = LoggerFactory.getLogger(AdminHttpUtils.class);

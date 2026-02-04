@@ -4,6 +4,13 @@ import cn.wildfirechat.pojos.MessagePayload;
 import cn.wildfirechat.proto.ProtoConstants;
 import org.json.simple.JSONObject;
 
+/**
+ * 语音消息内容类
+ * <p>
+ * 表示语音类型的消息内容，继承自MediaMessageContent。
+ * 包含语音时长信息。
+ * </p>
+ */
 public class SoundMessageContent extends MediaMessageContent {
     private int duration;
 

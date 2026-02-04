@@ -4,6 +4,13 @@ import cn.wildfirechat.pojos.MessagePayload;
 
 import java.util.List;
 
+/**
+ * 消息内容基类
+ * <p>
+ * 所有消息内容类型的抽象基类，定义了消息内容的通用属性和方法。
+ * 子类需要实现具体的消息类型编码和解码逻辑。
+ * </p>
+ */
 public abstract class MessageContent {
     private int mentionedType;
     private List<String> mentionedTargets;

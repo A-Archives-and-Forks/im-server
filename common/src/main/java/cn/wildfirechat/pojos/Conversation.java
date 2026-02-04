@@ -8,6 +8,13 @@
 
 package cn.wildfirechat.pojos;
 
+/**
+ * 会话类
+ * <p>
+ * 表示一个会话对象，包含会话类型、目标ID和线路信息。
+ * 用于标识消息发送或接收的目标会话。
+ * </p>
+ */
 public class Conversation {
     private int type;
     private String target;

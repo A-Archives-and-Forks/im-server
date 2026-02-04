@@ -14,13 +14,19 @@ import java.util.Base64;
 
 
 /**
- * Created by heavyrain lee on 2017/12/6.
+ * 创建者 heavyrain lee
  *
  * @refactor dhl
  * 添加小视频的宽高，时长
  */
 
-
+/**
+ * 视频消息内容类
+ * <p>
+ * 表示视频类型的消息内容，继承自MediaMessageContent。
+ * 包含视频缩略图和时长信息。
+ * </p>
+ */
 public class VideoMessageContent extends MediaMessageContent {
     private byte[] thumbnailBytes;
     private long duration ;

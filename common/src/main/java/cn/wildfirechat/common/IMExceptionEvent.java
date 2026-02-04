@@ -1,6 +1,18 @@
 package cn.wildfirechat.common;
 
+/**
+ * IM异常事件类
+ * <p>
+ * 用于记录和传递IM系统中的异常事件信息。
+ * </p>
+ */
 public class IMExceptionEvent {
+    /**
+     * 事件类型接口
+     * <p>
+     * 定义了各种异常事件的类型常量。
+     * </p>
+     */
     public interface EventType {
         int RDBS_Exception = 1;
         int MONGO_Exception = 2;

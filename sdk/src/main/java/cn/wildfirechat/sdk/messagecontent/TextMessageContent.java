@@ -11,6 +11,12 @@ import org.json.simple.parser.ParseException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * 文本消息内容类
+ * <p>
+ * 表示文本类型的消息内容，支持纯文本和引用回复功能。
+ * </p>
+ */
 public class TextMessageContent extends MessageContent {
     private String text;
     private QuoteInfo quoteInfo;

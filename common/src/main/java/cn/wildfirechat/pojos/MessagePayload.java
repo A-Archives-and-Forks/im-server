@@ -16,6 +16,22 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+/**
+ * 消息内容负载类
+ * <p>
+ * 封装消息的所有内容信息，包括：
+ * <ul>
+ * <li>消息类型</li>
+ * <li>可搜索内容（文本消息的文本）</li>
+ * <li>推送内容和推送数据</li>
+ * <li>消息内容（二进制数据）</li>
+ * <li>媒体类型和远程URL</li>
+ * <li>持久化标志和过期时间</li>
+ * <li>@提及信息</li>
+ * <li>额外数据</li>
+ * </ul>
+ * </p>
+ */
 public class MessagePayload {
     private int type;
     private String searchableContent;

@@ -7,6 +7,13 @@ package cn.wildfirechat.sdk.messagecontent;
 import cn.wildfirechat.pojos.MessagePayload;
 import cn.wildfirechat.proto.ProtoConstants;
 
+/**
+ * 正在输入消息内容类
+ * <p>
+ * 表示正在输入的状态消息，用于显示对方正在输入的提示。
+ * 支持多种输入类型：文本、语音、视频、位置、文件等。
+ * </p>
+ */
 public class TypingMessageContent extends MessageContent {
     public static final int TYPING_TEXT = 0;
     public static final int TYPING_VOICE = 1;

@@ -11,6 +11,12 @@ package cn.wildfirechat.pojos;
 import cn.wildfirechat.proto.WFCMessage;
 import io.netty.util.internal.StringUtil;
 
+/**
+ * 发送消息结果类
+ * <p>
+ * 封装发送消息后的返回结果，包含消息UID和时间戳。
+ * </p>
+ */
 public class SendMessageResult {
     private long messageUid;
     private long timestamp;

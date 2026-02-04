@@ -30,6 +30,13 @@ import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 
+/**
+ * 频道HTTP工具类
+ * <p>
+ * 提供频道API调用的HTTP工具方法，包括初始化、请求签名、HTTP请求等。
+ * 继承自HttpUtils并实现Closeable接口，专门用于频道接口的调用。
+ * </p>
+ */
 public class ChannelHttpUtils extends HttpUtils implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(ChannelHttpUtils.class);
 

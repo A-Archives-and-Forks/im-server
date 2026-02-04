@@ -13,6 +13,12 @@ import org.json.simple.parser.ParseException;
 
 import java.util.Base64;
 
+/**
+ * 位置消息内容类
+ * <p>
+ * 表示位置类型的消息内容，包含标题、缩略图、经纬度信息。
+ * </p>
+ */
 public class LocationMessageContent extends MessageContent {
     private String title;
     public byte[] thumbnailByte;

@@ -27,6 +27,18 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * HTTP工具类
+ * <p>
+ * 提供HTTP请求相关的工具方法，包括：
+ * <ul>
+ * <li>HTTP POST请求</li>
+ * <li>HTTP GET请求</li>
+ * <li>响应处理</li>
+ * <li>日志记录</li>
+ * </ul>
+ * </p>
+ */
 public class HttpUtils extends JsonUtils {
     // ======================== 常量定义（消除硬编码）========================
     private static final Logger LOG = LoggerFactory.getLogger(HttpUtils.class);

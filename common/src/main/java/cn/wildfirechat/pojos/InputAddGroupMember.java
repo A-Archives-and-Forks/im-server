@@ -14,6 +14,12 @@ import io.netty.util.internal.StringUtil;
 
 import java.util.List;
 
+/**
+ * 添加群组成员输入参数类
+ * <p>
+ * 封装添加群组成员的输入参数，包括群组ID、成员列表、成员额外信息等。
+ * </p>
+ */
 public class InputAddGroupMember extends InputGroupBase {
     private String group_id;
     private List<PojoGroupMember> members;

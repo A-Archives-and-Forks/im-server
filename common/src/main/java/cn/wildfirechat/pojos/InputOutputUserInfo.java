@@ -11,6 +11,21 @@ package cn.wildfirechat.pojos;
 
 import cn.wildfirechat.proto.WFCMessage;
 
+/**
+ * 用户信息类
+ * <p>
+ * 封装用户的所有信息，包括：
+ * <ul>
+ * <li>用户ID、用户名、显示名称</li>
+ * <li>头像、性别</li>
+ * <li>手机号、邮箱、地址</li>
+ * <li>公司、社交信息</li>
+ * <li>用户类型、删除状态</li>
+ * <li>更新时间</li>
+ * <li>额外扩展信息</li>
+ * </ul>
+ * </p>
+ */
 public class InputOutputUserInfo {
     private String userId;
     private String name;

@@ -10,6 +10,13 @@ import cn.wildfirechat.proto.ProtoConstants;
 
 import java.util.Base64;
 
+/**
+ * 图片消息内容类
+ * <p>
+ * 表示图片类型的消息内容，继承自MediaMessageContent。
+ * 包含图片缩略图数据。
+ * </p>
+ */
 public class ImageMessageContent extends MediaMessageContent {
     private byte[] thumbnailBytes;
 

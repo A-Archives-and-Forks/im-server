@@ -3,6 +3,13 @@ package cn.wildfirechat.sdk.messagecontent;
 import cn.wildfirechat.pojos.MessagePayload;
 import cn.wildfirechat.proto.ProtoConstants;
 
+/**
+ * 流式文本生成中消息内容类
+ * <p>
+ * 表示AI流式文本正在生成的状态消息。
+ * 包含生成的文本内容和流ID。
+ * </p>
+ */
 public class StreamTextGeneratingMessageContent extends MessageContent {
     private String text;
     private String streamId;
