@@ -1,9 +1,13 @@
 package win.liyufan.im;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SensitiveFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(SensitiveFilter.class);
     public enum MatchType {
         MIN_MATCH("最小匹配规则"),MAX_MATCH("最大匹配规则");
 
@@ -70,6 +74,9 @@ public class SensitiveFilter {
                 }
                 i=i+sensitiveWordLength-1;
             }
+        }
+        if(!sensitiveWords.isEmpty()) {
+            LOG.info("Text {} matched sensitive word {}", originalText, sensitiveWords);
         }
         return sensitiveWords;
     }
