@@ -93,6 +93,15 @@ public class MemorySessionStore implements ISessionsStore {
             return unReceivedMsgs;
         }
 
+        public boolean isPcClient() {
+            return platform == ProtoConstants.Platform.Platform_Windows || platform == ProtoConstants.Platform.Platform_OSX || platform == ProtoConstants.Platform.Platform_LINUX;
+        }
+
+        public boolean isPadClient() {
+            return platform == ProtoConstants.Platform.Platform_iPad || platform == ProtoConstants.Platform.Platform_APad || platform == ProtoConstants.Platform.Platform_HarmonyPad;
+        }
+
+
         public int getPushType() {
             return pushType;
         }

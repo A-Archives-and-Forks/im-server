@@ -78,8 +78,7 @@ import static io.moquette.BrokerConstants.*;
 import static io.moquette.server.Constants.MAX_CHATROOM_MESSAGE_QUEUE;
 import static io.moquette.server.Constants.MAX_MESSAGE_QUEUE;
 import static cn.wildfirechat.pojos.MyInfoType.*;
-import static win.liyufan.im.UserSettingScope.kUserSettingAddFriendStrategy;
-import static win.liyufan.im.UserSettingScope.kUserSettingPCOnline;
+import static win.liyufan.im.UserSettingScope.*;
 
 public class MemoryMessagesStore implements IMessagesStore {
     private static final String MESSAGES_MAP = "messages_map";
@@ -3023,6 +3022,13 @@ public class MemoryMessagesStore implements IMessagesStore {
 
         if (m_Server.isShutdowning()) {
             return;
+        }
+
+        if(!online && (session.isPcClient()) || session.isPadClient()) {
+            WFCMessage.UserSettingEntry lockSetting = getUserSetting(session.getUsername(), UserSettingScopeLockPC, session.getClientID());
+            if(lockSetting != null && "1".equals(lockSetting.getValue())) {
+                updateUserSettings(session.getUsername(), WFCMessage.ModifyUserSettingReq.newBuilder().setScope(UserSettingScopeLockPC).setKey(session.getClientID()).setValue("0").build(), null);
+            }
         }
 
         String pcValue = null;
