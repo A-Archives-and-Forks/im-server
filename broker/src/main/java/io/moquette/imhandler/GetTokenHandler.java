@@ -16,6 +16,7 @@ import io.moquette.spi.impl.security.TokenAuthenticator;
 import io.netty.buffer.ByteBuf;
 import cn.wildfirechat.common.ErrorCode;
 import win.liyufan.im.IMTopic;
+import win.liyufan.im.UserSettingScope;
 
 @Handler(IMTopic.GetTokenTopic)
 public class GetTokenHandler extends IMHandler<WFCMessage.GetTokenRequest> {
@@ -28,7 +29,7 @@ public class GetTokenHandler extends IMHandler<WFCMessage.GetTokenRequest> {
         }
         if((session.isPcClient() || session.isPadClient())) {
             if(m_messagesStore.isLocked(session.getUsername(), session.getClientID())) {
-                m_messagesStore.updateUserSettings(session.getUsername(), WFCMessage.ModifyUserSettingReq.newBuilder().setScope(UserSettingScopeLockPC).setKey(session.getClientID()).setValue("0").build(), null);
+                m_messagesStore.updateUserSettings(session.getUsername(), WFCMessage.ModifyUserSettingReq.newBuilder().setScope(UserSettingScope.UserSettingScopeLockPC).setKey(session.getClientID()).setValue("0").build(), null);
             }
         }
 
