@@ -3024,13 +3024,6 @@ public class MemoryMessagesStore implements IMessagesStore {
             return;
         }
 
-        if(!online && (session.isPcClient()) || session.isPadClient()) {
-            WFCMessage.UserSettingEntry lockSetting = getUserSetting(session.getUsername(), UserSettingScopeLockPC, session.getClientID());
-            if(lockSetting != null && "1".equals(lockSetting.getValue())) {
-                updateUserSettings(session.getUsername(), WFCMessage.ModifyUserSettingReq.newBuilder().setScope(UserSettingScopeLockPC).setKey(session.getClientID()).setValue("0").build(), null);
-            }
-        }
-
         String pcValue = null;
         String padValue = null;
         for (MemorySessionStore.Session s : m_Server.getStore().sessionsStore().sessionForUser(session.username)) {
@@ -4550,6 +4543,15 @@ public class MemoryMessagesStore implements IMessagesStore {
         } finally {
             mUserSettingLock.unlock();
         }
+    }
+
+    @Override
+    public boolean isLocked(String userId, String clientId) {
+        WFCMessage.UserSettingEntry lockSetting = getUserSetting(userId, UserSettingScopeLockPC, clientId);
+        if(lockSetting != null && "1".equals(lockSetting.getValue())) {
+            return true;
+        }
+        return false;
     }
 
     @Override

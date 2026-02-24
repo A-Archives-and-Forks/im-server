@@ -26,6 +26,11 @@ public class GetTokenHandler extends IMHandler<WFCMessage.GetTokenRequest> {
         if(userInfo != null && userInfo.getType() == 1) {
             return ErrorCode.ERROR_CODE_ROBOT_NO_TOKEN;
         }
+        if((session.isPcClient() || session.isPadClient())) {
+            if(m_messagesStore.isLocked(session.getUsername(), session.getClientID())) {
+                m_messagesStore.updateUserSettings(session.getUsername(), WFCMessage.ModifyUserSettingReq.newBuilder().setScope(UserSettingScopeLockPC).setKey(session.getClientID()).setValue("0").build(), null);
+            }
+        }
 
         TokenAuthenticator authenticator = new TokenAuthenticator();
         String strToken = authenticator.generateToken(fromUser);

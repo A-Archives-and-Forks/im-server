@@ -208,6 +208,9 @@ public interface IMessagesStore {
     List<WFCMessage.UserSettingEntry> getUserSetting(String userId, int scope);
     long updateUserSettings(String userId, WFCMessage.ModifyUserSettingReq request, String clientId);
     void clearUserSettings(String userId);
+
+    boolean isLocked(String userId, String clientId);
+
     boolean getUserGlobalSilent(String userId);
     boolean getUserVoipSilent(String userId);
 
