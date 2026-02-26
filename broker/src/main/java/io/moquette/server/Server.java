@@ -340,6 +340,9 @@ public class Server {
         MediaServerConfig.QINIU_BUCKET_CUSTOM3_NAME = config.getProperty(BrokerConstants.QINIU_BUCKET_CUSTOM3_NAME);
         MediaServerConfig.QINIU_BUCKET_CUSTOM3_DOMAIN = config.getProperty(BrokerConstants.QINIU_BUCKET_CUSTOM3_DOMAIN);
 
+        MediaServerConfig.QINIU_BUCKET_PAN_NAME = config.getProperty(BrokerConstants.QINIU_BUCKET_PAN_NAME);
+        MediaServerConfig.QINIU_BUCKET_PAN_DOMAIN = config.getProperty(BrokerConstants.QINIU_BUCKET_PAN_DOMAIN);
+
     	MediaServerConfig.SERVER_IP = getServerIp(config);
 
         MediaServerConfig.HTTP_SERVER_PORT = Integer.parseInt(config.getProperty(BrokerConstants.HTTP_SERVER_PORT));

@@ -29,6 +29,8 @@ public class MediaServerConfig {
     public static String QINIU_BUCKET_CUSTOM2_DOMAIN;
     public static String QINIU_BUCKET_CUSTOM3_NAME;
     public static String QINIU_BUCKET_CUSTOM3_DOMAIN;
+    public static String QINIU_BUCKET_PAN_NAME;
+    public static String QINIU_BUCKET_PAN_DOMAIN;
 
 
     public static String SERVER_IP = "localhost";

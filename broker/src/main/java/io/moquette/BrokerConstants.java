@@ -88,6 +88,8 @@ public final class BrokerConstants {
     public static final String QINIU_BUCKET_CUSTOM2_DOMAIN = "qiniu.bucket_custom2_domain";
     public static final String QINIU_BUCKET_CUSTOM3_NAME= "qiniu.bucket_custom3_name";
     public static final String QINIU_BUCKET_CUSTOM3_DOMAIN = "qiniu.bucket_custom3_domain";
+    public static final String QINIU_BUCKET_PAN_NAME= "qiniu.bucket_pan_name";
+    public static final String QINIU_BUCKET_PAN_DOMAIN = "qiniu.bucket_pan_domain";
 
 
     public static final String FILE_STORAGE_ROOT = "local.media.storage.root";

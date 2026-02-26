@@ -89,6 +89,10 @@ public class GetQiniuUploadTokenHandler extends IMHandler<Byte> {
                     bucketName = MediaServerConfig.QINIU_BUCKET_CUSTOM3_NAME;
                     bucketDomain = MediaServerConfig.QINIU_BUCKET_CUSTOM3_DOMAIN;
                     break;
+                case 12:
+                    bucketName = MediaServerConfig.QINIU_BUCKET_PAN_NAME;
+                    bucketDomain = MediaServerConfig.QINIU_BUCKET_PAN_DOMAIN;
+                    break;
                 default:
                     bucketName = MediaServerConfig.QINIU_BUCKET_GENERAL_NAME;
                     bucketDomain = MediaServerConfig.QINIU_BUCKET_GENERAL_DOMAIN;
