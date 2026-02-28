@@ -97,4 +97,4 @@ echo ""
 #JAVA_OPTS="$JAVA_OPTS -Xms2G"
 
 
-$JAVA -server $JAVA_OPTS $JAVA_OPTS_SCRIPT -Dlog4j.configurationFile="file:$LOG_FILE" -Dlog4j2.formatMsgNoLookups=true -Dcom.mchange.v2.c3p0.cfg.xml="$C3P0_CONF_FILE" -Dhazelcast.configuration=$HZ_CONF_FILE -Dwildfirechat.path="$WILDFIRECHAT_CONFIG_PATH" -cp "$WILDFIRECHAT_HOME/lib/*" cn.wildfirechat.server.Server
+$JAVA -server $JAVA_OPTS $JAVA_OPTS_SCRIPT -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -Dlog4j.configurationFile="file:$LOG_FILE" -Dlog4j2.formatMsgNoLookups=true -Dcom.mchange.v2.c3p0.cfg.xml="$C3P0_CONF_FILE" -Dhazelcast.configuration=$HZ_CONF_FILE -Dwildfirechat.path="$WILDFIRECHAT_CONFIG_PATH" -cp "$WILDFIRECHAT_HOME/lib/*" cn.wildfirechat.server.Server
