@@ -1,6 +1,9 @@
 package cn.wildfirechat.sdk;
 
 import cn.wildfirechat.common.ErrorCode;
+import cn.wildfirechat.pojos.mesh.PojoDomainPingResponse;
+import cn.wildfirechat.pojos.mesh.PojoSearchUserRes;
+import cn.wildfirechat.pojos.mesh.PojoUserConferenceResponse;
 import cn.wildfirechat.pojos.moments.CommentPojo;
 import cn.wildfirechat.pojos.moments.FeedPojo;
 import cn.wildfirechat.pojos.moments.FeedsPojo;
@@ -94,6 +97,9 @@ public class Main {
         testRobot();
         // 测试频道功能
         testChannel();
+
+        //测试Mesh相关API，用于分布式IM。Mesh相关测试依赖环境，不具备测绘条件，注释掉。
+        //testMesh();
     }
 
 
@@ -423,6 +429,15 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试踢下线用户客户端
+        IMResult<Void> kickoffResult = UserAdmin.kickoffUserClient(userInfo.getUserId(), null);
+        if (kickoffResult != null && kickoffResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("kickoff user client success");
+        } else {
+            System.out.println("kickoff user client failure");
+            System.exit(-1);
+        }
+
         //慎用，这个方法可能功能不完全，如果用户不在需要，建议使用block功能屏蔽用户
         // 销毁用户（物理删除，不可恢复）
         IMResult<Void> voidIMResult = UserAdmin.destroyUser("user11");
@@ -632,6 +647,15 @@ public class Main {
         // 验证好友额外信息是否正确
         if(!friendExtra.equals(getRelation.getResult().extra)) {
             System.out.println("set friend extra failure");
+            System.exit(-1);
+        }
+
+        //测试获取用户的机器人列表
+        IMResult<OutputStringList> userRobotsResult = UserAdmin.getUserRobots("ff1");
+        if (userRobotsResult != null && userRobotsResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("get user robots success");
+        } else {
+            System.out.println("get user robots failure");
             System.exit(-1);
         }
     }
@@ -868,6 +892,60 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试批量获取群组信息
+        IMResult<PojoGroupInfoList> batchGroupInfoResult = GroupAdmin.batchGroupInfos(Arrays.asList(groupInfo.getTarget_id()));
+        if (batchGroupInfoResult != null && batchGroupInfoResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("batch get group info success");
+        } else {
+            System.out.println("batch get group info failure");
+            System.exit(-1);
+        }
+
+        //测试群备注功能
+        String groupRemark = "test group remark";
+        IMResult<Void> setGroupRemarkResult = GroupAdmin.setGroupRemark("user1", groupInfo.getTarget_id(), groupRemark);
+        if (setGroupRemarkResult != null && setGroupRemarkResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("set group remark success");
+        } else {
+            System.out.println("set group remark failure");
+            System.exit(-1);
+        }
+
+        IMResult<String> getGroupRemarkResult = GroupAdmin.getGroupRemark("user1", groupInfo.getTarget_id());
+        if (getGroupRemarkResult != null && getGroupRemarkResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && groupRemark.equals(getGroupRemarkResult.getResult())) {
+            System.out.println("get group remark success");
+        } else {
+            System.out.println("get group remark failure");
+            System.exit(-1);
+        }
+
+        //测试收藏群功能
+        IMResult<Void> setFavGroupResult = GroupAdmin.setFavGroup("user1", groupInfo.getTarget_id(), true);
+        if (setFavGroupResult != null && setFavGroupResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("set fav group success");
+        } else {
+            System.out.println("set fav group failure");
+            System.exit(-1);
+        }
+
+        Thread.sleep(1000);
+        IMResult<Boolean> isFavGroupResult = GroupAdmin.isFavGroup("user1", groupInfo.getTarget_id());
+        if (isFavGroupResult != null && isFavGroupResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && isFavGroupResult.getResult()) {
+            System.out.println("is fav group success");
+        } else {
+            System.out.println("is fav group failure");
+            System.exit(-1);
+        }
+
+        //取消收藏
+        setFavGroupResult = GroupAdmin.setFavGroup("user1", groupInfo.getTarget_id(), false);
+        if (setFavGroupResult != null && setFavGroupResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("cancel fav group success");
+        } else {
+            System.out.println("cancel fav group failure");
+            System.exit(-1);
+        }
+
         //仅专业版支持
         if (commercialServer) {
             //开启群成员禁言
@@ -904,6 +982,24 @@ public class Main {
                 System.out.println("unallow group member failure");
                 System.exit(-1);
             }
+        }
+
+        //测试解散群组
+        IMResult<Void> dismissGroupResult = GroupAdmin.dismissGroup("user2", groupInfo.getTarget_id(), null, null);
+        if (dismissGroupResult != null && dismissGroupResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("dismiss group success");
+        } else {
+            System.out.println("dismiss group failure");
+            System.exit(-1);
+        }
+
+        //验证群组已被解散
+        resultGetGroupInfo = GroupAdmin.getGroupInfo(groupInfo.getTarget_id());
+        if (resultGetGroupInfo != null && resultGetGroupInfo.getErrorCode() == ErrorCode.ERROR_CODE_NOT_EXIST) {
+            System.out.println("group dismissed verified");
+        } else {
+            System.out.println("group dismiss verify failure");
+            System.exit(-1);
         }
     }
 
@@ -1006,6 +1102,14 @@ public class Main {
                 System.out.println("failure");
             }
 
+            //测试删除广播消息
+            IMResult<Void> deleteBroadCastResult = MessageAdmin.deleteBroadCastMessage("user1", resultBroadcastMessage.result.getMessageUid());
+            if (deleteBroadCastResult != null && deleteBroadCastResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("delete broadcast message success");
+            } else {
+                System.out.println("delete broadcast message failure");
+            }
+
             IMResult<OutputTimestamp> timestampResult = MessageAdmin.getConversationReadTimestamp("57gqmws2k", new Conversation(0, "admin", 0));
             if(timestampResult != null && timestampResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
                 System.out.println("Get conversation read time success");
@@ -1030,6 +1134,14 @@ public class Main {
             } else {
                 System.out.println("clear conversation failure");
             }
+
+            //测试清空用户消息
+            IMResult<Void> clearUserMessagesResult = MessageAdmin.clearUserMessages("user1", conversation, 0, System.currentTimeMillis());
+            if (clearUserMessagesResult != null && clearUserMessagesResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("clear user messages success");
+            } else {
+                System.out.println("clear user messages failure");
+            }
         }
 
         List<String> multicastReceivers = Arrays.asList("user2", "user3", "user4");
@@ -1046,6 +1158,14 @@ public class Main {
             System.out.println("Success");
         } else {
             System.out.println("failure");
+        }
+
+        //测试删除多播消息
+        IMResult<Void> deleteMultiCastResult = MessageAdmin.deleteMultiCastMessage("user1", resultMulticastMessage.result.getMessageUid(), multicastReceivers);
+        if (deleteMultiCastResult != null && deleteMultiCastResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("delete multicast message success");
+        } else {
+            System.out.println("delete multicast message failure");
         }
 
     }
@@ -1509,6 +1629,80 @@ public class Main {
             System.out.println("health check failure");
             System.exit(-1);
         }
+
+
+        //测试用户设置功能
+        IMResult<Void> setUserSettingResult = GeneralAdmin.setUserSetting("user1", 1, "test_key", "test_value");
+        if (setUserSettingResult != null && setUserSettingResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("set user setting success");
+        } else {
+            System.out.println("set user setting failure");
+            System.exit(-1);
+        }
+
+        IMResult<UserSettingPojo> getUserSettingResult = GeneralAdmin.getUserSetting("user1", 1, "test_key");
+        if (getUserSettingResult != null && getUserSettingResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && "test_value".equals(getUserSettingResult.getResult().getValue())) {
+            System.out.println("get user setting success");
+        } else {
+            System.out.println("get user setting failure");
+            System.exit(-1);
+        }
+
+        if (commercialServer) {
+            //测试会话置顶功能
+            IMResult<Void> setTopResult = GeneralAdmin.setConversationTop("user1", ProtoConstants.ConversationType.ConversationType_Private, "user2", 0, true);
+            if (setTopResult != null && setTopResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("set conversation top success");
+            } else {
+                System.out.println("set conversation top failure");
+                System.exit(-1);
+            }
+
+            Thread.sleep(1000);
+            IMResult<Boolean> getTopResult = GeneralAdmin.getConversationTop("user1", ProtoConstants.ConversationType.ConversationType_Private, "user2", 0);
+            if (getTopResult != null && getTopResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && getTopResult.getResult()) {
+                System.out.println("get conversation top success");
+            } else {
+                System.out.println("get conversation top failure");
+                System.exit(-1);
+            }
+
+            //取消置顶
+            setTopResult = GeneralAdmin.setConversationTop("user1", ProtoConstants.ConversationType.ConversationType_Private, "user2", 0, false);
+            if (setTopResult != null && setTopResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("cancel conversation top success");
+            } else {
+                System.out.println("cancel conversation top failure");
+                System.exit(-1);
+            }
+
+            //测试获取会话文件
+            IMResult<FilesPojo> getConversationFilesResult = GeneralAdmin.getConversationFiles(ProtoConstants.ConversationType.ConversationType_Private, "user2", 0, "user1", 0, true, 10);
+            if (getConversationFilesResult != null && getConversationFilesResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("get conversation files success");
+            } else {
+                System.out.println("get conversation files failure");
+            }
+
+            //测试获取用户文件
+            IMResult<FilesPojo> getUserFilesResult = GeneralAdmin.getUserFiles("user1", 0, true, 10);
+            if (getUserFilesResult != null && getUserFilesResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("get user files success");
+            } else {
+                System.out.println("get user files failure");
+            }
+
+            //测试获取单个文件信息
+            if (getUserFilesResult.getResult() != null && getUserFilesResult.getResult().files != null && !getUserFilesResult.getResult().files.isEmpty()) {
+                long messageId = getUserFilesResult.getResult().files.get(0).messageId;
+                IMResult<FilesPojo.FilePojo> getFileResult = GeneralAdmin.getFile(messageId);
+                if (getFileResult != null && getFileResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                    System.out.println("get file success");
+                } else {
+                    System.out.println("get file failure");
+                }
+            }
+        }
     }
 
     /**
@@ -1589,6 +1783,24 @@ public class Main {
             System.out.println("get user chatroom success");
         } else {
             System.out.println("get user chatroom failure");
+            System.exit(-1);
+        }
+
+        //测试设置聊天室全局禁言
+        IMResult<Void> setChatroomMuteResult = ChatroomAdmin.setChatroomMute(chatroomId, true);
+        if (setChatroomMuteResult != null && setChatroomMuteResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("set chatroom mute success");
+        } else {
+            System.out.println("set chatroom mute failure");
+            System.exit(-1);
+        }
+
+        //取消聊天室全局禁言
+        setChatroomMuteResult = ChatroomAdmin.setChatroomMute(chatroomId, false);
+        if (setChatroomMuteResult != null && setChatroomMuteResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("cancel chatroom mute success");
+        } else {
+            System.out.println("cancel chatroom mute failure");
             System.exit(-1);
         }
 
@@ -1787,6 +1999,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试删除机器人回调地址
         voidIMResult1 = robotService.deleteCallback();
         if(voidIMResult1 != null && voidIMResult1.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("delete callback success");
@@ -1795,6 +2008,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //验证回调地址已删除
         callbackPojoIMResult = robotService.getCallback();
         if(callbackPojoIMResult != null && callbackPojoIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && StringUtil.isNullOrEmpty(callbackPojoIMResult.getResult().getUrl())) {
             System.out.println("get callback success");
@@ -1803,19 +2017,31 @@ public class Main {
             System.exit(-1);
         }
 
+        //创建会话对象，设置目标用户和会话类型
         Conversation conversation = new Conversation();
         conversation.setTarget("user2");
         conversation.setType(ProtoConstants.ConversationType.ConversationType_Private);
+        
+        //创建消息payload，设置消息类型和内容
         MessagePayload payload = new MessagePayload();
         payload.setType(1);
         payload.setSearchableContent("hello world");
 
+        //测试机器人发送消息
         IMResult<SendMessageResult> resultRobotSendMessage = robotService.sendMessage(robotService.getRobotId(), conversation, payload);
         if (resultRobotSendMessage != null && resultRobotSendMessage.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("robot send message success");
         } else {
             System.out.println("robot send message failure");
             System.exit(-1);
+        }
+
+        //测试机器人回复消息
+        IMResult<SendMessageResult> replyMessageResult = robotService.replyMessage(resultRobotSendMessage.getResult().getMessageUid(), payload, false);
+        if (replyMessageResult != null && replyMessageResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("robot reply message success");
+        } else {
+            System.out.println("robot reply message failure");
         }
 
         if(commercialServer) {
@@ -1849,6 +2075,7 @@ public class Main {
         }
 
 
+        //测试机器人通过用户ID获取用户信息
         IMResult<InputOutputUserInfo> resultRobotGetUserInfo = robotService.getUserInfo("userId1");
         if (resultRobotGetUserInfo != null && resultRobotGetUserInfo.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("robot get user info success");
@@ -1857,6 +2084,23 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试机器人通过手机号获取用户信息
+        IMResult<InputOutputUserInfo> resultRobotGetUserInfoByMobile = robotService.getUserInfoByMobile("13900000000");
+        if (resultRobotGetUserInfoByMobile != null && resultRobotGetUserInfoByMobile.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("robot get user info by mobile success");
+        } else {
+            System.out.println("robot get user info by mobile failure");
+        }
+
+        //测试机器人通过用户名获取用户信息
+        IMResult<InputOutputUserInfo> resultRobotGetUserInfoByName = robotService.getUserInfoByName("user1");
+        if (resultRobotGetUserInfoByName != null && resultRobotGetUserInfoByName.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("robot get user info by name success");
+        } else {
+            System.out.println("robot get user info by name failure");
+        }
+
+        //创建群组信息，用于测试机器人群组管理功能
         String groupId = "robot_group" + System.currentTimeMillis();
         PojoGroupInfo groupInfo = new PojoGroupInfo();
         groupInfo.setTarget_id(groupId);
@@ -1878,6 +2122,7 @@ public class Main {
         member3.setMember_id("user3");
         members.add(member3);
 
+        //测试机器人创建群组
         IMResult<OutputCreateGroupResult> resultCreateGroup = robotService.createGroup(groupInfo, members, null, null, null);
         if (resultCreateGroup != null && resultCreateGroup.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("create group success");
@@ -1954,6 +2199,15 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试设置群成员extra
+        voidIMResult = robotService.setGroupMemberExtra(groupInfo.getTarget_id(), "user2", "robot member extra", null, null);
+        if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("set group member extra success");
+        } else {
+            System.out.println("set group member extra failure");
+            System.exit(-1);
+        }
+
         if(commercialServer) {
             PojoGroupMember m4 = new PojoGroupMember();
             m4.setMember_id("user4");
@@ -1986,6 +2240,23 @@ public class Main {
                 System.out.println("cancel group manager failure");
                 System.exit(-1);
             }
+
+
+            //测试机器人应用获取用户信息。authCode应该是从客户端SDK里获取到的，这里不具备条件，跳过测试
+//            IMResult<OutputApplicationUserInfo> appGetUserInfoResult = robotService.applicationGetUserInfo("test_auth_code");
+//            if (appGetUserInfoResult != null && (appGetUserInfoResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS || appGetUserInfoResult.getErrorCode() == ErrorCode.ERROR_CODE_INVALID_DATA)) {
+//                System.out.println("robot application get user info success");
+//            } else {
+//                System.out.println("robot application get user info failure");
+//            }
+
+            //测试机器人发送会议请求。不具备测试条件，注释掉。
+//            IMResult<String> sendConferenceRequestResult = robotService.sendConferenceRequest(robotId, "client1", "test_request", 1, "room1", "test_data", false);
+//            if (sendConferenceRequestResult != null && (sendConferenceRequestResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS || sendConferenceRequestResult.getErrorCode() == ErrorCode.ERROR_CODE_INVALID_DATA)) {
+//                System.out.println("robot send conference request success");
+//            } else {
+//                System.out.println("robot send conference request failure");
+//            }
 
             OutputApplicationConfigData config = robotService.getApplicationSignature();
             System.out.println(config);
@@ -2028,6 +2299,7 @@ public class Main {
                 System.exit(-1);
             }
         }
+        //测试机器人转让群组给user2
         voidIMResult = robotService.transferGroup(groupInfo.getTarget_id(), "user2", null, null);
         if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("transfer success");
@@ -2036,6 +2308,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //验证群组转让成功，检查新群主是否为user2
         resultGetGroupInfo = robotService.getGroupInfo(groupInfo.getTarget_id());
         if (resultGetGroupInfo != null && resultGetGroupInfo.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             if ("user2".equals(resultGetGroupInfo.getResult().getOwner())) {
@@ -2049,6 +2322,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试机器人退出群组
         voidIMResult = robotService.quitGroup(groupInfo.getTarget_id(), null, null);
         if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("quit group success");
@@ -2138,9 +2412,45 @@ public class Main {
                 System.out.println("get user moments profile failure:" + profileResult.getErrorCode().code);
                 System.exit(-1);
             }
+
+            //测试更新朋友圈设置
+            IMResult<Void> updateBgResult = robotService.updateMomentsBackgroundUrl("https://example.com/bg.jpg");
+            if (updateBgResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("update moments background success");
+            } else {
+                System.out.println("update moments background failure:" + updateBgResult.getErrorCode().code);
+            }
+
+            IMResult<Void> updateVisibleCountResult = robotService.updateMomentsStrangerVisibleCount(10);
+            if (updateVisibleCountResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("update moments visible count success");
+            } else {
+                System.out.println("update moments visible count failure:" + updateVisibleCountResult.getErrorCode().code);
+            }
+
+            IMResult<Void> updateVisibleScopeResult = robotService.updateMomentsVisibleScope(0);
+            if (updateVisibleScopeResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("update moments visible scope success");
+            } else {
+                System.out.println("update moments visible scope failure:" + updateVisibleScopeResult.getErrorCode().code);
+            }
+
+            IMResult<Void> updateBlackListResult = robotService.updateMomentsBlackList(Arrays.asList("user1"), null);
+            if (updateBlackListResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("update moments blacklist success");
+            } else {
+                System.out.println("update moments blacklist failure:" + updateBlackListResult.getErrorCode().code);
+            }
+
+            IMResult<Void> updateBlockListResult = robotService.updateMomentsBlockList(Arrays.asList("user2"), null);
+            if (updateBlockListResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("update moments blocklist success");
+            } else {
+                System.out.println("update moments blocklist failure:" + updateBlockListResult.getErrorCode().code);
+            }
         }
 
-        //使用完需要释放
+        //释放机器人服务资源
         robotService.close();
     }
 
@@ -2238,6 +2548,8 @@ public class Main {
 
 
         //3. 测试channel api功能
+        
+        //测试用户关注频道
         IMResult<Void> resultVoid = channelServiceApi.subscribe("userId2");
         if (resultVoid != null && resultVoid.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("subscribe success");
@@ -2246,6 +2558,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试另一个用户关注频道
         resultVoid = channelServiceApi.subscribe("userId3");
         if (resultVoid != null && resultVoid.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("subscribe done");
@@ -2254,6 +2567,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //使用Admin API让userId4关注频道
         resultVoid = ChannelAdmin.subscribeChannel(channelId, "userId4");
         if (resultVoid != null && resultVoid.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("subscribe done");
@@ -2262,6 +2576,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //获取频道订阅者列表
         IMResult<OutputStringList> resultStringList = channelServiceApi.getSubscriberList();
         if (resultStringList != null && resultStringList.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && resultStringList.getResult().getList().contains("userId2") && resultStringList.getResult().getList().contains("userId3") && resultStringList.getResult().getList().contains("userId4")) {
             System.out.println("get subscriber done");
@@ -2270,6 +2585,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //检查用户是否订阅了频道
         IMResult<Boolean> booleanIMResult = channelServiceApi.isSubscriber("userId2");
         if(booleanIMResult != null && booleanIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && booleanIMResult.getResult()) {
             System.out.println("is subscriber success");
@@ -2278,6 +2594,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试用户取消关注频道
         resultVoid = channelServiceApi.unsubscribe("userId2");
         if (resultVoid != null && resultVoid.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("unsubscriber done");
@@ -2286,6 +2603,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //验证userId2已不在订阅者列表中
         resultStringList = channelServiceApi.getSubscriberList();
         if (resultStringList != null && resultStringList.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && resultStringList.getResult().getList().contains("userId3") && !resultStringList.getResult().getList().contains("userId2")) {
             System.out.println("get subscriber done");
@@ -2294,6 +2612,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试频道获取用户信息
         IMResult<InputOutputUserInfo> resultGetUserInfo1 = channelServiceApi.getUserInfo("userId3");
         if (resultGetUserInfo1 != null && resultGetUserInfo1.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("get user info success");
@@ -2302,6 +2621,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //创建消息payload
         MessagePayload payload = new MessagePayload();
         payload.setType(1);
         payload.setSearchableContent("hello world");
@@ -2311,6 +2631,15 @@ public class Main {
             System.out.println("send message to all the subscriber success");
         } else {
             System.out.println("send message to all the subscriber  failure");
+            System.exit(-1);
+        }
+
+        //测试重新发布消息
+        IMResult<Void> republishResult = channelServiceApi.republishMessage(resultSendMessage.getResult().getMessageUid(), Arrays.asList("userId2", "userId3"));
+        if (republishResult != null && republishResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("republish message success");
+        } else {
+            System.out.println("republish message failure");
             System.exit(-1);
         }
 
@@ -2327,6 +2656,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //发送定向消息给指定用户
         payload.setSearchableContent("hello to user2");
 
         resultSendMessage = channelServiceApi.sendMessage(0, Arrays.asList("userId2"),payload);
@@ -2337,6 +2667,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试修改频道描述信息
         IMResult<Void> voidIMResult = channelServiceApi.modifyChannelInfo(ProtoConstants.ModifyChannelInfoType.Modify_Channel_Desc, "this is a test channel, update at:" + new Date().toString());
         if (voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("modify channel profile success");
@@ -2386,6 +2717,22 @@ public class Main {
         } else {
             System.out.println("get channel info failure");
             System.exit(-1);
+        }
+
+        //测试修改频道菜单
+        List<PojoChannelMenu> testMenus = new ArrayList<>();
+        PojoChannelMenu testMenu = new PojoChannelMenu();
+        testMenu.menuId = UUID.randomUUID().toString();
+        testMenu.type = "view";
+        testMenu.name = "测试菜单";
+        testMenu.key = "test_key";
+        testMenu.url = "http://www.test.com";
+        testMenus.add(testMenu);
+        IMResult<Void> modifyMenuResult = channelServiceApi.modifyChannelMenu(testMenus);
+        if (modifyMenuResult != null && modifyMenuResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("modify channel menu success");
+        } else {
+            System.out.println("modify channel menu failure");
         }
         OutputApplicationConfigData config = channelServiceApi.getApplicationSignature();
         System.out.println(config);
@@ -2489,9 +2836,12 @@ public class Main {
      * @throws Exception 当测试过程中发生错误时抛出异常
      */
     static void testDevice() throws Exception {
+        //创建设备信息，设置设备ID和所有者列表
         InputCreateDevice createDevice = new InputCreateDevice();
         createDevice.setDeviceId("deviceId1");
         createDevice.setOwners(Arrays.asList("opoGoG__", "userId1"));
+        
+        //测试创建设备（如果不存在则创建，存在则更新）
         IMResult<OutputCreateDevice> resultCreateDevice = UserAdmin.createOrUpdateDevice(createDevice);
         if (resultCreateDevice != null && resultCreateDevice.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("Create device " + resultCreateDevice.getResult().getDeviceId() + " success");
@@ -2500,6 +2850,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试获取设备信息
         IMResult<OutputDevice> getDevice = UserAdmin.getDevice("deviceId1");
         if (getDevice != null && getDevice.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && getDevice.getResult().getDeviceId().equals("deviceId1") && getDevice.getResult().getOwners().contains("opoGoG__")) {
             System.out.println("Get device " + resultCreateDevice.getResult().getDeviceId() + " success");
@@ -2508,6 +2859,7 @@ public class Main {
             System.exit(-1);
         }
 
+        //测试获取用户绑定的所有设备
         IMResult<OutputDeviceList> getUserDevices = UserAdmin.getUserDevices("userId1");
         if (getUserDevices != null && getUserDevices.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             boolean success = false;
@@ -2529,10 +2881,25 @@ public class Main {
         }
     }
 
-    /*
-    会议相关接口，仅音视频高级版服务支持
+    /**
+     * 会议功能测试（仅音视频高级版服务支持）
+     * <p>
+     * 测试以下会议功能：
+     * <ul>
+     * <li>获取会议列表</li>
+     * <li>销毁会议</li>
+     * <li>创建普通会议</li>
+     * <li>创建高级会议</li>
+     * <li>检查会议是否存在</li>
+     * <li>开启会议录制</li>
+     * <li>获取参会者列表</li>
+     * <li>RTP转发相关操作</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
      */
     public static void testConference() throws Exception {
+        //获取当前会议列表
         IMResult<PojoConferenceInfoList> listResult = ConferenceAdmin.listConferences(100, 0);
         if(listResult == null || listResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("get conference list failure");
@@ -2541,6 +2908,7 @@ public class Main {
             System.out.println("conference list " + listResult.getResult().conferenceInfoList);
         }
 
+        //清理现有会议，避免影响测试
         for (PojoConferenceInfo conferenceInfo:listResult.getResult().conferenceInfoList) {
             IMResult<Void> destroyResult = ConferenceAdmin.destroy(conferenceInfo.roomId, conferenceInfo.advance);
             if(destroyResult == null || destroyResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
@@ -2551,6 +2919,7 @@ public class Main {
             }
         }
 
+        //再次获取会议列表，确认已清空
         listResult = ConferenceAdmin.listConferences(100, 0);
         if(listResult == null || listResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("get conference list failure");
@@ -2559,7 +2928,11 @@ public class Main {
             System.out.println("conference list " + listResult.getResult().conferenceInfoList);
         }
 
-        IMResult<Void> voidIMResult = ConferenceAdmin.createRoom("helloroomid", "hello room description", "123456", 9, false, 0, false, true);
+        //生成两个会议房间ID
+        String roomId1 = UUID.randomUUID().toString();
+        String roomId2 = UUID.randomUUID().toString();
+        //创建普通会议房间（非高级版，最多9人）
+        IMResult<Void> voidIMResult = ConferenceAdmin.createRoom(roomId1, "hello room description", "123456", 9, false, 0, false, true);
         if(voidIMResult == null || voidIMResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("create conference failure");
             System.exit(-1);
@@ -2567,7 +2940,8 @@ public class Main {
             System.out.println("create conference");
         }
 
-        voidIMResult = ConferenceAdmin.createRoom("helloroomid2", "hello room description advanced", "123456", 20, true, 0, false, true);
+        //创建高级会议房间（支持更多功能，最多20人）
+        voidIMResult = ConferenceAdmin.createRoom(roomId2, "hello room description advanced", "123456", 20, true, 0, false, true);
         if(voidIMResult == null || voidIMResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("create conference failure");
             System.exit(-1);
@@ -2575,7 +2949,8 @@ public class Main {
             System.out.println("create conference");
         }
 
-        IMResult<Boolean> booleanIMResult = ConferenceAdmin.existsConferences("helloroomid2");
+        //检查会议房间是否存在
+        IMResult<Boolean> booleanIMResult = ConferenceAdmin.existsConferences(roomId1);
         if(booleanIMResult == null || booleanIMResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("exist conference failure");
             System.exit(-1);
@@ -2583,7 +2958,8 @@ public class Main {
             System.out.println("exit conference success");
         }
 
-        voidIMResult = ConferenceAdmin.enableRecording("helloroomid2", true, true);
+        //开启会议录制功能（视频和音频都录制）
+        voidIMResult = ConferenceAdmin.enableRecording(roomId2, true, true);
         if(voidIMResult == null || voidIMResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("recording conference failure");
             System.exit(-1);
@@ -2599,6 +2975,7 @@ public class Main {
             System.out.println("conference list " + listResult.getResult().conferenceInfoList);
         }
 
+        //获取每个会议的参会者列表
         for (PojoConferenceInfo conferenceInfo:listResult.getResult().conferenceInfoList) {
             IMResult<PojoConferenceParticipantList> listParticipantsResult = ConferenceAdmin.listParticipants(conferenceInfo.roomId, conferenceInfo.advance);
             if(listParticipantsResult == null || listParticipantsResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
@@ -2609,6 +2986,7 @@ public class Main {
             }
         }
 
+        //获取RTP转发器列表，并停止所有转发
         IMResult<PojoConferenceRtpForwarders> listForwarderResult = ConferenceAdmin.listRtpForwarders("6366963312");
         if(listForwarderResult == null || listForwarderResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("list rtp forward failure");
@@ -2628,11 +3006,187 @@ public class Main {
             }));
         }
 
+        //测试RTP转发功能，将媒体流转发到指定地址
         IMResult<Void> rtpForwardResult = ConferenceAdmin.rtpForward("6366963312", "cygqmws2k", "192.168.1.81", 10000, 111, 0, 10005, 98, 0);
         if(rtpForwardResult == null || rtpForwardResult.getErrorCode() != ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("rtp forward failure");
         } else {
             System.out.println("rtp forward success");
         }
+    }
+
+    //***********************************************
+    //****  Mesh相关API，用于分布式IM
+    //***********************************************
+    /**
+     * Mesh（分布式IM）API测试
+     * <p>
+     * 测试以下分布式IM功能：
+     * <ul>
+     * <li>搜索用户 - 跨域搜索用户</li>
+     * <li>批量获取用户信息 - 获取多个用户的详细信息</li>
+     * <li>发送好友请求 - 向其他域用户发送好友请求</li>
+     * <li>处理好友请求 - 接受或拒绝好友请求</li>
+     * <li>创建域 - 创建新的Mesh域</li>
+     * <li>获取域信息 - 获取指定域的详细信息</li>
+     * <li>获取所有域 - 获取Mesh网络中的所有域列表</li>
+     * <li>Ping域 - 测试域的连通性</li>
+     * <li>删除域 - 从Mesh网络中移除域</li>
+     * <li>同步群组 - 跨域同步群组信息</li>
+     * <li>发送消息 - 向其他域用户发送消息</li>
+     * <li>发布消息 - 向多个域用户广播消息</li>
+     * <li>添加加入群组请求 - 跨域申请加入群组</li>
+     * <li>会议用户请求 - 跨域会议相关请求</li>
+     * <li>会议用户事件 - 跨域会议事件处理</li>
+     * </ul>
+     * </p>
+     * @throws Exception 当测试过程中发生错误时抛出异常
+     */
+    static void testMesh() throws Exception {
+        //测试搜索用户
+        IMResult<PojoSearchUserRes> searchUserResult = MeshAdmin.searchUser("test", 0, 0, 1);
+        if (searchUserResult != null && searchUserResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh search user success");
+        } else {
+            System.out.println("mesh search user failure");
+        }
+
+        //测试批量获取用户信息
+        IMResult<OutputUserInfoList> batchUserInfosResult = MeshAdmin.getBatchUserInfos(Arrays.asList("user1", "user2"));
+        if (batchUserInfosResult != null && batchUserInfosResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh batch get user info success");
+        } else {
+            System.out.println("mesh batch get user info failure");
+        }
+
+        //测试发送好友请求
+        IMResult<Void> sendFriendRequestResult = MeshAdmin.sendFriendRequest("user1", "user2", "hello");
+        if (sendFriendRequestResult != null && (sendFriendRequestResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS || sendFriendRequestResult.getErrorCode() == ErrorCode.ERROR_CODE_ALREADY_FRIENDS)) {
+            System.out.println("mesh send friend request success");
+        } else {
+            System.out.println("mesh send friend request failure");
+        }
+
+        //测试处理好友请求
+        IMResult<Void> handleFriendRequestResult = MeshAdmin.handleFriendRequest("user2", "user1", 1);
+        if (handleFriendRequestResult != null && handleFriendRequestResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh handle friend request success");
+        } else {
+            System.out.println("mesh handle friend request failure");
+        }
+
+        //测试创建域
+        String domainId = "test_domain_" + System.currentTimeMillis();
+        InputOutputDomainInfo domainInfo = new InputOutputDomainInfo();
+        domainInfo.setDomainId(domainId);
+        domainInfo.setName("Test Domain");
+        IMResult<Void> createDomainResult = MeshAdmin.createDomain(domainInfo);
+        if (createDomainResult != null && createDomainResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh create domain success");
+        } else {
+            System.out.println("mesh create domain failure");
+        }
+
+        //测试获取域
+        IMResult<InputOutputDomainInfo> getDomainResult = MeshAdmin.getDomain(domainId);
+        if (getDomainResult != null && getDomainResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh get domain success");
+        } else {
+            System.out.println("mesh get domain failure");
+        }
+
+        //测试获取所有域
+        IMResult<InputOutputDomainInfoList> getAllDomainResult = MeshAdmin.getAllDomain();
+        if (getAllDomainResult != null && getAllDomainResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh get all domain success");
+        } else {
+            System.out.println("mesh get all domain failure");
+        }
+
+        //测试ping域
+        IMResult<PojoDomainPingResponse> pingDomainResult = MeshAdmin.pingDomain(domainId);
+        if (pingDomainResult != null && pingDomainResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh ping domain success");
+        } else {
+            System.out.println("mesh ping domain failure");
+        }
+
+        //测试删除域
+        IMResult<Void> deleteDomainResult = MeshAdmin.deleteDomain(domainId);
+        if (deleteDomainResult != null && deleteDomainResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh delete domain success");
+        } else {
+            System.out.println("mesh delete domain failure");
+        }
+
+        //测试同步群组
+        PojoGroupInfo meshGroupInfo = new PojoGroupInfo();
+        meshGroupInfo.setTarget_id("mesh_group_" + System.currentTimeMillis());
+        meshGroupInfo.setName("Mesh Test Group");
+        meshGroupInfo.setOwner("user1");
+        meshGroupInfo.setType(2);
+        List<PojoGroupMember> meshMembers = new ArrayList<>();
+        PojoGroupMember meshMember = new PojoGroupMember();
+        meshMember.setMember_id("user1");
+        meshMembers.add(meshMember);
+        IMResult<Void> syncGroupResult = MeshAdmin.syncGroup(meshGroupInfo, meshMembers);
+        if (syncGroupResult != null && syncGroupResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh sync group success");
+        } else {
+            System.out.println("mesh sync group failure");
+        }
+
+        //测试发送消息
+        Conversation meshConversation = new Conversation();
+        meshConversation.setTarget("user2");
+        meshConversation.setType(ProtoConstants.ConversationType.ConversationType_Private);
+        MessagePayload meshPayload = new MessagePayload();
+        meshPayload.setType(1);
+        meshPayload.setSearchableContent("mesh test message");
+        IMResult<SendMessageResult> meshSendMessageResult = MeshAdmin.sendMessage("user1", meshConversation, meshPayload, null);
+        if (meshSendMessageResult != null && meshSendMessageResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh send message success");
+        } else {
+            System.out.println("mesh send message failure");
+        }
+
+        //测试发布消息
+        if (meshSendMessageResult != null && meshSendMessageResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            SendMessageData publishMessageData = new SendMessageData();
+            publishMessageData.setSender("user1");
+            publishMessageData.setConv(meshConversation);
+            publishMessageData.setPayload(meshPayload);
+            IMResult<SendMessageResult> publishMessageResult = MeshAdmin.publishMessage(publishMessageData, Arrays.asList("user2"), meshSendMessageResult.getResult().getMessageUid());
+            if (publishMessageResult != null && publishMessageResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("mesh publish message success");
+            } else {
+                System.out.println("mesh publish message failure");
+            }
+        }
+
+        //测试添加加入群组请求
+        IMResult<Void> addJoinGroupRequestResult = MeshAdmin.addJoinGroupRequest("user2", meshGroupInfo.getTarget_id(), Arrays.asList("user3"), "please add me", null);
+        if (addJoinGroupRequestResult != null && addJoinGroupRequestResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh add join group request success");
+        } else {
+            System.out.println("mesh add join group request failure");
+        }
+
+        //测试会议用户请求
+        IMResult<PojoUserConferenceResponse> userConferenceRequestResult = MeshAdmin.userConferenceRequest("client1", "user1", "test_request", 1, "room1", "test_data", false);
+        if (userConferenceRequestResult != null && userConferenceRequestResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh user conference request success");
+        } else {
+            System.out.println("mesh user conference request failure");
+        }
+
+        //测试会议用户事件
+        IMResult<Void> userConferenceEventResult = MeshAdmin.userConferenceEvent("test_event_data", "user1", "client1", false);
+        if (userConferenceEventResult != null && userConferenceEventResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("mesh user conference event success");
+        } else {
+            System.out.println("mesh user conference event failure");
+        }
+
     }
 }
