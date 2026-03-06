@@ -1870,6 +1870,10 @@ public class DatabaseStore {
                 sql = "update t_user_session set `_deleted` = ?, `_token` = ?, `_voip_token` = ?, `_dt` = ?  where `_uid`=? and (`_platform` = ? or `_platform` = ? or `_platform` = ?)  and `_cid` <> ? and `_deleted` = 0";
             } else if(platform == ProtoConstants.Platform.Platform_iPad || platform == ProtoConstants.Platform.Platform_APad || platform == ProtoConstants.Platform.Platform_HarmonyPad) {
                 sql = "update t_user_session set `_deleted` = ?, `_token` = ?, `_voip_token` = ?, `_dt` = ?  where `_uid`=? and (`_platform` = ? or `_platform` = ? or `_platform` = ?)  and `_cid` <> ? and `_deleted` = 0";
+            } else if(platform == ProtoConstants.Platform.Platform_AndroidWearable || platform == ProtoConstants.Platform.Platform_HarmonyWearable) {
+                sql = "update t_user_session set `_deleted` = ?, `_token` = ?, `_voip_token` = ?, `_dt` = ?  where `_uid`=? and (`_platform` = ? or `_platform` = ?)  and `_cid` <> ? and `_deleted` = 0";
+            } else if(platform == ProtoConstants.Platform.Platform_AndroidTV || platform == ProtoConstants.Platform.Platform_AppleTV || platform == ProtoConstants.Platform.Platform_HarmonyTV) {
+                sql = "update t_user_session set `_deleted` = ?, `_token` = ?, `_voip_token` = ?, `_dt` = ?  where `_uid`=? and (`_platform` = ? or `_platform` = ? or `_platform` = ?)  and `_cid` <> ? and `_deleted` = 0";
             } else {
                 sql = "update t_user_session set `_deleted` = ?, `_token` = ?, `_voip_token` = ?, `_dt` = ?  where `_uid`=? and `_platform` = ? and `_cid` <> ? and `_deleted` = 0";
             }
@@ -1897,6 +1901,13 @@ public class DatabaseStore {
                 statement.setInt(index++, ProtoConstants.Platform.Platform_iPad);
                 statement.setInt(index++, ProtoConstants.Platform.Platform_APad);
                 statement.setInt(index++, ProtoConstants.Platform.Platform_HarmonyPad);
+            } else if(platform == ProtoConstants.Platform.Platform_AndroidWearable || platform == ProtoConstants.Platform.Platform_HarmonyWearable) {
+                statement.setInt(index++, ProtoConstants.Platform.Platform_AndroidWearable);
+                statement.setInt(index++, ProtoConstants.Platform.Platform_HarmonyWearable);
+            } else if(platform == ProtoConstants.Platform.Platform_AndroidTV || platform == ProtoConstants.Platform.Platform_AppleTV || platform == ProtoConstants.Platform.Platform_HarmonyTV) {
+                statement.setInt(index++, ProtoConstants.Platform.Platform_AndroidTV);
+                statement.setInt(index++, ProtoConstants.Platform.Platform_AppleTV);
+                statement.setInt(index++, ProtoConstants.Platform.Platform_HarmonyTV);
             } else {
                 statement.setInt(index++, platform);
             }

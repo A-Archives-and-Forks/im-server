@@ -41,6 +41,8 @@ public class MemorySessionStore implements ISessionsStore {
     private boolean supportMultiEndpoint = false;
     private boolean supportMultiPCEndpoint = false;
     private boolean supportMultiPadEndpoint = false;
+    private boolean supportMultiWearableEndpoint = false;
+    private boolean supportMultiTVEndpoint = false;
     private boolean clientSupportKickoff = false;
 
     public static class Session implements Comparable<Session>{
@@ -101,6 +103,9 @@ public class MemorySessionStore implements ISessionsStore {
             return platform == ProtoConstants.Platform.Platform_iPad || platform == ProtoConstants.Platform.Platform_APad || platform == ProtoConstants.Platform.Platform_HarmonyPad;
         }
 
+        public boolean isTVClient() {
+            return platform == ProtoConstants.Platform.Platform_AppleTV || platform == ProtoConstants.Platform.Platform_AndroidTV || platform == ProtoConstants.Platform.Platform_HarmonyTV;
+        }
 
         public int getPushType() {
             return pushType;
@@ -313,6 +318,16 @@ public class MemorySessionStore implements ISessionsStore {
         }
 
         try {
+            supportMultiWearableEndpoint = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.SERVER_MULTI_WEARABLE_ENDPOINT, "false"));
+        } catch (Exception e) {
+        }
+
+        try {
+            supportMultiTVEndpoint = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.SERVER_MULTI_TV_ENDPOINT, "false"));
+        } catch (Exception e) {
+        }
+
+        try {
             clientSupportKickoff = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.SERVER_CLIENT_SUPPORT_KICKOFF_EVENT, "false"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -419,6 +434,11 @@ public class MemorySessionStore implements ISessionsStore {
             && !(platform == ProtoConstants.Platform.Platform_iPad && supportMultiPadEndpoint)
             && !(platform == ProtoConstants.Platform.Platform_APad && supportMultiPadEndpoint)
             && !(platform == ProtoConstants.Platform.Platform_HarmonyPad && supportMultiPadEndpoint)
+            && !(platform == ProtoConstants.Platform.Platform_AndroidWearable && supportMultiWearableEndpoint)
+            && !(platform == ProtoConstants.Platform.Platform_HarmonyWearable && supportMultiWearableEndpoint)
+            && !(platform == ProtoConstants.Platform.Platform_AndroidTV && supportMultiTVEndpoint)
+            && !(platform == ProtoConstants.Platform.Platform_AppleTV && supportMultiTVEndpoint)
+            && !(platform == ProtoConstants.Platform.Platform_HarmonyTV && supportMultiTVEndpoint)
         ) {
             databaseStore.clearMultiEndpoint(username, clientID, platform);
             if (userSessions.get(username) != null) {
@@ -443,6 +463,14 @@ public class MemorySessionStore implements ISessionsStore {
                             }
                         } else if(platform == ProtoConstants.Platform.Platform_OSX || platform == ProtoConstants.Platform.Platform_Windows || platform == ProtoConstants.Platform.Platform_LINUX || platform == ProtoConstants.Platform.Platform_HarmonyPC) {
                             if (s.getPlatform() == ProtoConstants.Platform.Platform_OSX || s.getPlatform() == ProtoConstants.Platform.Platform_Windows || s.getPlatform() == ProtoConstants.Platform.Platform_LINUX || s.getPlatform() == ProtoConstants.Platform.Platform_HarmonyPC) {
+                                remove = true;
+                            }
+                        } else if(platform == ProtoConstants.Platform.Platform_AndroidWearable || platform == ProtoConstants.Platform.Platform_HarmonyWearable) {
+                            if (s.getPlatform() == ProtoConstants.Platform.Platform_AndroidWearable || s.getPlatform() == ProtoConstants.Platform.Platform_HarmonyWearable) {
+                                remove = true;
+                            }
+                        } else if(platform == ProtoConstants.Platform.Platform_AndroidTV || platform == ProtoConstants.Platform.Platform_AppleTV || platform == ProtoConstants.Platform.Platform_HarmonyTV) {
+                            if (s.getPlatform() == ProtoConstants.Platform.Platform_AndroidTV || s.getPlatform() == ProtoConstants.Platform.Platform_AppleTV || s.getPlatform() == ProtoConstants.Platform.Platform_HarmonyTV) {
                                 remove = true;
                             }
                         } else { //web, microapp

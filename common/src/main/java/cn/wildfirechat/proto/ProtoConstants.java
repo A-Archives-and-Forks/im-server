@@ -56,7 +56,14 @@ public class ProtoConstants {
         int Platform_Harmony = 10;
         int Platform_HarmonyPad = 11;
         int Platform_HarmonyPC = 12;
-        int Platform_MAX = Platform_HarmonyPC;
+        // 穿戴端 (Wearable)
+        int Platform_AndroidWearable = 13;
+        int Platform_HarmonyWearable = 14;
+        // TV端
+        int Platform_AndroidTV = 15;
+        int Platform_AppleTV = 16;
+        int Platform_HarmonyTV = 17;
+        int Platform_MAX = Platform_HarmonyTV;
     }
 
     //message NotifyMessage & PullMessageRequest -> type

@@ -96,13 +96,18 @@ public class PushServer {
             session.getPlatform() == ProtoConstants.Platform.Platform_Android ||
             session.getPlatform() == ProtoConstants.Platform.Platform_APad ||
             session.getPlatform() == ProtoConstants.Platform.Platform_Harmony ||
-            session.getPlatform() == ProtoConstants.Platform.Platform_HarmonyPad
+            session.getPlatform() == ProtoConstants.Platform.Platform_HarmonyPad ||
+            session.getPlatform() == ProtoConstants.Platform.Platform_AppleTV ||
+            session.getPlatform() == ProtoConstants.Platform.Platform_AndroidTV ||
+            session.getPlatform() == ProtoConstants.Platform.Platform_HarmonyTV ||
+            session.getPlatform() == ProtoConstants.Platform.Platform_HarmonyWearable ||
+            session.getPlatform() == ProtoConstants.Platform.Platform_AndroidWearable
         ) {
             String url = androidPushServerUrl;
-            if (session.getPlatform() == ProtoConstants.Platform.Platform_iOS || session.getPlatform() == ProtoConstants.Platform.Platform_iPad) {
+            if (session.getPlatform() == ProtoConstants.Platform.Platform_iOS || session.getPlatform() == ProtoConstants.Platform.Platform_iPad || session.getPlatform() == ProtoConstants.Platform.Platform_AppleTV) {
                 url = iOSPushServerUrl;
                 pushMessage.voipDeviceToken = session.getVoipDeviceToken();
-            } else if (session.getPlatform() == ProtoConstants.Platform.Platform_Harmony || session.getPlatform() == ProtoConstants.Platform.Platform_HarmonyPad) {
+            } else if (session.getPlatform() == ProtoConstants.Platform.Platform_Harmony || session.getPlatform() == ProtoConstants.Platform.Platform_HarmonyPad || session.getPlatform() == ProtoConstants.Platform.Platform_HarmonyWearable || session.getPlatform() == ProtoConstants.Platform.Platform_HarmonyTV) {
                 url = harmonyPushServerUrl;
             }
             HttpUtils.httpJsonPost(url, gson.toJson(pushMessage, pushMessage.getClass()), POST_TYPE_Push);
