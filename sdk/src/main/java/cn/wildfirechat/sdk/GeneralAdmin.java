@@ -274,7 +274,7 @@ public class GeneralAdmin {
         return AdminHttpUtils.httpJsonPost(APIPath.GET_CUSTOMER, null, String.class);
     }
 
-    private static IMResult<OutputPresignedUploadUrl> getPresignedUploadUrl(String fileName, int/*ProtoConstants.MessageMediaType*/ mediaType, String contentType) throws Exception {
+    public static IMResult<OutputPresignedUploadUrl> getPresignedUploadUrl(String fileName, int/*ProtoConstants.MessageMediaType*/ mediaType, String contentType) throws Exception {
         String path = APIPath.Get_Presigned_Upload_Url;
 
         InputGetPresignedUploadUrl requestPojo = new InputGetPresignedUploadUrl();

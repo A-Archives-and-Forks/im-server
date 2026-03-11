@@ -493,7 +493,7 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, Void.class);
     }
 
-    private IMResult<OutputPresignedUploadUrl> getPresignedUploadUrl(String fileName, int/*ProtoConstants.MessageMediaType*/ mediaType, String contentType) throws Exception {
+    public IMResult<OutputPresignedUploadUrl> getPresignedUploadUrl(String fileName, int/*ProtoConstants.MessageMediaType*/ mediaType, String contentType) throws Exception {
         String path = APIPath.Robot_Get_Presigned_Upload_Url;
 
         InputGetPresignedUploadUrl requestPojo = new InputGetPresignedUploadUrl();
