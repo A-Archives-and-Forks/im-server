@@ -120,6 +120,10 @@ public class RobotHttpUtils extends HttpUtils implements Closeable {
         return robotSecret;
     }
 
+    public CloseableHttpClient getHttpClient() {
+        return httpClient;
+    }
+
     @Override
     public void close() throws IOException {
         httpClient.close();

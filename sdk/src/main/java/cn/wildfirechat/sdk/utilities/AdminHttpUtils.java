@@ -46,6 +46,11 @@ public class AdminHttpUtils extends HttpUtils {
     // ======================== 线程安全的全局变量 ========================
     private static volatile String adminUrl;
     private static volatile String adminSecret;
+
+    public static CloseableHttpClient getHttpClient() {
+        return httpClient;
+    }
+
     private static volatile CloseableHttpClient httpClient;
 
 

@@ -127,6 +127,8 @@ public interface APIPath {
     String Get_User_Files = "/admin/file/user_files";
     String Get_Message_File = "/admin/file/message_file";
 
+    String Get_Presigned_Upload_Url = "/admin/oss/get_upload_url";
+
     String Conference_List = "/admin/conference/list";
     String Conference_Exist = "/admin/conference/exist";
     String Conference_List_Participant = "/admin/conference/list_participant";
@@ -188,4 +190,6 @@ public interface APIPath {
     String Robot_Moments_Update_Profiles_Value = "/robot/moments/profiles/value/push";
 
     String Robot_Conference_Request = "/robot/conference/request";
+
+    String Robot_Get_Presigned_Upload_Url = "/robot/oss/get_upload_url";
 }
