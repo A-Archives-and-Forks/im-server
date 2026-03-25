@@ -2437,6 +2437,10 @@ public class MemoryMessagesStore implements IMessagesStore {
             return ErrorCode.ERROR_CODE_NOT_RIGHT;
         }
 
+        if(newOwner.equals(groupInfo.getOwner())) {
+            return ErrorCode.ERROR_CODE_SUCCESS;
+        }
+
         //check the new owner is in member list? is that necessary?
         MultiMap<String, WFCMessage.GroupMember> groupMembers = hzInstance.getMultiMap(GROUP_MEMBERS);
         Collection<WFCMessage.GroupMember> members = groupMembers.get(groupId);
