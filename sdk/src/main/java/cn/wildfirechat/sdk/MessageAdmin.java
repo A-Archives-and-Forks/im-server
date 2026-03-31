@@ -5,6 +5,7 @@ import cn.wildfirechat.pojos.*;
 import cn.wildfirechat.sdk.model.IMResult;
 import cn.wildfirechat.sdk.utilities.AdminHttpUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -292,5 +293,21 @@ public class MessageAdmin {
         String path = APIPath.Msg_Delivery;
         InputUserId input = new InputUserId(userId);
         return AdminHttpUtils.httpJsonPost(path, input, OutputTimestamp.class);
+    }
+
+    /**
+     * 导入消息。只用在服务为正式使用之前，从别的IM服务进行导入历史消息。当导入时，只能部署一个节点，可以多线程导入。当导入结束后，检查有没有异常日志，如果有异常日志需要解决后重新导入。
+     * 当导入完成后，重启IM服务（不要用kill -9，需要等待缓存写入）。重启之后再用客户端验证是否有历史消息可以从远端加载。另外需要保留之前IM服务的备份记录，以防有消息泄漏。
+     * 下面所有参数必须有效才行，如果是群组消息，还需要先创建群组。
+     *
+     * @param messages 消息列表
+     * @return  导入结果
+     * @throws Exception
+     */
+    public static IMResult<Void> importMessage(List<ImportMessagesData.ImportMessage> messages) throws Exception {
+        String path = APIPath.Msg_Import;
+        ImportMessagesData messageData = new ImportMessagesData();
+        messageData.messages = messages;
+        return AdminHttpUtils.httpJsonPost(path, messageData, Void.class);
     }
 }

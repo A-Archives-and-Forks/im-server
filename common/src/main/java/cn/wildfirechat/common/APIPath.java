@@ -88,6 +88,7 @@ public interface APIPath {
     String Msg_Delivery = "/admin/message/delivery";
     String Conversation_Delete = "/admin/conversation/delete";
     String Msg_Clear_By_User = "/admin/message/clear_by_user";
+    String Msg_Import = "/admin/message/import";
 
     String Create_Group = "/admin/group/create";
     String Group_Dismiss = "/admin/group/del";
