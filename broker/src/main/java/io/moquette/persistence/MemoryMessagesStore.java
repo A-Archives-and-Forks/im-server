@@ -3278,6 +3278,11 @@ public class MemoryMessagesStore implements IMessagesStore {
     }
 
     @Override
+    public List<WFCMessage.Robot> getRobotInfoList(int count, int offset) {
+        return databaseStore.getAllRobots(count, offset);
+    }
+
+    @Override
     public List<String> getUserRobotIds(String userId) {
         return databaseStore.getUserRobotIds(userId);
     }

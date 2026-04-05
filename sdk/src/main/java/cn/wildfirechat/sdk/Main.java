@@ -465,6 +465,15 @@ public class Main {
             System.exit(-1);
         }
 
+        // 获取所有机器人列表（分页：每页100条，第0页）
+        IMResult<OutputGetRobotList> getRobotListIMResult = UserAdmin.getAllRobots(100, 0);
+        if (getRobotListIMResult != null && getRobotListIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("getRobotListIMResult success");
+        } else {
+            System.out.println("getRobotListIMResult failure");
+            System.exit(-1);
+        }
+
         // 商业版专属功能
         if (commercialServer) {
             // 获取在线用户总数

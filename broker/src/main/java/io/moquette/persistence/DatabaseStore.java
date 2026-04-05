@@ -3188,6 +3188,69 @@ public class DatabaseStore {
         return outList;
     }
 
+    List<WFCMessage.Robot> getAllRobots(int count, int offset) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        List<WFCMessage.Robot> outList = new ArrayList<>();
+
+        try {
+            connection = DBUtil.getConnection();
+            String sql = "select  `_uid`, `_owner`" +
+                ", `_secret`" +
+                ", `_callback`" +
+                ", `_state`" +
+                ", `_extra`" +
+                ", `_dt` from t_robot limit ? offset ?";
+            statement = connection.prepareStatement(sql);
+
+            int index = 1;
+            statement.setInt(1, count);
+            statement.setInt(2, offset);
+
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                WFCMessage.Robot.Builder builder = WFCMessage.Robot.newBuilder();
+                index = 1;
+                String value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setUid(value);
+
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setOwner(value);
+
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setSecret(value);
+
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setCallback(value);
+
+
+                int state = rs.getInt(index++);
+                builder.setState(state);
+
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setExtra(value);
+
+                long longValue = rs.getLong(index++);
+
+                outList.add(builder.build());
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Utility.printExecption(LOG, e, RDBS_Exception);
+        } finally {
+            DBUtil.closeDB(connection, statement, rs);
+        }
+
+        return outList;
+    }
+
     List<String> getUserRobotIds(String userId) {
         Connection connection = null;
         PreparedStatement statement = null;

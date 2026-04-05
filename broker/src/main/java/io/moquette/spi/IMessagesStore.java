@@ -157,6 +157,7 @@ public interface IMessagesStore {
     ErrorCode searchUser(String userId, String keyword, int searchType, int userType, int page, List<WFCMessage.User> users);
 
     List<WFCMessage.User> getUserInfoList(int count, int offset);
+    List<WFCMessage.Robot> getRobotInfoList(int count, int offset);
     List<String> getUserRobotIds(String userId);
 
     boolean updateSystemSetting(int id, String value, String desc);

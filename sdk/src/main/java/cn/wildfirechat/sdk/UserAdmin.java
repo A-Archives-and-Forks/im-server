@@ -118,6 +118,21 @@ public class UserAdmin {
     }
 
     /**
+     * 获取所有机器人列表（分页）
+     * @param count 每页数量
+     * @param offset 偏移量
+     * @return 机器人列表
+     * @throws Exception 请求失败时抛出异常
+     */
+    public static IMResult<OutputGetRobotList> getAllRobots(int count, int offset) throws Exception {
+        String path = APIPath.User_Get_All_Robots;
+        InputGetUserList input = new InputGetUserList();
+        input.count = count;
+        input.offset = offset;
+        return AdminHttpUtils.httpJsonPost(path, input, OutputGetRobotList.class);
+    }
+
+    /**
      * 批量获取用户信息
      * @param userIds 用户ID列表
      * @return 用户信息列表

@@ -45,6 +45,7 @@ public interface APIPath {
     String User_Get_Email_Info = "/admin/user/get_info_by_email";
     String User_Get_All = "/admin/user/all";
     String User_Get_Robot_Info = "/admin/user/get_robot_info";
+    String User_Get_All_Robots = "/admin/user/get_all_robots";
     String User_Get_User_Robots = "/admin/user/get_user_robots";
     String User_Get_Blocked_List = "/admin/user/get_blocked_list";
     String User_Check_Block_Status = "/admin/user/check_block_status";
