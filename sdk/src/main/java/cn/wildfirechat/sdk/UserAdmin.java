@@ -70,6 +70,7 @@ public class UserAdmin {
 
     /**
      * 根据手机号获取用户信息（不包含已删除用户）
+     * @deprecated 用户手机号码不要求唯一，正常应该业务系统保证电话号码唯一。如果业务系统不限制电话号码唯一，可能一个号码有多个用户，此方法只能返回一个，此时建议使用 {@link #getUsersByMobile(String mobile, boolean includeDeleted)}
      * @param mobile 手机号
      * @return 用户信息
      * @throws Exception 请求失败时抛出异常
@@ -79,7 +80,8 @@ public class UserAdmin {
     }
 
     /**
-     * 根据手机号获取用户信息
+     * 根据手机号获取用户信息，
+     * @deprecated 用户手机号码不要求唯一，正常应该业务系统保证电话号码唯一。如果业务系统不限制电话号码唯一，可能一个号码有多个用户，此方法只能返回一个，此时建议使用 {@link #getUsersByMobile(String mobile, boolean includeDeleted)}
      * @param mobile 手机号
      * @param includeDeleted 是否包含已删除的用户
      * @return 用户信息
@@ -89,6 +91,19 @@ public class UserAdmin {
         String path = APIPath.User_Get_Info;
         InputGetUserInfo getUserInfo = new InputGetUserInfo(null, null, mobile, includeDeleted);
         return AdminHttpUtils.httpJsonPost(path, getUserInfo, InputOutputUserInfo.class);
+    }
+
+    /**
+     * 根据电话号码获取用户信息列表
+     * @param mobile 邮箱地址
+     * @param includeDeleted 是否包含已删除的用户
+     * @return 用户信息列表
+     * @throws Exception 请求失败时抛出异常
+     */
+    public static IMResult<OutputUserInfoList> getUsersByMobile(String mobile, boolean includeDeleted) throws Exception {
+        String path = APIPath.User_Get_By_Mobile;
+        InputGetUserInfo getUserInfo = new InputGetUserInfo(null, null, mobile, includeDeleted);
+        return AdminHttpUtils.httpJsonPost(path, getUserInfo, OutputUserInfoList.class);
     }
 
     /**

@@ -43,6 +43,7 @@ public interface APIPath {
     String User_Get_Info = "/admin/user/get_info";
     String User_Batch_Get_Infos = "/admin/user/batch_get_infos";
     String User_Get_Email_Info = "/admin/user/get_info_by_email";
+    String User_Get_By_Mobile = "/admin/user/get_info_by_mobile";
     String User_Get_All = "/admin/user/all";
     String User_Get_Robot_Info = "/admin/user/get_robot_info";
     String User_Get_All_Robots = "/admin/user/get_all_robots";

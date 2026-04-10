@@ -154,6 +154,7 @@ public interface IMessagesStore {
     WFCMessage.User getUserInfoByName(String name);
     WFCMessage.User getUserInfoByMobile(String mobile);
     List<WFCMessage.User> getUserInfosByEmail(String email);
+    List<WFCMessage.User> getUserInfosByMobile(String mobile, boolean includeDeleted);
     ErrorCode searchUser(String userId, String keyword, int searchType, int userType, int page, List<WFCMessage.User> users);
 
     List<WFCMessage.User> getUserInfoList(int count, int offset);

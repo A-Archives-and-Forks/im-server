@@ -3273,6 +3273,11 @@ public class MemoryMessagesStore implements IMessagesStore {
     }
 
     @Override
+    public List<WFCMessage.User> getUserInfosByMobile(String mobile, boolean includeDeleted) {
+        return databaseStore.getUserInfosByMobile(mobile, includeDeleted);
+    }
+
+    @Override
     public List<WFCMessage.User> getUserInfoList(int count, int offset) {
         return databaseStore.getAllUsers(count, offset);
     }
