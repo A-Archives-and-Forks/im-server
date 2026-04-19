@@ -114,12 +114,16 @@ public class RobotService implements Closeable {
     }
 
     public IMResult<Void> updateMessage(long messageUid, MessagePayload payload) throws Exception {
+        return updateMessage(messageUid, payload, true);
+    }
+
+    public IMResult<Void> updateMessage(long messageUid, MessagePayload payload, boolean distribute) throws Exception {
         String path = APIPath.Robot_Message_Update;
         UpdateMessageContentData updateMessageContentData = new UpdateMessageContentData();
         updateMessageContentData.setMessageUid(messageUid);
         updateMessageContentData.setPayload(payload);
         updateMessageContentData.setUpdateTimestamp(0);
-        updateMessageContentData.setDistribute(1);
+        updateMessageContentData.setDistribute(distribute?1:0);
         return robotHttpUtils.httpJsonPost(path, updateMessageContentData, Void.class);
     }
 
