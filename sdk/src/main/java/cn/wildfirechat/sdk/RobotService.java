@@ -97,6 +97,14 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, messageData, SendMessageResult.class);
     }
 
+    /**
+     * 回复消息
+     * @param messageUid 原消息UID
+     * @param payload 消息内容
+     * @param only2Sender 是否只回复给原发送者
+     * @return 发送结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<SendMessageResult> replyMessage(long messageUid, MessagePayload payload, boolean only2Sender) throws Exception {
         String path = APIPath.Robot_Message_Reply;
         ReplyMessageData messageData = new ReplyMessageData();
@@ -106,6 +114,12 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, messageData, SendMessageResult.class);
     }
 
+    /**
+     * 撤回消息
+     * @param messageUid 消息UID
+     * @return 操作结果，返回被撤回消息的UID
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<String> recallMessage(long messageUid) throws Exception {
         String path = APIPath.Robot_Message_Recall;
         RecallMessageData messageData = new RecallMessageData();
@@ -113,10 +127,25 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, messageData, String.class);
     }
 
+    /**
+     * 更新消息内容
+     * @param messageUid 消息UID
+     * @param payload 新的消息内容
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> updateMessage(long messageUid, MessagePayload payload) throws Exception {
         return updateMessage(messageUid, payload, true);
     }
 
+    /**
+     * 更新消息内容
+     * @param messageUid 消息UID
+     * @param payload 新的消息内容
+     * @param distribute 是否分发给在线用户
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> updateMessage(long messageUid, MessagePayload payload, boolean distribute) throws Exception {
         String path = APIPath.Robot_Message_Update;
         UpdateMessageContentData updateMessageContentData = new UpdateMessageContentData();
@@ -127,24 +156,48 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, updateMessageContentData, Void.class);
     }
 
+    /**
+     * 根据用户ID获取用户信息
+     * @param userId 用户ID
+     * @return 用户信息
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<InputOutputUserInfo> getUserInfo(String userId) throws Exception {
         String path = APIPath.Robot_User_Info;
         InputGetUserInfo getUserInfo = new InputGetUserInfo(userId, null, null);
         return robotHttpUtils.httpJsonPost(path, getUserInfo, InputOutputUserInfo.class);
     }
 
+    /**
+     * 根据手机号获取用户信息
+     * @param phone 手机号
+     * @return 用户信息
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<InputOutputUserInfo> getUserInfoByMobile(String phone) throws Exception {
         String path = APIPath.Robot_User_Info;
         InputGetUserInfo getUserInfo = new InputGetUserInfo(null, null, phone);
         return robotHttpUtils.httpJsonPost(path, getUserInfo, InputOutputUserInfo.class);
     }
 
+    /**
+     * 根据用户名获取用户信息
+     * @param userName 用户名
+     * @return 用户信息
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<InputOutputUserInfo> getUserInfoByName(String userName) throws Exception {
         String path = APIPath.Robot_User_Info;
         InputGetUserInfo getUserInfo = new InputGetUserInfo(null, userName, null);
         return robotHttpUtils.httpJsonPost(path, getUserInfo, InputOutputUserInfo.class);
     }
 
+    /**
+     * 设置机器人消息回调地址
+     * @param url 回调地址
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> setCallback(String url) throws Exception {
         String path = APIPath.Robot_Set_Callback;
         RobotCallbackPojo pojo = new RobotCallbackPojo();
@@ -152,23 +205,43 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, pojo, Void.class);
     }
     
+    /**
+     * 获取机器人消息回调地址
+     * @return 回调信息
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<RobotCallbackPojo> getCallback() throws Exception {
         String path = APIPath.Robot_Get_Callback;
         return robotHttpUtils.httpJsonPost(path, null, RobotCallbackPojo.class);
     }
 
+    /**
+     * 删除机器人消息回调地址
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> deleteCallback() throws Exception {
         String path = APIPath.Robot_Delete_Callback;
         return robotHttpUtils.httpJsonPost(path, null, Void.class);
     }
 
+    /**
+     * 获取机器人资料
+     * @return 机器人资料
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<OutputRobot> getProfile() throws Exception {
         String path = APIPath.Robot_Get_Profile;
         return robotHttpUtils.httpJsonPost(path, null, OutputRobot.class);
     }
 
-    /*
-    type可选范围为MyInfoType，注意不能修改电话号码，如果要修改电话号码请使用adminapi进行修改
+    /**
+     * 更新机器人资料
+     * <p>type可选范围为MyInfoType，注意不能修改电话号码，如果要修改电话号码请使用adminapi进行修改</p>
+     * @param type 资料类型，参考MyInfoType
+     * @param value 资料值
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
      */
     public IMResult<Void> updateProfile(int/*MyInfoType*/ type, String value) throws Exception {
         String path = APIPath.Robot_Update_Profile;
@@ -176,6 +249,16 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, pojo, Void.class);
     }
 
+    /**
+     * 创建群组
+     * @param group_info 群组信息
+     * @param members 群成员列表
+     * @param member_extra 成员扩展信息
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 创建结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<OutputCreateGroupResult> createGroup(PojoGroupInfo group_info, List<PojoGroupMember> members, String member_extra, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Create_Group;
         PojoGroup pojoGroup = new PojoGroup();
@@ -190,6 +273,12 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, createGroup, OutputCreateGroupResult.class);
     }
 
+    /**
+     * 获取群组信息
+     * @param groupId 群组ID
+     * @return 群组信息
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<PojoGroupInfo> getGroupInfo(String groupId) throws Exception {
         String path = APIPath.Robot_Group_Get_Info;
         InputGetGroup input = new InputGetGroup();
@@ -198,6 +287,14 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, input, PojoGroupInfo.class);
     }
 
+    /**
+     * 解散群组
+     * @param groupId 群组ID
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> dismissGroup(String groupId, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Dismiss;
         InputDismissGroup dismissGroup = new InputDismissGroup();
@@ -207,6 +304,15 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, dismissGroup, Void.class);
     }
 
+    /**
+     * 转让群组
+     * @param groupId 群组ID
+     * @param newOwner 新群主用户ID
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> transferGroup(String groupId, String newOwner, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Transfer;
         InputTransferGroup transferGroup = new InputTransferGroup();
@@ -217,6 +323,16 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, transferGroup, Void.class);
     }
 
+    /**
+     * 修改群组信息
+     * @param groupId 群组ID
+     * @param type 修改类型，参考ModifyGroupInfoType
+     * @param value 修改的值
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> modifyGroupInfo(String groupId, /*ModifyGroupInfoType*/int type, String value, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Modify_Info;
         InputModifyGroupInfo modifyGroupInfo = new InputModifyGroupInfo();
@@ -229,6 +345,12 @@ public class RobotService implements Closeable {
     }
 
 
+    /**
+     * 获取群成员列表
+     * @param groupId 群组ID
+     * @return 群成员列表
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<OutputGroupMemberList> getGroupMembers(String groupId) throws Exception {
         String path = APIPath.Robot_Group_Member_List;
         InputGetGroup input = new InputGetGroup();
@@ -236,6 +358,13 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, input, OutputGroupMemberList.class);
     }
 
+    /**
+     * 获取指定群成员信息
+     * @param groupId 群组ID
+     * @param memberId 成员用户ID
+     * @return 群成员信息
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<PojoGroupMember> getGroupMember(String groupId, String memberId) throws Exception {
         String path = APIPath.Robot_Group_Member_Get;
         InputGetGroupMember input = new InputGetGroupMember();
@@ -244,6 +373,16 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, input, PojoGroupMember.class);
     }
 
+    /**
+     * 添加群成员
+     * @param groupId 群组ID
+     * @param groupMembers 要添加的成员列表
+     * @param member_extra 成员扩展信息
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> addGroupMembers(String groupId, List<PojoGroupMember> groupMembers, String member_extra, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Member_Add;
         InputAddGroupMember addGroupMember = new InputAddGroupMember();
@@ -255,6 +394,16 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, addGroupMember, Void.class);
     }
 
+    /**
+     * 设置群管理员
+     * @param groupId 群组ID
+     * @param groupMemberIds 成员用户ID列表
+     * @param isManager 是否设为管理员
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> setGroupManager(String groupId, List<String> groupMemberIds, boolean isManager, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Set_Manager;
         InputSetGroupManager addGroupMember = new InputSetGroupManager();
@@ -266,6 +415,16 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, addGroupMember, Void.class);
     }
 
+    /**
+     * 禁言/取消禁言群成员
+     * @param groupId 群组ID
+     * @param groupMemberIds 成员用户ID列表
+     * @param isMute 是否禁言
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> muteGroupMember(String groupId, List<String> groupMemberIds, boolean isMute, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Mute_Member;
         InputMuteGroupMember addGroupMember = new InputMuteGroupMember();
@@ -277,6 +436,16 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, addGroupMember, Void.class);
     }
 
+    /**
+     * 允许/禁止群成员
+     * @param groupId 群组ID
+     * @param groupMemberIds 成员用户ID列表
+     * @param isAllow 是否允许
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> allowGroupMember(String groupId, List<String> groupMemberIds, boolean isAllow, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Allow_Member;
         InputMuteGroupMember addGroupMember = new InputMuteGroupMember();
@@ -288,6 +457,15 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, addGroupMember, Void.class);
     }
 
+    /**
+     * 踢出群成员
+     * @param groupId 群组ID
+     * @param groupMemberIds 要踢出的成员用户ID列表
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> kickoffGroupMembers(String groupId, List<String> groupMemberIds, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Member_Kickoff;
         InputKickoffGroupMember kickoffGroupMember = new InputKickoffGroupMember();
@@ -298,6 +476,14 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, kickoffGroupMember, Void.class);
     }
 
+    /**
+     * 退出群组
+     * @param groupId 群组ID
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> quitGroup(String groupId, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Member_Quit;
         InputQuitGroup quitGroup = new InputQuitGroup();
@@ -307,6 +493,16 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, quitGroup, Void.class);
     }
 
+    /**
+     * 设置群成员昵称
+     * @param groupId 群组ID
+     * @param memberId 成员用户ID
+     * @param alias 群昵称
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> setGroupMemberAlias(String groupId, String memberId, String alias, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Set_Member_Alias;
         InputSetGroupMemberAlias input = new InputSetGroupMemberAlias();
@@ -318,6 +514,16 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, input, Void.class);
     }
 
+    /**
+     * 设置群成员扩展信息
+     * @param groupId 群组ID
+     * @param memberId 成员用户ID
+     * @param extra 扩展信息
+     * @param to_lines 指定线路
+     * @param notify_message 通知消息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> setGroupMemberExtra(String groupId, String memberId, String extra, List<Integer> to_lines, MessagePayload notify_message) throws Exception {
         String path = APIPath.Robot_Group_Set_Member_Extra;
         InputSetGroupMemberExtra input = new InputSetGroupMemberExtra();
@@ -329,6 +535,12 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, input, Void.class);
     }
 
+    /**
+     * 通过授权码获取应用用户信息
+     * @param authCode 授权码
+     * @return 应用用户信息
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<OutputApplicationUserInfo> applicationGetUserInfo(String authCode) throws Exception {
         String path = APIPath.Robot_Application_Get_UserInfo;
         InputApplicationGetUserInfo input = new InputApplicationGetUserInfo();
@@ -336,6 +548,11 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, input, OutputApplicationUserInfo.class);
     }
 
+    /**
+     * 获取应用签名配置
+     * <p>用于客户端接入时的签名验证</p>
+     * @return 应用签名配置数据
+     */
     public OutputApplicationConfigData getApplicationSignature() {
         int nonce = (int)(Math.random() * 100000 + 3);
         long timestamp = System.currentTimeMillis()/1000;
@@ -350,12 +567,36 @@ public class RobotService implements Closeable {
         return configData;
     }
 
+    /**
+     * 发送会议相关请求
+     * @param robotId 机器人ID
+     * @param clientId 客户端ID
+     * @param request 请求类型
+     * @param sessionId 会话ID
+     * @param roomId 会议室ID
+     * @param data 请求数据
+     * @param advance 是否高级请求
+     * @return 请求结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<String> sendConferenceRequest(String robotId, String clientId, String request, long sessionId, String roomId, String data, boolean advance) throws Exception {
         String path = APIPath.Robot_Conference_Request;
         InputConferenceRequest input = new InputConferenceRequest(robotId, clientId, request, sessionId, roomId, data, advance);
         return robotHttpUtils.httpJsonPost(path, input, String.class);
     }
 
+    /**
+     * 发布朋友圈动态
+     * @param type 内容类型，参考MomentsContentType
+     * @param text 文本内容
+     * @param medias 媒体列表
+     * @param toUsers 可见用户列表
+     * @param excludeUsers 不可见用户列表
+     * @param mentionedUsers 提及用户列表
+     * @param extra 扩展信息
+     * @return 发布结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<FeedPojo> postMomentsFeed(int/*MomentsContentType*/ type, String text, List<MediaEntry> medias, List<String> toUsers, List<String> excludeUsers, List<String> mentionedUsers, String extra) throws Exception {
         String path = APIPath.Robot_Moments_Post_Feed;
         FeedPojo feedPojo = new FeedPojo();
@@ -380,6 +621,19 @@ public class RobotService implements Closeable {
         return feedResult;
     }
 
+    /**
+     * 更新朋友圈动态
+     * @param feedId 动态ID
+     * @param type 内容类型，参考MomentsContentType
+     * @param text 文本内容
+     * @param medias 媒体列表
+     * @param toUsers 可见用户列表
+     * @param excludeUsers 不可见用户列表
+     * @param mentionedUsers 提及用户列表
+     * @param extra 扩展信息
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> updateMomentsFeed(long feedId, int/*MomentsContentType*/ type, String text, List<MediaEntry> medias, List<String> toUsers, List<String> excludeUsers, List<String> mentionedUsers, String extra) throws Exception {
         String path = APIPath.Robot_Moments_Update_Feed;
         FeedPojo feedPojo = new FeedPojo();
@@ -394,6 +648,14 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, feedPojo, Void.class);
     }
 
+    /**
+     * 获取朋友圈动态列表
+     * @param feedId 起始动态ID
+     * @param count 获取数量
+     * @param user 指定用户ID，为空表示获取所有
+     * @return 动态列表
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<FeedsPojo> getMomentsFeeds(long feedId, int count, String user) throws Exception {
         String path = APIPath.Robot_Moments_Pull_Feeds;
         PullFeedRequestPojo requestPojo = new PullFeedRequestPojo();
@@ -403,6 +665,12 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, FeedsPojo.class);
     }
 
+    /**
+     * 获取单条朋友圈动态
+     * @param feedId 动态ID
+     * @return 动态详情
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<FeedPojo> getMomentsFeed(long feedId) throws Exception {
         String path = APIPath.Robot_Moments_Fetch_Feed;
         PullOneFeedRequestPojo requestPojo = new PullOneFeedRequestPojo();
@@ -410,6 +678,12 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, FeedPojo.class);
     }
 
+    /**
+     * 删除朋友圈动态
+     * @param feedId 动态ID
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> deleteMomentsFeed(long feedId) throws Exception {
         String path = APIPath.Robot_Moments_Recall_Feed;
         IdPojo requestPojo = new IdPojo();
@@ -417,6 +691,17 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, Void.class);
     }
 
+    /**
+     * 发布朋友圈评论
+     * @param feedId 动态ID
+     * @param replyId 回复的评论ID
+     * @param type 评论类型，参考MomentsCommentType
+     * @param text 评论内容
+     * @param replyTo 回复目标用户ID
+     * @param extra 扩展信息
+     * @return 评论结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<CommentPojo> postMomentsComment(long feedId, long replyId, int/*MomentsCommentType*/ type, String text, String replyTo, String extra) throws Exception {
         String path = APIPath.Robot_Moments_Post_Comment;
         CommentPojo commentPojo = new CommentPojo();
@@ -440,6 +725,13 @@ public class RobotService implements Closeable {
         return feedResult;
     }
 
+    /**
+     * 删除朋友圈评论
+     * @param feedId 动态ID
+     * @param commentId 评论ID
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> deleteMomentsComment(long feedId, long commentId) throws Exception {
         String path = APIPath.Robot_Moments_Recall_Comment;
         IdPojo requestPojo = new IdPojo();
@@ -448,6 +740,12 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, Void.class);
     }
 
+    /**
+     * 获取用户朋友圈资料
+     * @param userId 用户ID
+     * @return 朋友圈资料
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<MomentProfilePojo> getUserMomentsProfile(String userId) throws Exception {
         String path = APIPath.Robot_Moments_Fetch_Profiles;
         PullProfileRequestPojo requestPojo = new PullProfileRequestPojo();
@@ -455,6 +753,12 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, MomentProfilePojo.class);
     }
 
+    /**
+     * 更新朋友圈背景图
+     * @param url 背景图URL
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> updateMomentsBackgroundUrl(String url) throws Exception {
         String path = APIPath.Robot_Moments_Update_Profiles_Value;
         PushProfileValueRequestPojo requestPojo = new PushProfileValueRequestPojo();
@@ -463,6 +767,12 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, Void.class);
     }
 
+    /**
+     * 更新朋友圈陌生人可见数量
+     * @param count 可见数量
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> updateMomentsStrangerVisibleCount(int count) throws Exception {
         String path = APIPath.Robot_Moments_Update_Profiles_Value;
         PushProfileValueRequestPojo requestPojo = new PushProfileValueRequestPojo();
@@ -471,6 +781,12 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, Void.class);
     }
 
+    /**
+     * 更新朋友圈可见范围
+     * @param scope 可见范围，参考MomentsVisibleScope
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> updateMomentsVisibleScope(int/*MomentsVisibleScope*/ scope) throws Exception {
         String path = APIPath.Robot_Moments_Update_Profiles_Value;
         PushProfileValueRequestPojo requestPojo = new PushProfileValueRequestPojo();
@@ -479,6 +795,13 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, Void.class);
     }
 
+    /**
+     * 更新朋友圈黑名单
+     * @param addList 要添加的用户ID列表
+     * @param removeList 要移除的用户ID列表
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> updateMomentsBlackList(List<String> addList, List<String> removeList) throws Exception {
         String path = APIPath.Robot_Moments_Update_Profiles_List_Value;
         PushProfileListRequestPojo requestPojo = new PushProfileListRequestPojo();
@@ -488,6 +811,13 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, Void.class);
     }
 
+    /**
+     * 更新朋友圈屏蔽列表
+     * @param addList 要添加的用户ID列表
+     * @param removeList 要移除的用户ID列表
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<Void> updateMomentsBlockList(List<String> addList, List<String> removeList) throws Exception {
         String path = APIPath.Robot_Moments_Update_Profiles_List_Value;
         PushProfileListRequestPojo requestPojo = new PushProfileListRequestPojo();
@@ -497,6 +827,14 @@ public class RobotService implements Closeable {
         return robotHttpUtils.httpJsonPost(path, requestPojo, Void.class);
     }
 
+    /**
+     * 获取预签名上传地址
+     * @param fileName 文件名
+     * @param mediaType 媒体类型，参考{@link cn.wildfirechat.proto.ProtoConstants.MessageMediaType}
+     * @param contentType 文件Content-Type
+     * @return 预签名上传地址信息
+     * @throws Exception 请求失败时抛出异常
+     */
     public IMResult<OutputPresignedUploadUrl> getPresignedUploadUrl(String fileName, int/*ProtoConstants.MessageMediaType*/ mediaType, String contentType) throws Exception {
         String path = APIPath.Robot_Get_Presigned_Upload_Url;
 
@@ -824,6 +1162,10 @@ public class RobotService implements Closeable {
         // 注意：正常流程下的流关闭在 uploadToQiniu 或 uploadToOther 的 finally 块中处理
     }
 
+    /**
+     * 关闭服务，释放资源
+     * @throws IOException 关闭时发生IO异常
+     */
     @Override
     public void close() throws IOException {
         robotHttpUtils.close();
