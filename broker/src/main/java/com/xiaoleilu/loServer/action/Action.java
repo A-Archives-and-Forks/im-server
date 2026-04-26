@@ -144,7 +144,7 @@ abstract public class Action {
                 errorCode = ErrorCode.ERROR_CODE_SUCCESS;
             }
 
-            RestResult result = RestResult.resultOf(errorCode, errorCode.getMsg(), RestResult.resultOf(errorCode));
+            RestResult result = RestResult.resultOf(errorCode, errorCode.getMsg(), null);
             response.setContent(gson.toJson(result));
             response.send();
         }
