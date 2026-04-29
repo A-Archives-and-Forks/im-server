@@ -193,6 +193,30 @@ public class RobotService implements Closeable {
     }
 
     /**
+     * 根据邮箱获取用户信息列表
+     * @param email 邮箱地址
+     * @return 用户信息列表
+     * @throws Exception 请求失败时抛出异常
+     */
+    public IMResult<OutputUserInfoList> getUserInfoByEmail(String email) throws Exception {
+        String path = APIPath.Robot_User_Get_Email_Info;
+        return robotHttpUtils.httpJsonPost(path, email, OutputUserInfoList.class);
+    }
+
+    /**
+     * 批量获取用户信息
+     * @param userIds 用户ID列表
+     * @return 用户信息列表
+     * @throws Exception 请求失败时抛出异常
+     */
+    public IMResult<OutputUserInfoList> getBatchUsers(List<String> userIds) throws Exception {
+        String path = APIPath.Robot_User_Batch_Get_Infos;
+        InputStringList input = new InputStringList();
+        input.setList(userIds);
+        return robotHttpUtils.httpJsonPost(path, input, OutputUserInfoList.class);
+    }
+
+    /**
      * 设置机器人消息回调地址
      * @param url 回调地址
      * @return 操作结果

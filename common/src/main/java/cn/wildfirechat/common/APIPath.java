@@ -154,6 +154,8 @@ public interface APIPath {
     String Channel_Application_Get_UserInfo = "/channel/application/get_user_info";
 
     String Robot_User_Info = "/robot/user_info";
+    String Robot_User_Get_Email_Info = "/robot/user/get_info_by_email";
+    String Robot_User_Batch_Get_Infos = "/robot/user/batch_get_infos";
     String Robot_Get_Profile = "/robot/profile";
     String Robot_Message_Send = "/robot/message/send";
     String Robot_Message_Reply = "/robot/message/reply";

@@ -1975,6 +1975,7 @@ public class Main {
         createRobot.setName(robotId);
         createRobot.setDisplayName("机器人");
         createRobot.setOwner("userId1");
+        createRobot.setEmail("123@wildfirechat.cn");
         createRobot.setSecret(robotSecret);
         createRobot.setCallback("http://127.0.0.1:8883/robot/recvmsg");
         IMResult<OutputCreateRobot> resultCreateRobot = UserAdmin.createRobot(createRobot);
@@ -2132,6 +2133,21 @@ public class Main {
             System.out.println("robot get user info by name success");
         } else {
             System.out.println("robot get user info by name failure");
+        }
+
+        //测试机器人通过邮箱获取用户信息
+        IMResult<OutputUserInfoList> resultRobotGetUserInfoByEmail = robotService.getUserInfoByEmail("123@wildfirechat.cn");
+        if (resultRobotGetUserInfoByEmail != null && resultRobotGetUserInfoByEmail.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("robot get user info by email success");
+        } else {
+            System.out.println("robot get user info by email failure");
+        }
+
+        IMResult<OutputUserInfoList> userInfoListIMResult = robotService.getBatchUsers(Arrays.asList("userId1", "userId2"));
+        if (userInfoListIMResult != null && userInfoListIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("robot get batch user info by email success");
+        } else {
+            System.out.println("robot get batch user info by email failure");
         }
 
         //创建群组信息，用于测试机器人群组管理功能
