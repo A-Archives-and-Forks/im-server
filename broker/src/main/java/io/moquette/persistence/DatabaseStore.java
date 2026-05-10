@@ -4220,50 +4220,69 @@ public class DatabaseStore {
     }
 
     public List<String> findMissingMids(String cid, List<String> midList, boolean contain) {
-        String tempTable = "temp_check_mids_" + System.currentTimeMillis();
+        if (midList == null || midList.isEmpty()) {
+            return new ArrayList<>();
+        }
 
-        try (Connection conn = DBUtil.getConnection()) {
-            // Step 1: 创建临时表（仅当前连接可见，自动清理）
-            String createSql = "CREATE TEMPORARY TABLE " + tempTable + " (_mid VARCHAR(64) NOT NULL PRIMARY KEY)";
+        String tempTable = "temp_check_mids_" + System.currentTimeMillis();
+        Connection conn = null;
+        try {
+            conn = DBUtil.getConnection();
+
+            // Step 1: 创建临时表
             try (Statement st = conn.createStatement()) {
-                st.execute(createSql);
+                st.execute("CREATE TEMPORARY TABLE " + tempTable +
+                    " (_mid VARCHAR(64) NOT NULL PRIMARY KEY)");
             }
 
-            // Step 2: 批量插入待检查的 mid（去重用 INSERT IGNORE）
+            // Step 2: 批量插入
             String insertSql = "INSERT IGNORE INTO " + tempTable + " (_mid) VALUES (?)";
-            int count = 0;
             try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+                int count = 0;
                 for (String mid : midList) {
                     ps.setString(1, mid);
                     ps.addBatch();
-                    if (++count % 1000 == 0)  {
-                        ps.executeBatch(); // 每1000条刷盘
+                    if (++count % 1000 == 0) {
+                        ps.executeBatch();
                         ps.clearBatch();
                     }
                 }
-                ps.executeBatch();
+                if (count % 1000 != 0) {
+                    ps.executeBatch();
+                }
             }
 
-            // Step 3: 查询差集（NOT EXISTS 利用复合索引）
+            // Step 3: 查询
             String querySql = "SELECT t._mid FROM " + tempTable + " t " +
-                "WHERE " + (contain?"":" NOT ") + " EXISTS (" +
+                "WHERE " + (contain ? "" : " NOT ") + " EXISTS (" +
                 "    SELECT 1 FROM t_channel_listener c " +
                 "    WHERE c._cid = ? AND c._mid = t._mid" +
                 ")";
 
-            List<String> missing = new ArrayList<>();
+            List<String> result = new ArrayList<>();
             try (PreparedStatement ps = conn.prepareStatement(querySql)) {
                 ps.setString(1, cid);
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        missing.add(rs.getString(1));
+                        result.add(rs.getString(1));
                     }
                 }
             }
 
-            return missing;
+            return result;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("查询缺失mid失败", e);
+        } finally {
+            // 显式清理临时表
+            if (conn != null) {
+                try (Statement st = conn.createStatement()) {
+                    st.execute("DROP TEMPORARY TABLE IF EXISTS " + tempTable);
+                } catch (SQLException ignored) {
+                    // 清理失败不影响主流程
+                } finally {
+                    try { conn.close(); } catch (SQLException ignored) {}
+                }
+            }
         }
     }
 

@@ -1694,7 +1694,7 @@ public class Main {
 
 
         //测试用户设置功能
-        IMResult<Void> setUserSettingResult = GeneralAdmin.setUserSetting("user1", 1, "test_key", "test_value");
+        IMResult<Void> setUserSettingResult = GeneralAdmin.setUserSetting("user1", 3003, "test_key", "test_value");
         if (setUserSettingResult != null && setUserSettingResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
             System.out.println("set user setting success");
         } else {
@@ -1702,7 +1702,7 @@ public class Main {
             System.exit(-1);
         }
 
-        IMResult<UserSettingPojo> getUserSettingResult = GeneralAdmin.getUserSetting("user1", 1, "test_key");
+        IMResult<UserSettingPojo> getUserSettingResult = GeneralAdmin.getUserSetting("user1", 3003, "test_key");
         if (getUserSettingResult != null && getUserSettingResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS && "test_value".equals(getUserSettingResult.getResult().getValue())) {
             System.out.println("get user setting success");
         } else {
@@ -2726,13 +2726,15 @@ public class Main {
             System.exit(-1);
         }
 
-        //测试重新发布消息
-        IMResult<Void> republishResult = channelServiceApi.republishMessage(resultSendMessage.getResult().getMessageUid(), Arrays.asList("userId2", "userId3"));
-        if (republishResult != null && republishResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
-            System.out.println("republish message success");
-        } else {
-            System.out.println("republish message failure");
-            System.exit(-1);
+        if(commercialServer) {
+            //测试重新发布消息
+            IMResult<Void> republishResult = channelServiceApi.republishMessage(resultSendMessage.getResult().getMessageUid(), Arrays.asList("userId2", "userId3"));
+            if (republishResult != null && republishResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("republish message success");
+            } else {
+                System.out.println("republish message failure");
+                System.exit(-1);
+            }
         }
 
         ArticleContent articleContent = new ArticleContent("article1", "https://media.wfcoss.cn/channel-assets/20220816/2dd76540daa9444dae44e942aa1c2bbc.png", "这是一个测试文章", "测试一下文章的功能", "https://mp.weixin.qq.com/s/W6tanLbALd3qqZM8r3MTgA", true);
