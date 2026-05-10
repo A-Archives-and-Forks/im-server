@@ -113,6 +113,7 @@ public interface IMessagesStore {
     ErrorCode modifyGroupMemberAlias(String operator, String groupId, String alias, String memberId, boolean isAdmin);
     ErrorCode modifyGroupMemberExtra(String operator, String groupId, String extra, String memberId, boolean isAdmin);
     List<WFCMessage.GroupInfo> getGroupInfos(List<WFCMessage.UserRequest> requests, String fromUser, boolean isAdmin);
+    List<WFCMessage.GroupInfo> getGroupInfos(List<WFCMessage.UserRequest> requests);
     WFCMessage.GroupInfo getGroupInfo(String groupId);
     Set<String> getUserGroupIds(String userId);
     Set<String> getUserGroupIds(String userId, List<Integer> types);
@@ -170,6 +171,7 @@ public interface IMessagesStore {
     int getChatroomMemberCount(String chatroomId);
     Collection<String> getChatroomMemberClient(String userId);
     boolean checkUserClientInChatroom(String user, String clientId, String chatroomId);
+    ErrorCode setChatroomState(String chatroomId, int status);
 
     long insertChatroomMessages(String target, int line, long messageId);
     Collection<UserClientEntry> getChatroomMembers(String chatroomId);
@@ -232,6 +234,12 @@ public interface IMessagesStore {
     boolean canSendMessageInChannel(String user, String channelId);
     boolean checkUserInChannel(String user, String channelId);
     Collection<String> getChannelSubscriber(String channelId);
+    List<WFCMessage.ChannelInfo> getChannelInfoList(int count, int offset, boolean withDeleted);
+    int getChannelTotalCount(boolean withDeleted);
+    ErrorCode batchListenChannel(String channelId, List<String> userIds, boolean listen);
+    int getChannelListenerCount(String channelId);
+    List<String> getChannelListenerList(String channelId, int count, int offset);
+
 
     int getOnlineUserCount();
     GetOnlineUserResult getOnlineUsers(int offset, int count);

@@ -2,8 +2,11 @@ package cn.wildfirechat.sdk;
 
 import cn.wildfirechat.common.APIPath;
 import cn.wildfirechat.pojos.*;
+import cn.wildfirechat.pojos.mesh.PojoStringList;
 import cn.wildfirechat.sdk.model.IMResult;
 import cn.wildfirechat.sdk.utilities.AdminHttpUtils;
+
+import java.util.List;
 
 /**
  * 频道管理类
@@ -54,6 +57,21 @@ public class ChannelAdmin {
     }
 
     /**
+     * 获取频道信息列表
+     * @param count 数量
+     * @param offset offset
+     * @return 频道信息列表
+     * @throws Exception 请求失败时抛出异常
+     */
+    public static IMResult<OutputChannelInfoList> getChannelInfoList(int count, int offset) throws Exception {
+        String path = APIPath.List_Channel_Info;
+        InputCountOffset inputCountOffset = new InputCountOffset();
+        inputCountOffset.count = count;
+        inputCountOffset.offset = offset;
+        return AdminHttpUtils.httpJsonPost(path, inputCountOffset, OutputChannelInfoList.class);
+    }
+
+    /**
      * 订阅频道
      * @param channelId 频道ID
      * @param userId 用户ID
@@ -63,6 +81,19 @@ public class ChannelAdmin {
     public static IMResult<Void> subscribeChannel(String channelId, String userId) throws Exception {
         String path = APIPath.Subscribe_Channel;
         InputSubscribeChannel input = new InputSubscribeChannel(channelId, userId, 1);
+        return AdminHttpUtils.httpJsonPost(path, input, Void.class);
+    }
+
+    /**
+     * 批量用户订阅频道
+     * @param channelId 频道ID
+     * @param userIds 用户ID列表
+     * @return 订阅结果
+     * @throws Exception 请求失败时抛出异常
+     */
+    public static IMResult<Void> batchSubscribeChannel(String channelId, List<String> userIds) throws Exception {
+        String path = APIPath.Batch_Subscribe_Channel;
+        InputSubscribeChannelBatch input = new InputSubscribeChannelBatch(channelId, userIds, 1);
         return AdminHttpUtils.httpJsonPost(path, input, Void.class);
     }
 
@@ -80,6 +111,19 @@ public class ChannelAdmin {
     }
 
     /**
+     * 批量用户取消订阅频道
+     * @param channelId 频道ID
+     * @param userIds 用户ID列表
+     * @return 取消订阅结果
+     * @throws Exception 请求失败时抛出异常
+     */
+    public static IMResult<Void> batchUnsubscribeChannel(String channelId, List<String> userIds) throws Exception {
+        String path = APIPath.Batch_Subscribe_Channel;
+        InputSubscribeChannelBatch input = new InputSubscribeChannelBatch(channelId, userIds, 0);
+        return AdminHttpUtils.httpJsonPost(path, input, Void.class);
+    }
+
+    /**
      * 检查用户是否订阅了频道
      * @param userId 用户ID
      * @param channelId 频道ID
@@ -90,5 +134,19 @@ public class ChannelAdmin {
         String path = APIPath.Check_User_Subscribe_Channel;
         InputSubscribeChannel input = new InputSubscribeChannel(channelId, userId, 0);
         return AdminHttpUtils.httpJsonPost(path, input, OutputBooleanValue.class);
+    }
+
+    /**
+     * 获取频道订阅用户列表
+     * @param channelId 频道ID
+     * @param count
+     * @param offset
+     * @return 订阅用户id列表
+     * @throws Exception 请求失败时抛出异常
+     */
+    public static IMResult<PojoTotalList> getChannelSubscribers(String channelId, int count, int offset) throws Exception {
+        String path = APIPath.List_Channel_Subscriber;
+        InputStringCountOffset input = new InputStringCountOffset(channelId, count, offset);
+        return AdminHttpUtils.httpJsonPost(path, input, PojoTotalList.class);
     }
 }

@@ -8,6 +8,8 @@
 
 package cn.wildfirechat.pojos;
 
+import cn.wildfirechat.proto.WFCMessage;
+
 /**
  * 群组信息类
  * <p>
@@ -174,5 +176,27 @@ public class PojoGroupInfo {
 
     public void setMember_update_dt(long member_update_dt) {
         this.member_update_dt = member_update_dt;
+    }
+
+    static public PojoGroupInfo fromProto(WFCMessage.GroupInfo groupInfo) {
+        PojoGroupInfo pojoGroupInfo = new PojoGroupInfo();
+        pojoGroupInfo.setExtra(groupInfo.getExtra());
+        pojoGroupInfo.setName(groupInfo.getName());
+        pojoGroupInfo.setOwner(groupInfo.getOwner());
+        pojoGroupInfo.setPortrait(groupInfo.getPortrait());
+        pojoGroupInfo.setTarget_id(groupInfo.getTargetId());
+        pojoGroupInfo.setType(groupInfo.getType());
+        pojoGroupInfo.setMember_count(groupInfo.getMemberCount());
+        pojoGroupInfo.setMute(groupInfo.getMute());
+        pojoGroupInfo.setJoin_type(groupInfo.getJoinType());
+        pojoGroupInfo.setPrivate_chat(groupInfo.getPrivateChat());
+        pojoGroupInfo.setSearchable(groupInfo.getSearchable());
+        pojoGroupInfo.setMax_member_count(groupInfo.getMemberCount());
+        pojoGroupInfo.setHistory_message(groupInfo.getHistoryMessage());
+        pojoGroupInfo.setSuper_group(groupInfo.getSuperGroup()>0);
+        pojoGroupInfo.setDeleted(groupInfo.getDeleted()>0);
+        pojoGroupInfo.setUpdate_dt(groupInfo.getUpdateDt());
+        pojoGroupInfo.setMember_update_dt(groupInfo.getMemberUpdateDt());
+        return pojoGroupInfo;
     }
 }

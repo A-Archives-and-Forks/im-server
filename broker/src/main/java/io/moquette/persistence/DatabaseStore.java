@@ -3917,7 +3917,6 @@ public class DatabaseStore {
         return null;
     }
 
-
     void persistChannelListener(final String groupId, final List<String> memberList) {
         mScheduler.execute(()->{
             Connection connection = null;
@@ -4181,6 +4180,260 @@ public class DatabaseStore {
             DBUtil.closeDB(connection, statement);
         }
     }
+
+    void batchInsertChannelListener(String channelId, List<String> listeners, boolean listen) throws SQLException {
+        LOG.info("updateChannelListener {}", channelId);
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = DBUtil.getConnection();
+            int size = 0;
+            String sql = listen
+                ? "insert into t_channel_listener (_cid, _mid, _dt) values(?, ?, ?)"
+                : "delete from t_channel_listener where _cid=? and _mid=?";
+            statement = connection.prepareStatement(sql);
+
+            for (String listener : listeners) {
+                int index = 1;
+                statement.setString(index++, channelId);
+                statement.setString(index++, listener);
+                if (listen) {
+                    statement.setLong(index++, System.currentTimeMillis());
+                }
+                statement.addBatch();
+                if(++size%100 == 0) {
+                    statement.executeBatch();
+                    statement.clearBatch();
+                }
+            }
+            if(size%100 != 0) {
+                statement.executeBatch();
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Utility.printExecption(LOG, e, RDBS_Exception);
+            throw e;
+        } finally {
+            DBUtil.closeDB(connection, statement);
+        }
+    }
+
+    public List<String> findMissingMids(String cid, List<String> midList, boolean contain) {
+        String tempTable = "temp_check_mids_" + System.currentTimeMillis();
+
+        try (Connection conn = DBUtil.getConnection()) {
+            // Step 1: 创建临时表（仅当前连接可见，自动清理）
+            String createSql = "CREATE TEMPORARY TABLE " + tempTable + " (_mid VARCHAR(64) NOT NULL PRIMARY KEY)";
+            try (Statement st = conn.createStatement()) {
+                st.execute(createSql);
+            }
+
+            // Step 2: 批量插入待检查的 mid（去重用 INSERT IGNORE）
+            String insertSql = "INSERT IGNORE INTO " + tempTable + " (_mid) VALUES (?)";
+            int count = 0;
+            try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+                for (String mid : midList) {
+                    ps.setString(1, mid);
+                    ps.addBatch();
+                    if (++count % 1000 == 0)  {
+                        ps.executeBatch(); // 每1000条刷盘
+                        ps.clearBatch();
+                    }
+                }
+                ps.executeBatch();
+            }
+
+            // Step 3: 查询差集（NOT EXISTS 利用复合索引）
+            String querySql = "SELECT t._mid FROM " + tempTable + " t " +
+                "WHERE " + (contain?"":" NOT ") + " EXISTS (" +
+                "    SELECT 1 FROM t_channel_listener c " +
+                "    WHERE c._cid = ? AND c._mid = t._mid" +
+                ")";
+
+            List<String> missing = new ArrayList<>();
+            try (PreparedStatement ps = conn.prepareStatement(querySql)) {
+                ps.setString(1, cid);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        missing.add(rs.getString(1));
+                    }
+                }
+            }
+
+            return missing;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    List<WFCMessage.ChannelInfo> getChannelInfoList(int count, int offset, boolean withDeleted) {
+        List<WFCMessage.ChannelInfo> out = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        try {
+            connection = DBUtil.getConnection();
+            String sql = "select _cid, _name" +
+                ", _portrait" +
+                ", _owner" +
+                ", _status" +
+                ", _desc" +
+                ", _extra" +
+                ", _dt from t_channel";
+            if(!withDeleted) {
+                sql += " where _status <> 64 ";
+            }
+            sql += " order by _dt desc ";
+
+            sql += " limit " + count;
+
+            if (offset > 0) {
+                sql += " offset " + offset;
+            }
+
+            statement = connection.prepareStatement(sql);
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                WFCMessage.ChannelInfo.Builder builder = WFCMessage.ChannelInfo.newBuilder();
+                int index = 1;
+
+                String value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setTargetId(value);
+
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setName(value);
+
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setPortrait(value);
+
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setOwner(value);
+
+                int status = rs.getInt(index++);
+                builder.setStatus(status);
+
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setDesc(value);
+
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setExtra(value);
+
+                long longValue = rs.getLong(index++);
+                builder.setUpdateDt(longValue);
+
+                out.add(builder.build());
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Utility.printExecption(LOG, e, RDBS_Exception);
+        } finally {
+            DBUtil.closeDB(connection, statement, rs);
+        }
+        return out;
+    }
+
+    int getChannelTotalCount(boolean withDeleted) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        try {
+            connection = DBUtil.getConnection();
+            String sql = "select count(*) from t_channel";
+            if(!withDeleted) {
+                sql += " where _status <> 64";
+            }
+
+            statement = connection.prepareStatement(sql);
+            rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Utility.printExecption(LOG, e, RDBS_Exception);
+        } finally {
+            DBUtil.closeDB(connection, statement, rs);
+        }
+        return 0;
+    }
+
+    public int getChannelListenerCount(String channelId) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try {
+            connection = DBUtil.getConnection();
+            String sql = "select count(*) from  t_channel_listener where _cid = ?";
+
+            statement = connection.prepareStatement(sql);
+
+            int index = 1;
+            statement.setString(index++, channelId);
+
+            rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Utility.printExecption(LOG, e, RDBS_Exception);
+        } finally {
+            DBUtil.closeDB(connection, statement, rs);
+        }
+        return 0;
+    }
+
+    public List<String> getChannelListenerList(String channelId, int count, int offset) {
+        List<String> out = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try {
+            connection = DBUtil.getConnection();
+            String sql = "select  _mid from t_channel_listener where _cid = ?";
+
+            if(count > 0) {
+                sql += " limit " + count;
+            }
+
+            if(offset > 0) {
+                sql += " offset " + offset;
+            }
+
+            statement = connection.prepareStatement(sql);
+
+            int index = 1;
+            statement.setString(index++, channelId);
+
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                String value = rs.getString(1);
+                if (!StringUtil.isNullOrEmpty(value)) {
+                    out.add(value);
+                }
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Utility.printExecption(LOG, e, RDBS_Exception);
+        } finally {
+            DBUtil.closeDB(connection, statement, rs);
+        }
+        return out;
+    }
+
 
     public Set<String> getSensitiveWord() {
         Connection connection = null;

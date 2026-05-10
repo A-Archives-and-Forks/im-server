@@ -48,6 +48,7 @@ import win.liyufan.im.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -78,6 +79,7 @@ import static io.moquette.BrokerConstants.*;
 import static io.moquette.server.Constants.MAX_CHATROOM_MESSAGE_QUEUE;
 import static io.moquette.server.Constants.MAX_MESSAGE_QUEUE;
 import static cn.wildfirechat.pojos.MyInfoType.*;
+import static win.liyufan.im.IMTopic.PutUserSettingTopic;
 import static win.liyufan.im.UserSettingScope.*;
 
 public class MemoryMessagesStore implements IMessagesStore {
@@ -1342,6 +1344,20 @@ public class MemoryMessagesStore implements IMessagesStore {
     }
 
     @Override
+    public ErrorCode setChatroomState(String chatroomId, int status) {
+        HazelcastInstance hzInstance = m_Server.getHazelcastInstance();
+        IMap<String, WFCMessage.ChatroomInfo> chatroomInfoMap = hzInstance.getMap(CHATROOMS);
+        WFCMessage.ChatroomInfo info = chatroomInfoMap.get(chatroomId);
+
+        if (info == null) {
+            return ErrorCode.ERROR_CODE_NOT_EXIST;
+        }
+        info = info.toBuilder().setState(status).build();
+        chatroomInfoMap.set(chatroomId, info);
+        return ErrorCode.ERROR_CODE_SUCCESS;
+    }
+
+    @Override
     public long insertChatroomMessages(String target, int line, long messageId) {
         // messageId是全局的，messageSeq是跟个人相关的，理论上messageId的增长数度远远大于seq。
         // 考虑到一种情况，当服务器发生变化，用户发生迁移后，messageSeq还需要保持有序。 要么把Seq持久化，要么在迁移后Seq取一个肯定比以前更大的数字（这个数字就是messageId）
@@ -2320,6 +2336,19 @@ public class MemoryMessagesStore implements IMessagesStore {
                 }
                 out.add(groupInfo);
             }
+        }
+
+        return out;
+    }
+
+    @Override
+    public List<WFCMessage.GroupInfo> getGroupInfos(List<WFCMessage.UserRequest> requests) {
+        HazelcastInstance hzInstance = m_Server.getHazelcastInstance();
+        IMap<String, WFCMessage.GroupInfo> mIMap = hzInstance.getMap(GROUPS_MAP);
+        ArrayList<WFCMessage.GroupInfo> out = new ArrayList<>();
+        for (WFCMessage.UserRequest request : requests) {
+            WFCMessage.GroupInfo groupInfo = mIMap.get(request.getUid());
+            out.add(groupInfo);
         }
 
         return out;
@@ -4923,6 +4952,56 @@ public class MemoryMessagesStore implements IMessagesStore {
     @Override
     public Collection<String> getChannelSubscriber(String channelId) {
         return getChannelListener(channelId);
+    }
+
+    @Override
+    public List<WFCMessage.ChannelInfo> getChannelInfoList(int count, int offset, boolean withDeleted) {
+        return databaseStore.getChannelInfoList(count, offset, withDeleted);
+    }
+
+    @Override
+    public int getChannelTotalCount(boolean withDeleted) {
+        return databaseStore.getChannelTotalCount(withDeleted);
+    }
+
+    @Override
+    public ErrorCode batchListenChannel(String channelId, List<String> userIds, boolean listen) {
+        IMap<String, WFCMessage.ChannelInfo> mIMap = m_Server.getHazelcastInstance().getMap(CHANNELS);
+        WFCMessage.ChannelInfo channelData =  mIMap.get(channelId);
+        if(channelData == null || (channelData.getStatus() & Channel_State_Mask_Deleted) > 0) {
+            return ErrorCode.ERROR_CODE_NOT_EXIST;
+        }
+        List<String> missedIds = databaseStore.findMissingMids(channelId, userIds, !listen);
+
+        try {
+            databaseStore.batchInsertChannelListener(channelId, missedIds, listen);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        new Thread(() -> {
+            for (String missedId : missedIds) {
+                WFCMessage.ModifyUserSettingReq modifyUserSettingReq = WFCMessage.ModifyUserSettingReq.newBuilder().setScope(kUserSettingListenedChannels).setKey(channelId).setValue(listen? "1" : "0").build();
+                m_Server.onApiMessage(missedId, null, modifyUserSettingReq.toByteArray(), 0, missedId, PutUserSettingTopic, ProtoConstants.RequestSourceType.Request_From_User);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+
+        return ErrorCode.ERROR_CODE_SUCCESS;
+    }
+
+    @Override
+    public int getChannelListenerCount(String channelId) {
+        return databaseStore.getChannelListenerCount(channelId);
+    }
+
+    @Override
+    public List<String> getChannelListenerList(String channelId, int count, int offset) {
+        return databaseStore.getChannelListenerList(channelId, count, offset);
     }
 
     @Override

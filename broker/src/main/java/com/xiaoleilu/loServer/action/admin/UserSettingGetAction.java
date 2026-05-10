@@ -10,12 +10,8 @@ package com.xiaoleilu.loServer.action.admin;
 
 import cn.wildfirechat.common.APIPath;
 import cn.wildfirechat.common.ErrorCode;
-import cn.wildfirechat.pojos.InputGetGroup;
-import cn.wildfirechat.pojos.InputGetUserInfo;
-import cn.wildfirechat.pojos.InputOutputUserInfo;
-import cn.wildfirechat.pojos.PojoGroupInfo;
+import cn.wildfirechat.pojos.UserSettingPojo;
 import cn.wildfirechat.proto.WFCMessage;
-import com.google.gson.Gson;
 import com.xiaoleilu.loServer.RestResult;
 import com.xiaoleilu.loServer.annotation.HttpMethod;
 import com.xiaoleilu.loServer.annotation.Route;
@@ -25,9 +21,9 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.internal.StringUtil;
 
-@Route(APIPath.Group_Get_Info)
+@Route(APIPath.User_Get_Setting)
 @HttpMethod("POST")
-public class GetGroupInfoAction extends AdminAction {
+public class UserSettingGetAction extends AdminAction {
 
     @Override
     public boolean isTransactionAction() {
@@ -37,20 +33,22 @@ public class GetGroupInfoAction extends AdminAction {
     @Override
     public boolean action(Request request, Response response) {
         if (request.getNettyRequest() instanceof FullHttpRequest) {
-            InputGetGroup inputGetGroup = getRequestBody(request.getNettyRequest(), InputGetGroup.class);
-            if (inputGetGroup != null
-                && (!StringUtil.isNullOrEmpty(inputGetGroup.getGroupId()))) {
-
-                WFCMessage.GroupInfo groupInfo = messagesStore.getGroupInfo(inputGetGroup.getGroupId());
+            UserSettingPojo input = getRequestBody(request.getNettyRequest(), UserSettingPojo.class);
+            if (input != null && (!StringUtil.isNullOrEmpty(input.getUserId()))) {
+                WFCMessage.UserSettingEntry entry = messagesStore.getUserSetting(input.getUserId(), input.getScope(), input.getKey());
+                response.setStatus(HttpResponseStatus.OK);
                 RestResult result;
-                if (groupInfo == null) {
+                if (entry == null) {
                     result = RestResult.resultOf(ErrorCode.ERROR_CODE_NOT_EXIST);
                 } else {
-                    result = RestResult.ok(PojoGroupInfo.fromProto(groupInfo));
+                    input.setValue(entry.getValue());
+                    result = RestResult.ok(input);
                 }
-                setResponseContent(result, response);
+                response.setContent(gson.toJson(result));
             } else {
-                setResponseContent(RestResult.resultOf(ErrorCode.INVALID_PARAMETER), response);
+                response.setStatus(HttpResponseStatus.OK);
+                RestResult result = RestResult.resultOf(ErrorCode.INVALID_PARAMETER);
+                response.setContent(gson.toJson(result));
             }
 
         }

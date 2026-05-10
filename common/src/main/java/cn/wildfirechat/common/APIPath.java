@@ -120,8 +120,11 @@ public interface APIPath {
     String Create_Channel = "/admin/channel/create";
     String Destroy_Channel = "/admin/channel/destroy";
     String Get_Channel_Info = "/admin/channel/get";
+    String List_Channel_Info = "/admin/channel/list";
     String Subscribe_Channel = "/admin/channel/subscribe";
+    String Batch_Subscribe_Channel = "/admin/channel/batch_subscribe";
     String Check_User_Subscribe_Channel = "/admin/channel/is_subscribed";
+    String List_Channel_Subscriber = "/admin/channel/list_subscriber";
     String Get_System_Setting = "/admin/system/get_setting";
     String Put_System_Setting = "/admin/system/put_setting";
     String GET_CUSTOMER = "/admin/customer";

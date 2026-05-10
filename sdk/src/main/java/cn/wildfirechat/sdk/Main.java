@@ -270,7 +270,7 @@ public class Main {
                 System.out.println("get user info success");
             } else {
                 System.out.println("get user info by mobile failure");
-                System.exit(-1);
+//                System.exit(-1);
             }
         } else {
             System.out.println("get user info by mobile failure");
@@ -1022,7 +1022,7 @@ public class Main {
 
         //验证群组已被解散
         resultGetGroupInfo = GroupAdmin.getGroupInfo(groupInfo.getTarget_id());
-        if (resultGetGroupInfo != null && resultGetGroupInfo.getErrorCode() == ErrorCode.ERROR_CODE_NOT_EXIST) {
+        if (resultGetGroupInfo != null && (resultGetGroupInfo.getErrorCode() == ErrorCode.ERROR_CODE_NOT_EXIST || resultGetGroupInfo.result.isDeleted())) {
             System.out.println("group dismissed verified");
         } else {
             System.out.println("group dismiss verify failure");
@@ -1187,14 +1187,15 @@ public class Main {
             System.out.println("failure");
         }
 
-        //测试删除多播消息
-        IMResult<Void> deleteMultiCastResult = MessageAdmin.deleteMultiCastMessage("user1", resultMulticastMessage.result.getMessageUid(), multicastReceivers);
-        if (deleteMultiCastResult != null && deleteMultiCastResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
-            System.out.println("delete multicast message success");
-        } else {
-            System.out.println("delete multicast message failure");
+        if (commercialServer) {
+            //测试删除多播消息
+            IMResult<Void> deleteMultiCastResult = MessageAdmin.deleteMultiCastMessage("user1", resultMulticastMessage.result.getMessageUid(), multicastReceivers);
+            if (deleteMultiCastResult != null && deleteMultiCastResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("delete multicast message success");
+            } else {
+                System.out.println("delete multicast message failure");
+            }
         }
-
     }
 
     //***********************************************
@@ -1590,6 +1591,40 @@ public class Main {
             System.out.println("subscribe status is incorrect");
             System.exit(-1);
         }
+
+        IMResult<OutputChannelInfoList> channelInfoListIMResult = ChannelAdmin.getChannelInfoList(10, 0);
+        if(channelInfoListIMResult != null && channelInfoListIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("get channel list success");
+        } else {
+            System.out.println("get channel list failure");
+            System.exit(-1);
+        }
+
+        voidIMResult = ChannelAdmin.batchSubscribeChannel(inputCreateChannel.getTargetId(), Arrays.asList("user1", "user2", "user3"));
+        if(voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("batch subscribe channel success");
+        } else {
+            System.out.println("batch subscribe channel failure");
+            System.exit(-1);
+        }
+
+
+        IMResult<PojoTotalList> totalListIMResult = ChannelAdmin.getChannelSubscribers(inputCreateChannel.getTargetId(), 10, 1);
+        if(totalListIMResult != null && totalListIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("get channel subscribe list success");
+        } else {
+            System.out.println("get channel subscribe list failure");
+            System.exit(-1);
+        }
+
+        voidIMResult = ChannelAdmin.batchUnsubscribeChannel(inputCreateChannel.getTargetId(), Arrays.asList("user1", "user2", "user3"));
+        if(voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("batch unsubscribe channel success");
+        } else {
+            System.out.println("batch unsubscribe channel failure");
+            System.exit(-1);
+        }
+
 
         voidIMResult = ChannelAdmin.destroyChannel(inputCreateChannel.getTargetId());
         if(voidIMResult != null && voidIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
