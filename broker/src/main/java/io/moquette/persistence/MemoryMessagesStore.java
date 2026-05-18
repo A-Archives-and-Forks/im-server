@@ -224,11 +224,13 @@ public class MemoryMessagesStore implements IMessagesStore {
     private boolean mRobotCallbackWithTargetInfo = false;
     private boolean mRobotMentionExternalRobot = false;
     private int mRobotGetUserInfoMask = 0;
+    private boolean mRobotAppAllowAnyHost = false;
 
     private boolean mChannelCallbackWithClientInfo = false;
     private boolean mChannelCallbackWithSenderInfo = false;
     private boolean mChannelCallbackWithTargetInfo = false;
     private boolean mChannelNewCallbackFeature = true;
+    private boolean mChannelAppAllowAnyHost = false;
 
     private Set<Integer> mUserHideProperties = new HashSet<>();
 
@@ -689,6 +691,9 @@ public class MemoryMessagesStore implements IMessagesStore {
         try {
             mRobotGetUserInfoMask = Integer.parseInt(server.getConfig().getProperty(BrokerConstants.ROBOT_Get_User_Info_Mask, "0"));
         } catch (Exception e) {}
+        try {
+            mRobotAppAllowAnyHost = "true".equalsIgnoreCase(server.getConfig().getProperty(BrokerConstants.ROBOT_App_Allow_Any_Host, "false"));
+        } catch (Exception e) {}
 
         try {
             mChannelCallbackWithClientInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.CHANNEL_Callback_With_Client_Info, "false"));
@@ -699,9 +704,11 @@ public class MemoryMessagesStore implements IMessagesStore {
         try {
             mChannelCallbackWithTargetInfo = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.CHANNEL_Callback_With_Target_Info, "false"));
         } catch (Exception e) {}
-
         try {
             mChannelNewCallbackFeature = Boolean.parseBoolean(server.getConfig().getProperty(BrokerConstants.CHANNEL_New_Callback_Feature, "true"));
+        } catch (Exception e) {}
+        try {
+            mChannelAppAllowAnyHost = "true".equalsIgnoreCase(server.getConfig().getProperty(BrokerConstants.CHANNEL_App_Allow_Any_Host, "false"));
         } catch (Exception e) {}
 
         try {
@@ -4216,12 +4223,12 @@ public class MemoryMessagesStore implements IMessagesStore {
         String secret = null;
         if(type == ProtoConstants.ApplicationType.ApplicationType_Robot) {
             WFCMessage.Robot robotData = getRobot(applicationId);
-            if(robotData != null && !StringUtil.isNullOrEmpty(robotData.getCallback()) && !StringUtil.isNullOrEmpty(robotData.getSecret())) {
+            if(robotData != null && (mRobotAppAllowAnyHost || !StringUtil.isNullOrEmpty(robotData.getCallback())) && !StringUtil.isNullOrEmpty(robotData.getSecret())) {
                 try {
                     URL url = new URL(robotData.getCallback());
                     if(url.getHost() == null) {
                         LOG.error("get application auth code error, application callback is invalid url");
-                    } else if(url.getHost().equals(host)) {
+                    } else if(mRobotAppAllowAnyHost || url.getHost().equals(host)) {
                         secret = robotData.getSecret();
                     } else {
                         LOG.error("get application auth code error, request host is not the same host with callback host");
@@ -4242,12 +4249,12 @@ public class MemoryMessagesStore implements IMessagesStore {
             }
         } else if(type == ProtoConstants.ApplicationType.ApplicationType_Channel) {
             WFCMessage.ChannelInfo channelData = getChannelInfo(applicationId);
-            if(channelData != null && !StringUtil.isNullOrEmpty(channelData.getCallback()) && !StringUtil.isNullOrEmpty(channelData.getSecret())) {
+            if(channelData != null && (mChannelAppAllowAnyHost || !StringUtil.isNullOrEmpty(channelData.getCallback())) && !StringUtil.isNullOrEmpty(channelData.getSecret())) {
                 try {
                     URL url = new URL(channelData.getCallback());
                     if(url.getHost() == null) {
                         LOG.error("get application auth code error, application callback is invalid url");
-                    } else if(url.getHost().equals(host)) {
+                    } else if(mChannelAppAllowAnyHost || url.getHost().equals(host)) {
                         secret = channelData.getSecret();
                     } else {
                         LOG.error("get application auth code error, request host is not the same host with callback host");
@@ -4285,12 +4292,12 @@ public class MemoryMessagesStore implements IMessagesStore {
         String secret = null;
         if(type == ProtoConstants.ApplicationType.ApplicationType_Robot) {
             WFCMessage.Robot robotData = getRobot(applicationId);
-            if(robotData != null && !StringUtil.isNullOrEmpty(robotData.getCallback()) && !StringUtil.isNullOrEmpty(robotData.getSecret())) {
+            if(robotData != null && (mRobotAppAllowAnyHost || !StringUtil.isNullOrEmpty(robotData.getCallback())) && !StringUtil.isNullOrEmpty(robotData.getSecret())) {
                 secret = robotData.getSecret();
             }
         } else if(type == ProtoConstants.ApplicationType.ApplicationType_Channel) {
             WFCMessage.ChannelInfo channelData = getChannelInfo(applicationId);
-            if(channelData != null && !StringUtil.isNullOrEmpty(channelData.getCallback()) && !StringUtil.isNullOrEmpty(channelData.getSecret())) {
+            if(channelData != null && (mChannelAppAllowAnyHost || !StringUtil.isNullOrEmpty(channelData.getCallback())) && !StringUtil.isNullOrEmpty(channelData.getSecret())) {
                 secret = channelData.getSecret();
             }
         } else if(type == ProtoConstants.ApplicationType.ApplicationType_Admin) {

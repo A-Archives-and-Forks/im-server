@@ -186,12 +186,13 @@ public final class BrokerConstants {
     public static final String ROBOT_Callback_With_Target_Info = "robot.callback_with_target_info";
     public static final String ROBOT_Mention_External_Robot = "robot.mention_external_robot";
     public static final String ROBOT_Get_User_Info_Mask = "robot.get_user_info_mask";
+    public static final String ROBOT_App_Allow_Any_Host = "robot.application_allow_any_host";
 
     public static final String CHANNEL_Callback_With_Client_Info = "channel.callback_with_client_info";
     public static final String CHANNEL_Callback_With_Sender_Info = "channel.callback_with_sender_info";
     public static final String CHANNEL_Callback_With_Target_Info = "channel.callback_with_target_info";
     public static final String CHANNEL_New_Callback_Feature = "channel.new_callback_feature";
-
+    public static final String CHANNEL_App_Allow_Any_Host = "channel.application_allow_any_host";
 
     public static final String FRIEND_Disable_Search = "friend.disable_search";
     public static final String FRIEND_Disable_NickName_Search = "friend.disable_nick_name_search";
