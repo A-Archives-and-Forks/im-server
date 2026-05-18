@@ -107,6 +107,8 @@ public class ProtoConstants {
         int StreamingText_Generationg = 14;
         int StreamingText_Generated = 15;
         int Not_Delivered = 16;
+        int Meeting_Minutes = 25;
+        int Transcription = 26;
         int Ptt_Voice = 23;
         int Enter_Channel_Chat = 71;
         int Leave_Channel_Chat = 72;

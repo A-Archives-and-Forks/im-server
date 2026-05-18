@@ -24,6 +24,8 @@ public class MessageContentFactory {
     private static final Map<Integer, Class<? extends MessageContent>> contentClassMap = new ConcurrentHashMap<>();
 
     private static List<Class> buildinMessageContents = Arrays.asList(
+        MeetingMinutesMessageContent.class,
+        TranscriptionMessageContent.class,
         ArticlesMessageContent.class,
         StreamTextGeneratedMessageContent.class,
         CallStartMessageContent.class,
