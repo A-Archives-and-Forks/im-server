@@ -4297,9 +4297,13 @@ public class DatabaseStore {
             String sql = "select _cid, _name" +
                 ", _portrait" +
                 ", _owner" +
+                ", _secret" +
                 ", _status" +
                 ", _desc" +
                 ", _extra" +
+                ", _callback" +
+                ", _automatic" +
+                ", _menu" +
                 ", _dt from t_channel";
             if(!withDeleted) {
                 sql += " where _status <> 64 ";
@@ -4334,6 +4338,10 @@ public class DatabaseStore {
                 value = (value == null ? "" : value);
                 builder.setOwner(value);
 
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setSecret(value);
+
                 int status = rs.getInt(index++);
                 builder.setStatus(status);
 
@@ -4344,6 +4352,32 @@ public class DatabaseStore {
                 value = rs.getString(index++);
                 value = (value == null ? "" : value);
                 builder.setExtra(value);
+
+                value = rs.getString(index++);
+                value = (value == null ? "" : value);
+                builder.setCallback(value);
+
+                int intValue = rs.getInt(index++);
+                builder.setAutomatic(intValue);
+
+                try {
+                    byte[] bytes = null;
+                    Blob blob = rs.getBlob(index++);
+                    if (blob != null) {
+                        bytes = toByteArray(blob.getBinaryStream());
+                    }
+
+                    if (bytes != null) {
+                        WFCMessage.ChannelMenuList menuButtonList = WFCMessage.ChannelMenuList.parseFrom(bytes);
+                        if (menuButtonList.getMenuCount() > 0) {
+                            for (int i = 0; i < menuButtonList.getMenuCount(); i++) {
+                                builder.addMenu(menuButtonList.getMenu(i));
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 long longValue = rs.getLong(index++);
                 builder.setUpdateDt(longValue);
