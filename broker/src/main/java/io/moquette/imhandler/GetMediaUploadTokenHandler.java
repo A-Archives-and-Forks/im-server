@@ -18,16 +18,28 @@ import io.moquette.server.config.MediaServerConfig;
 import io.moquette.spi.impl.Qos1PublishHandler;
 import io.netty.buffer.ByteBuf;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import static io.moquette.server.config.MediaServerConfig.FILE_STROAGE_REMOTE_SERVER_URL;
 
 @Handler("GMUT")
 public class GetMediaUploadTokenHandler extends IMHandler<WFCMessage.GetUploadTokenRequest> {
     @Override
     public ErrorCode action(ByteBuf ackPayload, String clientID, String fromUser, ProtoConstants.RequestSourceType requestSourceType, WFCMessage.GetUploadTokenRequest request, Qos1PublishHandler.IMCallback callback) {
+        String fileKey = request.getMediaPath();
+        if(fileKey.contains("/")) {
+            fileKey = fileKey.substring(fileKey.lastIndexOf("/")+1);
+        }
+
+        String encodedUserId = Base64.getEncoder().encodeToString(fromUser.getBytes(StandardCharsets.UTF_8)).replace("+", "-2B").replace("/", "-2F").replace("=", "-3D");
+        if(!fileKey.startsWith(fromUser) && !fileKey.startsWith(encodedUserId)) {
+            LOG.error("GetMediaUploadTokenHandler error: {}, {}", fromUser, request.getMediaPath());
+            return ErrorCode.ERROR_CODE_NOT_RIGHT;
+        }
+
         int type = request.getMediaType();
-
         String token;
-
         WFCMessage.GetUploadTokenResult.Builder resultBuilder = WFCMessage.GetUploadTokenResult.newBuilder();
         if (MediaServerConfig.USER_QINIU) {
             Auth auth = Auth.create(MediaServerConfig.QINIU_ACCESS_KEY, MediaServerConfig.QINIU_SECRET_KEY);
@@ -93,12 +105,12 @@ public class GetMediaUploadTokenHandler extends IMHandler<WFCMessage.GetUploadTo
                     break;
             }
 
-            token = auth.uploadToken(bucketName);
+            token = auth.uploadToken(bucketName, request.getMediaPath());
             resultBuilder.setDomain(bucketDomain)
                 .setServer(MediaServerConfig.QINIU_SERVER_URL);
             resultBuilder.setPort(80);
         } else {
-            token = UploadFileAction.getToken(type);
+            token = UploadFileAction.getToken(type, request.getMediaPath());
             if(StringUtil.isNullOrEmpty(MediaServerConfig.FILE_STROAGE_REMOTE_SERVER_URL)) {
                 resultBuilder.setDomain("http://" + MediaServerConfig.SERVER_IP + ":" + MediaServerConfig.HTTP_SERVER_PORT);
             } else {

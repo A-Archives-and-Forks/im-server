@@ -44,8 +44,8 @@ public class UploadFileAction extends Action {
 
     }
 
-    public static String getToken(int type) {
-        String signKey = KEY + "|" + (System.currentTimeMillis()) + "|" + type;
+    public static String getToken(int type, String key) {
+        String signKey = KEY + "|" + (System.currentTimeMillis()) + "|" + type + "|" + key;
         try {
             return DES.encryptDES(signKey);
         } catch (Exception e) {
@@ -55,14 +55,17 @@ public class UploadFileAction extends Action {
         return null;
     }
 
-    public static int validateToken(String token) throws InvalidateTokenExecption {
+    public static int validateToken(String token, String[] fileNames) throws InvalidateTokenExecption {
         try {
             String signKey = DES.decryptDES(token);
             String[] parts = signKey.split("\\|");
-            if(parts.length == 3) {
+            if(parts.length >= 3) {
                 if(parts[0].equals(KEY)) {
                     long timestamp = Long.parseLong(parts[1]);
                     if(Math.abs(System.currentTimeMillis() - timestamp) < 2 * 60 * 60 * 1000) {
+                        if(parts.length == 4) {
+                            fileNames[0] = parts[3];
+                        }
                         return Integer.parseInt(parts[2]);
                     }
                 }
@@ -153,11 +156,14 @@ public class UploadFileAction extends Action {
         try {
             int[] bucket = new int[1];
             bucket[0] = -1;
+            String[] fileNames = new String[1];
+            fileNames[0] = null;
+
             while (decoder.hasNext()) {
                 InterfaceHttpData data = decoder.next();
                 if (data != null) {
                     try {
-                        if(!writeFileUploadData(data, response, requestId, isKeepAlive, bucket)) {
+                        if(!writeFileUploadData(data, response, requestId, isKeepAlive, bucket, fileNames)) {
                             break;
                         }
                     } finally {
@@ -173,12 +179,15 @@ public class UploadFileAction extends Action {
     /**
      * writeFileUploadData
      */
-    private boolean writeFileUploadData(InterfaceHttpData data, Response response, String requestId, boolean isKeepAlive, int[] bucket) {
+    private boolean writeFileUploadData(InterfaceHttpData data, Response response, String requestId, boolean isKeepAlive, int[] bucket, String[] fileNames) {
         try {
             if (data.getHttpDataType() == InterfaceHttpData.HttpDataType.FileUpload) {
                 FileUpload fileUpload = (FileUpload) data;
 
                 String remoteFileName = fileUpload.getFilename();
+                if(fileNames[0] != null) {
+                    remoteFileName = fileNames[0];
+                }
                 long remoteFileSize = fileUpload.length();
 
                 if(bucket[0] == -1) {
@@ -323,7 +332,7 @@ public class UploadFileAction extends Action {
                     String token = attribute.getValue();
 
                     try {
-                        bucket[0] = validateToken(token);
+                        bucket[0] = validateToken(token, fileNames);
                     } catch (InvalidateTokenExecption e) {
                         logger.error("无效的token!", e);
                         response.setStatus(HttpResponseStatus.BAD_REQUEST);
