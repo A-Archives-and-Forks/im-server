@@ -57,6 +57,7 @@ public interface APIPath {
     String User_Online_Count = "/admin/user/online_count";
     String User_Online_List = "/admin/user/online_list";
     String User_Session_List = "/admin/user/session_list";
+    String User_Unread_count = "/admin/user/unread_count";
     String User_Application_Get_UserInfo = "/admin/user/app_get_user_info";
 
     String Friend_Update_Status = "/admin/friend/status";

@@ -485,6 +485,15 @@ public class Main {
 
         // 商业版专属功能
         if (commercialServer) {
+            // 获取用户的未读情况
+            IMResult<OutputUserUnreadCount> userUnreadCountIMResult = UserAdmin.getUserUnreadCount("user1");
+            if (userUnreadCountIMResult != null && userUnreadCountIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("get user unread count success");
+            } else {
+                System.out.println("get user unread count failure");
+                System.exit(-1);
+            }
+
             // 获取在线用户总数
             IMResult<GetOnlineUserCountResult> getOnlineUserCountResultIMResult = UserAdmin.getOnlineUserCount();
             if (getOnlineUserCountResultIMResult != null && getOnlineUserCountResultIMResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {

@@ -414,4 +414,15 @@ public class UserAdmin {
         InputUserId inputUserId = new InputUserId(userId);
         return AdminHttpUtils.httpJsonPost(APIPath.User_Session_List, inputUserId, GetUserSessionResult.class);
     }
+
+    /**
+     * 获取用户的未读数，只有专业版IM服务支持，未读数不是很准确，只能表示一个大概。
+     * @param userId
+     * @return 用户的未读数，包括未接收消息和客户端上报的未读数。
+     * @throws Exception
+     */
+    public static IMResult<OutputUserUnreadCount> getUserUnreadCount(String userId) throws Exception {
+        InputUserId inputUserId = new InputUserId(userId);
+        return AdminHttpUtils.httpJsonPost(APIPath.User_Unread_count, inputUserId, OutputUserUnreadCount.class);
+    }
 }
