@@ -3,6 +3,8 @@ package cn.wildfirechat.sdk;
 import cn.wildfirechat.common.APIPath;
 import cn.wildfirechat.common.ErrorCode;
 import cn.wildfirechat.pojos.*;
+import cn.wildfirechat.pojos.mesh.PojoSearchUserReq;
+import cn.wildfirechat.pojos.mesh.PojoSearchUserRes;
 import cn.wildfirechat.pojos.moments.*;
 import cn.wildfirechat.proto.ProtoConstants;
 import cn.wildfirechat.sdk.model.IMResult;
@@ -1184,6 +1186,41 @@ public class RobotService implements Closeable {
 
         return doUploadFile(fileName, mediaType, contentType, null, inputStream);
         // 注意：正常流程下的流关闭在 uploadToQiniu 或 uploadToOther 的 finally 块中处理
+    }
+
+    /**
+     * 获取机器人 owner 的好友列表
+     * @return 好友列表（好友用户ID列表）
+     * @throws Exception 请求失败时抛出异常
+     */
+    public IMResult<OutputGetFriendList> getOwnerFriendList() throws Exception {
+        String path = APIPath.Robot_Friend_Get_List;
+        return robotHttpUtils.httpJsonPost(path, null, OutputGetFriendList.class);
+    }
+
+    /**
+     * 根据昵称搜索用户
+     * @param keyword 搜索关键词（昵称）
+     * @return 匹配的用户列表
+     * @throws Exception 请求失败时抛出异常
+     */
+    public IMResult<PojoSearchUserRes> searchUserByDisplayName(String keyword) throws Exception {
+        String path = APIPath.Robot_Search_User;
+        PojoSearchUserReq req = new PojoSearchUserReq();
+        req.setKeyword(keyword);
+        return robotHttpUtils.httpJsonPost(path, req, PojoSearchUserRes.class);
+    }
+
+    /**
+     * 获取指定用户拥有的机器人列表
+     * @param userId 用户ID（机器人 owner）
+     * @return 机器人列表（包含用户信息）
+     * @throws Exception 请求失败时抛出异常
+     */
+    public IMResult<OutputGetRobotList> getUserRobots(String userId) throws Exception {
+        String path = APIPath.Robot_Get_User_Robots;
+        InputUserId input = new InputUserId(userId);
+        return robotHttpUtils.httpJsonPost(path, input, OutputGetRobotList.class);
     }
 
     /**

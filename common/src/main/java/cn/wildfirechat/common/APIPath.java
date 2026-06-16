@@ -160,6 +160,9 @@ public interface APIPath {
     String Robot_User_Info = "/robot/user_info";
     String Robot_User_Get_Email_Info = "/robot/user/get_info_by_email";
     String Robot_User_Batch_Get_Infos = "/robot/user/batch_get_infos";
+    String Robot_Friend_Get_List = "/robot/friend/list";
+    String Robot_Search_User = "/robot/user/search";
+    String Robot_Get_User_Robots = "/robot/user/get_user_robots";
     String Robot_Get_Profile = "/robot/profile";
     String Robot_Message_Send = "/robot/message/send";
     String Robot_Message_Reply = "/robot/message/reply";

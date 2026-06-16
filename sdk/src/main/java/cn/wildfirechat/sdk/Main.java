@@ -2551,6 +2551,33 @@ public class Main {
 //            System.out.println("update moments blocklist failure:" + uploadUrlIMResult.getErrorCode().code);
 //        }
 
+        //测试获取机器人owner好友列表
+        System.out.println("测试获取机器人owner好友列表...");
+        IMResult<OutputGetFriendList> friendListResult = robotService.getOwnerFriendList();
+        if (friendListResult != null && friendListResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("get owner friend list success, friends: " + friendListResult.getResult().getFriends());
+        } else {
+            System.out.println("get owner friend list failure");
+        }
+
+        //测试根据昵称搜索用户
+        System.out.println("测试根据昵称搜索用户...");
+        IMResult<PojoSearchUserRes> searchResult = robotService.searchUserByDisplayName("user");
+        if (searchResult != null && searchResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("search user by display name success, count: " + (searchResult.getResult().getUserInfos() != null ? searchResult.getResult().getUserInfos().size() : 0));
+        } else {
+            System.out.println("search user by display name failure");
+        }
+
+        //测试获取指定用户的机器人列表
+        System.out.println("测试获取指定用户的机器人列表...");
+        IMResult<OutputGetRobotList> robotListResult = robotService.getUserRobots("userId1");
+        if (robotListResult != null && robotListResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+            System.out.println("get user robots success, count: " + (robotListResult.getResult().robotInfoList != null ? robotListResult.getResult().robotInfoList.size() : 0));
+        } else {
+            System.out.println("get user robots failure");
+        }
+
         //释放机器人服务资源
         robotService.close();
     }
