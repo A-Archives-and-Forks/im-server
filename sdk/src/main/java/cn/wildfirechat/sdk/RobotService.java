@@ -1207,6 +1207,7 @@ public class RobotService implements Closeable {
     public IMResult<PojoSearchUserRes> searchUserByDisplayName(String keyword) throws Exception {
         String path = APIPath.Robot_Search_User;
         PojoSearchUserReq req = new PojoSearchUserReq();
+        req.setSearchType(100);
         req.setKeyword(keyword);
         return robotHttpUtils.httpJsonPost(path, req, PojoSearchUserRes.class);
     }
