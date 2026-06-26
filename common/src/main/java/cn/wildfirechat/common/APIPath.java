@@ -204,4 +204,6 @@ public interface APIPath {
     String Robot_Conference_Request = "/robot/conference/request";
 
     String Robot_Get_Presigned_Upload_Url = "/robot/oss/get_upload_url";
+
+    String Robot_Set_Online = "/robot/set_online";
 }

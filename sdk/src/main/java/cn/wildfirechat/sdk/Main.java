@@ -2151,6 +2151,14 @@ public class Main {
                 System.out.println("robot update message failure");
                 System.exit(-1);
             }
+
+            IMResult<Void> imResult = robotService.setOnline(ProtoConstants.Platform.Platform_LINUX, true);
+            if (imResult != null && imResult.getErrorCode() == ErrorCode.ERROR_CODE_SUCCESS) {
+                System.out.println("robot set online success");
+            } else {
+                System.out.println("robot set online failure");
+                System.exit(-1);
+            }
         }
 
 

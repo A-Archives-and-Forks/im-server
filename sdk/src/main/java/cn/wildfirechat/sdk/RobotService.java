@@ -854,6 +854,21 @@ public class RobotService implements Closeable {
     }
 
     /**
+     * 设置当前公众号是否在线。如果在线的话，需要周期性的报告在线，不大于10分钟。
+     * @param platform  平台
+     * @param isOnline  是否在线
+     * @return 操作结果
+     * @throws Exception 请求失败时抛出异常
+     */
+    public IMResult<Void> setOnline(int platform, boolean isOnline) throws Exception {
+        String path = APIPath.Robot_Set_Online;
+        IntPairPojo requestPojo = new IntPairPojo();
+        requestPojo.setFirst(platform);
+        requestPojo.setSecond(isOnline?1:0);
+        return robotHttpUtils.httpJsonPost(path, requestPojo, Void.class);
+    }
+
+    /**
      * 获取预签名上传地址
      * @param fileName 文件名
      * @param mediaType 媒体类型，参考{@link cn.wildfirechat.proto.ProtoConstants.MessageMediaType}
