@@ -39,9 +39,41 @@ public class RobotSearchUserAction extends RobotAction {
                 PojoSearchUserRes res = new PojoSearchUserRes();
                 res.keyword = input.keyword;
                 res.userInfos = new ArrayList<>();
+                int mask = messagesStore.getRobotGetUserInfoMask();
+                
                 for (WFCMessage.User user : users) {
-                    InputOutputUserInfo inputOutputUserInfo = InputOutputUserInfo.fromPbUser(user);
-                    res.userInfos.add(inputOutputUserInfo);
+                    InputOutputUserInfo outputUserInfo = InputOutputUserInfo.fromPbUser(user);
+                    if((mask & 1) == 0) {
+                        outputUserInfo.setName(null);
+                    }
+                    if((mask & 2) == 0) {
+                        outputUserInfo.setMobile(null);
+                    }
+                    if((mask & 4) == 0) {
+                        outputUserInfo.setEmail(null);
+                    }
+                    if((mask & 8) == 0) {
+                        outputUserInfo.setAddress(null);
+                    }
+                    if((mask & 16) == 0) {
+                        outputUserInfo.setCompany(null);
+                    }
+                    if((mask & 32) == 0) {
+                        outputUserInfo.setExtra(null);
+                    }
+                    if((mask & 64) == 0) {
+                        outputUserInfo.setUpdateDt(0);
+                    }
+                    if((mask & 128) == 0) {
+                        outputUserInfo.setGender(0);
+                    }
+                    if((mask & 256) == 0) {
+                        outputUserInfo.setSocial(null);
+                    }
+                    if((mask & 512) == 0) {
+                        outputUserInfo.setType(0);
+                    }
+                    res.userInfos.add(outputUserInfo);
                 }
                 setResponseContent(RestResult.ok(res), response);
             } else {
