@@ -136,13 +136,33 @@ public class FileAction extends Action {
 			return null;
 		}
 
-		// 路径安全检查
-        String path = httpPath.substring(0, httpPath.lastIndexOf("/"));
-		if (path.contains("/.") || path.contains("./") || ReUtil.isMatch(INSECURE_URI, path)) {
+		// 去除开头的 '/'，避免子路径被当作绝对路径处理
+		String relativePath = httpPath.substring(1);
+
+		// 路径安全检查：禁止目录穿越片段及危险字符
+		if (relativePath.contains("../") || relativePath.contains("/..")
+				|| relativePath.contains("./") || relativePath.contains("/.")) {
+			return null;
+		}
+		if (ReUtil.isMatch(INSECURE_URI, relativePath)) {
 			return null;
 		}
 
 		// 转换为绝对路径
-		return FileUtil.file(ServerSetting.getRoot(), httpPath);
+		File file = FileUtil.file(ServerSetting.getRoot(), relativePath);
+
+		// 最终校验：解析规范路径后必须仍位于根目录内（防御软链接、路径规范化绕过等）
+		try {
+			File canonicalRoot = ServerSetting.getRoot().getCanonicalFile();
+			File canonicalFile = file.getCanonicalFile();
+			if (!canonicalFile.toPath().startsWith(canonicalRoot.toPath())) {
+				return null;
+			}
+		} catch (IOException e) {
+			Logger.warn("Failed to canonicalize file path: {}", e.getMessage());
+			return null;
+		}
+
+		return file;
 	}
 }

@@ -68,7 +68,7 @@ public class AES {
             byte byte2 = (byte)((curhour & 0xFF0000) >> 16);
             tobeencrypdatawithtime[2] = byte2;
 
-            byte byte3 = (byte)((curhour & 0xFF) >> 24);
+            byte byte3 = (byte)((curhour & 0xFF000000) >> 24);
             tobeencrypdatawithtime[3] = byte3;
 
             System.arraycopy(tobeencrypdata, 0, tobeencrypdatawithtime, 4, tobeencrypdata.length);

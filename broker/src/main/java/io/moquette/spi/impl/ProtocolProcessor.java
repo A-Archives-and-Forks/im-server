@@ -386,8 +386,8 @@ public class ProtocolProcessor {
                 return false;
             }
             if (!m_authenticator.checkValid(clientId, msg.payload().userName(), pwd)) {
-                LOG.error("Authenticator has rejected the MQTT credentials CId={}, username={}, password={}",
-                        clientId, msg.payload().userName(), pwd);
+                LOG.error("Authenticator has rejected the MQTT credentials CId={}, username={}",
+                        clientId, msg.payload().userName());
                 failedCredentials(channel);
                 return false;
             }

@@ -119,8 +119,6 @@ public class RouteAction extends Action {
                     .getAddress().getHostAddress();
                 String ip = computeRealIp(request.getHeaders(), remote);
 
-
-                LOG.info("RouteAction token={}, userId={}", token, userId);
                 if (userId == null) {
                     sendResponse(response, ErrorCode.ERROR_CODE_TOKEN_ERROR, null);
                 } else {

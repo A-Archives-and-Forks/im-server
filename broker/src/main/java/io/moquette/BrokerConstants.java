@@ -121,6 +121,7 @@ public final class BrokerConstants {
 
     public static final String TOKEN_SECRET_KEY = "token.key";
     public static final String TOKEN_EXPIRE_TIME = "token.expire_time";
+    public static final String TOKEN_ENCRYPT_KEY = "token.encrypt_key";
 
     public static final String CONNECT_CLIENT_SIGNATURE_LIST = "connect.client_signature_list";
     public static final String CONNECT_REJECT_EMPTY_SIGNATURE = "connect.reject_empty_signature";

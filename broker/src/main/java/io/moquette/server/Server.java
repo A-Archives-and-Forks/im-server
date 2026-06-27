@@ -37,10 +37,7 @@ import io.moquette.spi.IStore;
 import io.moquette.spi.impl.ProtocolProcessor;
 import io.moquette.spi.impl.ProtocolProcessorBootstrapper;
 import io.moquette.spi.impl.security.AES;
-import io.moquette.spi.security.IAuthenticator;
-import io.moquette.spi.security.IAuthorizator;
-import io.moquette.spi.security.ISslContextCreator;
-import io.moquette.spi.security.Tokenor;
+import io.moquette.spi.security.*;
 import io.netty.util.ResourceLeakDetector;
 import io.netty.util.internal.StringUtil;
 import win.liyufan.im.DBUtil;
@@ -400,7 +397,7 @@ public class Server {
 
         MessageShardingUtil.setNodeId(1);
         Tokenor.setKey(config.getProperty(BrokerConstants.TOKEN_SECRET_KEY));
-
+        DES.setEncryptPassword(config.getProperty(BrokerConstants.TOKEN_ENCRYPT_KEY));
         AES.useAes256(aes256);
 
         String expirTimeStr = config.getProperty(TOKEN_EXPIRE_TIME);
